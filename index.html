@@ -38,7 +38,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.5rem; font-weight: bold;
+            color: white; 
         }
         .brand-text h1 { font-size: 1.5rem; font-weight: 700; color: #1a202c; margin: 0; line-height: 1.2; }
         .brand-text p { font-size: 0.875rem; color: #64748b; margin: 0; }
@@ -65,7 +65,7 @@
         
         .today .day-info { background-color: #3B82F6; color: white; border-radius: 8px; padding: 2px 0; }
         
-        /* POPRAWIONE style dla dni wolnych (weekendy i święta) */
+        /* ZMIANA: Nowy kolor poświaty dla dni wolnych */
         .day-off::before {
             content: '';
             position: absolute;
@@ -73,7 +73,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(254, 226, 226, 0.4); /* Półprzezroczysta czerwona poświata */
+            background-color: rgba(233, 213, 255, 0.4); /* Półprzezroczysta lawendowa poświata */
             z-index: 1;
         }
 
@@ -172,9 +172,13 @@
         <header class="modern-header">
             <div class="header-content">
                 <div class="brand">
-                    <div class="brand-icon">F</div>
+                    <div class="brand-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
                     <div class="brand-text">
-                        <h1>Kalendarz Rodziny</h1>
+                        <h1>Kalendarz Rodzinny</h1>
                         <p>Fedorczak</p>
                     </div>
                 </div>
@@ -185,7 +189,7 @@
                     <button id="view-toggle-btn" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Widok komfortowy</button>
                     <h2 id="month-year-display" class="text-lg sm:text-xl font-semibold text-gray-700 w-60 text-center">Ładowanie...</h2>
                     <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
-                    <button id="overview-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors ml-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
+                    <button id="overview-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors ml-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
                 </div>
             </div>
         </header>
@@ -392,7 +396,13 @@
 
         // --- Edycja i Zaznaczanie ---
         const handleEdit = (fieldDiv) => {
-            if (fieldDiv.querySelector('textarea')) return;
+            const activeTextarea = document.querySelector('.editable-field textarea');
+            if (activeTextarea && activeTextarea.parentElement === fieldDiv) {
+                 activeTextarea.blur();
+                 return;
+            }
+            if(activeTextarea) activeTextarea.blur();
+
             const textSpan = fieldDiv.querySelector('.event-text');
             const currentText = textSpan.textContent;
             
@@ -456,13 +466,6 @@
             }
 
             const fieldDiv = e.target.closest('.editable-field');
-            const activeTextarea = document.querySelector('.editable-field textarea');
-
-            // If an editor is open and we click outside, save it
-            if (activeTextarea && activeTextarea.parentElement !== fieldDiv) {
-                activeTextarea.blur();
-            }
-
             if (!fieldDiv) {
                 if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection();
                 return;
@@ -472,7 +475,7 @@
                 e.preventDefault();
                 toggleSelection(fieldDiv);
             } else {
-                if (selected.size > 0 && !fieldDiv.classList.contains('selected')) {
+                 if (selected.size > 0 && !fieldDiv.classList.contains('selected')) {
                     clearSelection();
                 }
                 handleEdit(fieldDiv);
