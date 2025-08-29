@@ -9,7 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { 
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Jaśniejsze tło */
+            background-color: #f8fafc;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -19,7 +19,6 @@
             height: 100vh;
             width: 100%;
         }
-        /* Nowy, nowoczesny nagłówek */
         .modern-header {
             background: white;
             border-bottom: 1px solid #e2e8f0;
@@ -76,7 +75,7 @@
             -webkit-user-select: none; user-select: none;
             word-wrap: break-word; overflow-wrap: break-word;
         }
-        .editable-field.selected { outline: 2px solid #2563EB; background-color: rgba(37, 99, 235, 0.1); }
+        .editable-field.selected { outline: 2px solid #2563EB; background-color: rgba(37, 99, 235, 0.1) !important; }
         .editable-field[draggable="true"] { cursor: grab; }
         .editable-field[draggable="true"]:active { cursor: grabbing; }
         .editable-field:hover { background-color: rgba(147, 197, 253, 0.15); }
@@ -114,20 +113,36 @@
         .compact-view .day-info { transform: scale(0.9); }
         .drag-over { outline: 2px dashed #3B82F6; outline-offset: -2px; background-color: rgba(59, 130, 246, 0.1); }
 
+        /* --- NOWY SYSTEM KOLORÓW --- */
+        
+        /* Kolory bazowe */
         .color-ania { background-color: #FFE6E6; }
         .color-aniaPraca { background-color: #FFDAB9; }
         .color-michal { background-color: #E0FFFF; }
-        .color-michalPraca { background-color: #D1E3FF; } /* ZMIANA: Jasny granat */
-        .color-wspolne { background-color: #D9F9E5; } /* ZMIANA: Pastelowy zielony */
-        .color-inne { background-color: #FFFBEB; } /* ZMIANA: Pastelowy żółty */
-        
-        /* POPRAWIONE reguły dla dyżurów */
-        .duty-shift.color-ania, .color-ania .duty-shift { background-color: #FFB3BA !important; }
-        .duty-shift.color-aniaPraca, .color-aniaPraca .duty-shift { background-color: #FFB38A !important; }
-        .duty-shift.color-michal, .color-michal .duty-shift { background-color: #AFEEEE !important; }
-        .duty-shift.color-michalPraca, .color-michalPraca .duty-shift { background-color: #A8C5FF !important; } /* ZMIANA: Ciemniejszy granat */
-        .duty-shift.color-wspolne, .color-wspolne .duty-shift { background-color: #A3E6BE !important; } /* ZMIANA: Ciemniejszy zielony */
-        .duty-shift.color-inne, .color-inne .duty-shift { background-color: #FEF3C7 !important; } /* ZMIANA: Ciemniejszy żółty */
+        .color-michalPraca { background-color: #D1E3FF; }
+        .color-wspolne { background-color: #D9F9E5; }
+        .color-inne { background-color: #FFFBEB; }
+
+        /* Pośrednie dyżury (np. JB k) */
+        .medium-duty.color-ania, .color-ania .medium-duty { background-color: #FCC2D7 !important; }
+        .medium-duty.color-aniaPraca, .color-aniaPraca .medium-duty { background-color: #FFC09F !important; }
+        .medium-duty.color-michal, .color-michal .medium-duty { background-color: #B2F2F2 !important; }
+        .medium-duty.color-michalPraca, .color-michalPraca .medium-duty { background-color: #B9D7FF !important; }
+        .medium-duty.color-wspolne, .color-wspolne .medium-duty { background-color: #B8F2D2 !important; }
+        .medium-duty.color-inne, .color-inne .medium-duty { background-color: #FFF2C2 !important; }
+
+        /* Pełne dyżury (np. JB OIT) */
+        .full-duty.color-ania, .color-ania .full-duty { background-color: #FFB3BA !important; }
+        .full-duty.color-aniaPraca, .color-aniaPraca .full-duty { background-color: #FFB38A !important; }
+        .full-duty.color-michal, .color-michal .full-duty { background-color: #AFEEEE !important; }
+        .full-duty.color-michalPraca, .color-michalPraca .full-duty { background-color: #A8C5FF !important; }
+        .full-duty.color-wspolne, .color-wspolne .full-duty { background-color: #A3E6BE !important; }
+        .full-duty.color-inne, .color-inne .full-duty { background-color: #FEF3C7 !important; }
+
+        /* Kolory dla lokalizacji */
+        .location-lask { background-color: #C4F1F9 !important; font-weight: 600; }
+        .location-other { background-color: #FEEBC8 !important; font-weight: 600; }
+
         
         #month-overview-view { display: none; padding: 1rem; }
         .overview-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; height: 100%; }
@@ -261,8 +276,21 @@
         const getMonthName = m => ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'][m];
         const getDayName = d => ['PN','WT','ŚR','CZ','PT','SB','ND'][d];
         const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
-        const dutyKeywords = ['doba', 'łask', 'jb znieczulenia', 'jb oit', 'jb k', 'jb wybudzeń'];
-        const isDuty = text => dutyKeywords.some(k => text.toLowerCase().includes(k));
+        
+        // --- NOWY SYSTEM SŁÓW KLUCZOWYCH ---
+        const fullDutyKeywords = ['jb oit', 'jb znieczuleń'];
+        const locationLaskKeywords = ['łask'];
+        const locationOtherKeywords = ['ortho', 'brzeziny'];
+
+        const getEventType = (text) => {
+            if (!text) return 'default';
+            const lowerText = text.toLowerCase();
+            if (fullDutyKeywords.some(k => lowerText.includes(k))) return 'full-duty';
+            if (lowerText.startsWith('jb')) return 'medium-duty';
+            if (locationLaskKeywords.some(k => lowerText.includes(k))) return 'location-lask';
+            if (locationOtherKeywords.some(k => lowerText.includes(k))) return 'location-other';
+            return 'default';
+        };
 
         // --- Renderowanie Kalendarza ---
         const render = (year, month, events) => {
@@ -293,7 +321,11 @@
                     
                     const fieldDiv = document.createElement('div');
                     fieldDiv.className = 'editable-field';
-                    if(isDuty(eventText)) fieldDiv.classList.add('duty-shift');
+                    
+                    const eventType = getEventType(eventText);
+                    if (eventType !== 'default') {
+                        fieldDiv.classList.add(eventType);
+                    }
                     
                     const cellId = `${day}-${field}`;
                     fieldDiv.dataset.day = day;
@@ -500,8 +532,12 @@
                 const dayEvents = events[day] || {};
                 fields.forEach(field => {
                     if (dayEvents[field]) {
-                        const isDutyClass = isDuty(dayEvents[field]) ? 'duty-shift' : '';
-                        cardHTML += `<div class="overview-event-item color-${field} ${isDutyClass}">${dayEvents[field]}</div>`;
+                        const eventType = getEventType(dayEvents[field]);
+                        let typeClass = '';
+                        if (eventType !== 'default') {
+                            typeClass = eventType;
+                        }
+                        cardHTML += `<div class="overview-event-item color-${field} ${typeClass}">${dayEvents[field]}</div>`;
                     }
                 });
                 cardHTML += `</div></div>`;
