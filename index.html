@@ -3,16 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalendarz Rodzinny Online</title>
+    <title>Kalendarz Rodziny Fedorczak</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { 
             font-family: 'Inter', sans-serif;
-            background-color: #F3F4F6;
+            background-color: #f8fafc; /* Jaśniejsze tło */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+        /* Nowy, nowoczesny nagłówek */
+        .modern-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            flex-shrink: 0;
+        }
+        .header-content {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; font-weight: bold;
+        }
+        .brand-text h1 { font-size: 1.5rem; font-weight: 700; color: #1a202c; margin: 0; line-height: 1.2; }
+        .brand-text p { font-size: 0.875rem; color: #64748b; margin: 0; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+
         .calendar-grid {
             display: grid;
             grid-template-columns: minmax(80px, 0.5fr) repeat(6, 1fr);
@@ -21,133 +53,157 @@
         .calendar-cell {
             border-bottom: 1px solid #E5E7EB;
             border-left: 1px solid #E5E7EB;
-            min-height: 110px;
+            min-height: 60px;
             position: relative;
             padding: 4px;
         }
-        .calendar-cell:first-child, .calendar-cell:nth-child(7n + 1) {
-            border-left: none;
-        }
-        .calendar-cell.header {
-             min-height: auto;
-             font-weight: 600;
-             background-color: #F9FAFB;
-        }
-        .day-info {
-            text-align: center;
-            font-weight: 600;
-        }
-        .day-number {
-            font-size: 1.25rem;
-            color: #374151;
-        }
-        .day-name {
-             font-size: 0.75rem;
-             color: #6B7280;
-        }
-        .weekend {
-            background-color: #F9FAFB;
-        }
-        .today .day-info {
-            background-color: #FBBF24;
-            color: white;
-            border-radius: 8px;
-            padding: 2px 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        .calendar-cell:first-child, .calendar-cell:nth-child(7n + 1) { border-left: none; }
+        .calendar-cell.header { min-height: auto; font-weight: 600; background-color: #F9FAFB; }
+        .day-info { text-align: center; font-weight: 600; }
+        .day-number { font-size: 1.25rem; color: #374151; }
+        .day-name { font-size: 0.75rem; color: #6B7280; }
+        .weekend { background-color: #F9FAFB; }
+        .today .day-info { background-color: #3B82F6; color: white; border-radius: 8px; padding: 2px 0; }
+        
         .editable-field {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            line-height: 1.4;
             padding: 4px;
             border-radius: 6px;
             height: 100%;
             cursor: pointer;
-            transition: background-color 0.2s;
+            position: relative;
+            -webkit-user-select: none; user-select: none;
+            word-wrap: break-word; overflow-wrap: break-word;
         }
-        .editable-field:hover {
-            background-color: rgba(147, 197, 253, 0.2);
-        }
-        .editable-field textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: white;
-            resize: none;
-            padding: 4px;
-            margin: 0;
-            outline: none;
-            border-radius: 6px;
-            box-shadow: 0 0 0 2px #3B82F6;
-        }
-        .saving { animation: saving-pulse 1.5s infinite; }
-        .saved { background-color: #D1FAE5 !important; transition: background-color 0.3s; }
+        .editable-field.selected { outline: 2px solid #2563EB; background-color: rgba(37, 99, 235, 0.1); }
+        .editable-field[draggable="true"] { cursor: grab; }
+        .editable-field[draggable="true"]:active { cursor: grabbing; }
+        .editable-field:hover { background-color: rgba(147, 197, 253, 0.15); }
+        .editable-field.duty-shift { font-weight: 600; }
 
-        @keyframes saving-pulse {
-            0% { background-color: #FEF9C3; }
-            50% { background-color: #FDE68A; }
-            100% { background-color: #FEF9C3; }
+        .editable-field textarea {
+            width: 100%; height: 100%; border: none; background-color: white;
+            resize: none; padding: 4px; margin: 0; outline: none; border-radius: 6px;
+            box-shadow: 0 0 0 2px #3B82F6; position: absolute; top: 0; left: 0;
+            font-size: 0.9rem;
         }
+        
+        .char-counter {
+            position: absolute; bottom: 2px; right: 4px; font-size: 0.65rem; color: #9ca3af;
+            background: rgba(255, 255, 255, 0.9); padding: 1px 4px; border-radius: 4px;
+        }
+        .char-counter.warning { color: #f59e0b; }
+        .char-counter.error { color: #ef4444; font-weight: 600; }
+
+        #context-menu {
+            position: fixed; background: white; border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 1000; min-width: 150px; padding: 4px; display: none;
+        }
+        .context-menu-item {
+            padding: 8px 12px; font-size: 0.875rem; color: #374151; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: background-color 0.2s;
+            border-radius: 6px;
+        }
+        .context-menu-item:hover { background-color: #f3f4f6; }
+        .context-menu-separator { height: 1px; background-color: #e5e7eb; margin: 4px 0; }
+
+        .compact-view .calendar-cell { min-height: auto; padding-top: 2px; padding-bottom: 2px; }
+        .compact-view .editable-field { min-height: 18px; font-size: 0.75rem; line-height: 1.1; padding: 2px; }
+        .compact-view .day-info { transform: scale(0.9); }
+        .drag-over { outline: 2px dashed #3B82F6; outline-offset: -2px; background-color: rgba(59, 130, 246, 0.1); }
 
         .color-ania { background-color: #FFE6E6; }
         .color-aniaPraca { background-color: #FFDAB9; }
-        .color-michal { background-color: #E6F3FF; }
-        .color-michalPraca { background-color: #E0FFFF; }
-        .color-wspolne { background-color: #E6FFE6; }
-        .color-inne { background-color: #FFF9E6; }
+        .color-michal { background-color: #E0FFFF; }
+        .color-michalPraca { background-color: #D1E3FF; } /* ZMIANA: Jasny granat */
+        .color-wspolne { background-color: #D9F9E5; } /* ZMIANA: Pastelowy zielony */
+        .color-inne { background-color: #FFFBEB; } /* ZMIANA: Pastelowy żółty */
+        
+        /* POPRAWIONE reguły dla dyżurów */
+        .duty-shift.color-ania, .color-ania .duty-shift { background-color: #FFB3BA !important; }
+        .duty-shift.color-aniaPraca, .color-aniaPraca .duty-shift { background-color: #FFB38A !important; }
+        .duty-shift.color-michal, .color-michal .duty-shift { background-color: #AFEEEE !important; }
+        .duty-shift.color-michalPraca, .color-michalPraca .duty-shift { background-color: #A8C5FF !important; } /* ZMIANA: Ciemniejszy granat */
+        .duty-shift.color-wspolne, .color-wspolne .duty-shift { background-color: #A3E6BE !important; } /* ZMIANA: Ciemniejszy zielony */
+        .duty-shift.color-inne, .color-inne .duty-shift { background-color: #FEF3C7 !important; } /* ZMIANA: Ciemniejszy żółty */
+        
+        #month-overview-view { display: none; padding: 1rem; }
+        .overview-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; height: 100%; }
+        .overview-day-header { text-align: center; font-weight: 600; font-size: 0.875rem; color: #6B7280; padding-bottom: 0.5rem; }
+        .overview-day-card { border: 1px solid #E5E7EB; border-radius: 4px; padding: 4px; display: flex; flex-direction: column; font-size: 0.7rem; overflow: hidden; background-color: #F9FAFB; }
+        .overview-day-card-header { font-weight: 600; text-align: right; color: #374151; margin-bottom: 4px; }
+        .overview-events-container { display: flex; flex-direction: column; gap: 2px; }
+        .overview-event-item { padding: 1px 3px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.65rem; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div id="app" class="w-full max-w-screen-2xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
-        <!-- Komunikat o błędzie -->
-        <div id="error-banner" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
-            <strong class="font-bold">Błąd konfiguracji!</strong>
-            <span class="block sm:inline">Aplikacja nie jest podłączona do bazy danych. Aby działała poza tą stroną, musisz skonfigurować własny projekt Firebase i wkleić jego konfigurację w kodzie.</span>
-        </div>
-        
+<body class="bg-gray-100">
+    <div id="app-container">
         <!-- Nagłówek -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-            <div class="flex items-center gap-2">
-                <div class="calendar-icon text-3xl">📅</div>
-                <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Kalendarz Rodzinny</h1>
+        <header class="modern-header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="brand-icon">F</div>
+                    <div class="brand-text">
+                        <h1>Kalendarz Rodziny</h1>
+                        <p>Fedorczak</p>
+                    </div>
+                </div>
+                <div class="header-actions flex items-center gap-2 md:gap-4 mt-4 sm:mt-0">
+                    <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <button id="today-btn" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dzisiaj</button>
+                    <button id="view-toggle-btn" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Widok komfortowy</button>
+                    <h2 id="month-year-display" class="text-lg sm:text-xl font-semibold text-gray-700 w-40 text-center">Ładowanie...</h2>
+                    <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                    <button id="overview-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors ml-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
+                </div>
             </div>
-            <div class="flex items-center gap-2 md:gap-4 mt-4 sm:mt-0">
-                <button id="prev-month" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                 <button id="today-btn" class="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dzisiaj</button>
-                <h2 id="month-year-display" class="text-lg sm:text-xl font-semibold text-gray-700 w-40 text-center">Ładowanie...</h2>
-                <button id="next-month" class="p-2 rounded-full hover:bg-gray-200 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                </button>
-            </div>
-             <div class="hidden sm:block w-24"></div> <!-- Pusty div dla symetrii na większych ekranach -->
-        </div>
+        </header>
 
-        <!-- Kalendarz -->
-        <div class="overflow-x-auto">
-            <div id="calendar-container" class="bg-white border-t min-w-[900px]">
-                <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
-                    <div class="calendar-cell header p-3">Dzień</div>
-                    <div class="calendar-cell header p-3 color-ania">Ania</div>
-                    <div class="calendar-cell header p-3 color-aniaPraca">Ania Praca</div>
-                    <div class="calendar-cell header p-3 color-michal">Michał</div>
-                    <div class="calendar-cell header p-3 color-michalPraca">Michał Praca</div>
-                    <div class="calendar-cell header p-3 color-wspolne">Wspólne</div>
-                    <div class="calendar-cell header p-3 color-inne">Dom/Finanse</div>
-                </div>
-                <div id="calendar-body" class="calendar-grid">
-                    <!-- Dni będą generowane dynamicznie -->
+        <main id="app" class="w-full max-w-screen-2xl bg-white p-4 sm:p-6 flex flex-col flex-grow self-center">
+            <div id="main-view" class="overflow-auto flex-1 flex flex-col">
+                <div id="calendar-wrapper" class="overflow-auto flex-1">
+                    <div id="calendar-container" class="bg-white border-t min-w-[900px]">
+                        <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
+                            <div class="calendar-cell header p-3">Dzień</div>
+                            <div class="calendar-cell header p-3 color-ania">Ania</div>
+                            <div class="calendar-cell header p-3 color-aniaPraca">Ania Praca</div>
+                            <div class="calendar-cell header p-3 color-michal">Michał</div>
+                            <div class="calendar-cell header p-3 color-michalPraca">Michał Praca</div>
+                            <div class="calendar-cell header p-3 color-wspolne">Wspólne</div>
+                            <div class="calendar-cell header p-3 color-inne">Dom/Finanse</div>
+                        </div>
+                        <div id="calendar-body" class="calendar-grid"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div id="loading" class="text-center p-8 text-gray-500 font-semibold">Ładowanie danych...</div>
+            <div id="month-overview-view" class="overflow-auto flex-1">
+                 <div class="overview-grid"></div>
+            </div>
+            <div id="loading" class="text-center p-8 text-gray-500 font-semibold">Ładowanie danych...</div>
+        </main>
+    </div>
+
+    <!-- Menu kontekstowe -->
+    <div id="context-menu" class="context-menu">
+        <div id="copy-btn" class="context-menu-item">Kopiuj</div>
+        <div id="paste-btn" class="context-menu-item">Wklej</div>
+        <div class="context-menu-separator"></div>
+        <div id="delete-btn" class="context-menu-item !text-red-600">Usuń</div>
+    </div>
+
+    <!-- Panel akcji masowych -->
+    <div id="bulk-actions" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-2xl z-20 flex items-center gap-4 transition-transform duration-300">
+        <span id="selection-count" class="text-sm font-medium text-gray-700"></span>
+        <button id="bulk-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md text-sm">Usuń</button>
+        <button id="clear-selection-btn" class="text-gray-500 hover:text-gray-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Konfiguracja Firebase ---
         const userFirebaseConfig = {
@@ -160,216 +216,328 @@
             measurementId: "G-57YKE2XKQ1"
         };
         
-        const finalFirebaseConfig = Object.keys(userFirebaseConfig).length > 0
-            ? userFirebaseConfig
-            : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null);
-        
         let db;
+        try {
+            const app = initializeApp(userFirebaseConfig);
+            const auth = getAuth(app);
+            db = getFirestore(app);
+            signInAnonymously(auth);
+            onAuthStateChanged(auth, user => user && initCalendar());
+        } catch (error) { console.error("Firebase Error:", error); }
 
-        if (finalFirebaseConfig) {
-            try {
-                const app = initializeApp(finalFirebaseConfig);
-                const auth = getAuth(app);
-                db = getFirestore(app);
-
-                onAuthStateChanged(auth, user => {
-                    if (user) {
-                        initCalendar();
-                    }
-                });
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    signInAnonymously(auth).catch(error => {
-                        console.error("Authentication Error:", error);
-                        document.getElementById('loading').textContent = 'Błąd logowania. Sprawdź, czy włączyłeś logowanie anonimowe w panelu Firebase.';
-                    });
-                }
-
-            } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                document.getElementById('error-banner').classList.remove('hidden');
-                document.getElementById('loading').style.display = 'none';
-            }
-        } else {
-            document.getElementById('error-banner').classList.remove('hidden');
-            document.getElementById('loading').style.display = 'none';
-        }
-
-
-        // --- Stan aplikacji ---
+        // --- Stan Aplikacji ---
         let currentDate = new Date();
-        let unsubscribeFromEvents = () => {};
-
-        // --- Elementy DOM ---
-        const monthYearDisplay = document.getElementById('month-year-display');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
-        const todayBtn = document.getElementById('today-btn');
-        const calendarBody = document.getElementById('calendar-body');
-        const loadingIndicator = document.getElementById('loading');
-
-        // --- Funkcje pomocnicze ---
-        const getMonthName = (monthIndex) => [
-            'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 
-            'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
-        ][monthIndex];
-        const getDayName = (dayIndex) => ['ND', 'PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB'][dayIndex];
+        let unsubscribe = () => {};
+        let clipboard = null;
+        let contextTarget = null;
+        const selected = new Set();
+        let isOverview = false;
+        const MAX_CHARS = 50;
         
-        const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
+        // --- Elementy DOM ---
+        const dom = {
+            monthYear: document.getElementById('month-year-display'),
+            prevBtn: document.getElementById('prev-month'),
+            nextBtn: document.getElementById('next-month'),
+            todayBtn: document.getElementById('today-btn'),
+            container: document.getElementById('calendar-container'),
+            viewToggle: document.getElementById('view-toggle-btn'),
+            overviewBtn: document.getElementById('overview-btn'),
+            body: document.getElementById('calendar-body'),
+            loading: document.getElementById('loading'),
+            contextMenu: document.getElementById('context-menu'),
+            copyBtn: document.getElementById('copy-btn'),
+            pasteBtn: document.getElementById('paste-btn'),
+            deleteBtn: document.getElementById('delete-btn'),
+            bulkActions: document.getElementById('bulk-actions'),
+            selectionCount: document.getElementById('selection-count'),
+            bulkDelete: document.getElementById('bulk-delete-btn'),
+            clearSelection: document.getElementById('clear-selection-btn'),
+            mainView: document.getElementById('main-view'),
+            overviewView: document.getElementById('month-overview-view')
+        };
 
-        // --- Główna funkcja renderująca kalendarz ---
-        const renderCalendar = (year, month, events) => {
-            loadingIndicator.style.display = 'none';
-            calendarBody.innerHTML = '';
-            monthYearDisplay.textContent = `${getMonthName(month)} ${year}`;
+        // --- Funkcje Pomocnicze ---
+        const getMonthName = m => ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'][m];
+        const getDayName = d => ['PN','WT','ŚR','CZ','PT','SB','ND'][d];
+        const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
+        const dutyKeywords = ['doba', 'łask', 'jb znieczulenia', 'jb oit', 'jb k', 'jb wybudzeń'];
+        const isDuty = text => dutyKeywords.some(k => text.toLowerCase().includes(k));
+
+        // --- Renderowanie Kalendarza ---
+        const render = (year, month, events) => {
+            dom.loading.style.display = 'none';
+            dom.body.innerHTML = '';
+            dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
             
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const today = new Date();
+            const fragment = document.createDocumentFragment();
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month, day);
                 const dayOfWeek = date.getDay();
-                
                 const isToday = today.toDateString() === date.toDateString();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                 const dayEvents = events[day] || {};
 
-                // Komórka z informacją o dniu
                 const dayInfoCell = document.createElement('div');
                 dayInfoCell.className = `calendar-cell flex items-center justify-center ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}`;
-                dayInfoCell.innerHTML = `
-                    <div class="day-info">
-                        <div class="day-number">${day}</div>
-                        <div class="day-name">${getDayName(dayOfWeek)}</div>
-                    </div>
-                `;
-                calendarBody.appendChild(dayInfoCell);
+                dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}</div></div>`;
+                fragment.appendChild(dayInfoCell);
 
-                // Komórki na wydarzenia
                 fields.forEach(field => {
+                    const eventText = dayEvents[field] || '';
                     const fieldCell = document.createElement('div');
                     fieldCell.className = `calendar-cell color-${field} ${isWeekend ? 'weekend' : ''}`;
                     
                     const fieldDiv = document.createElement('div');
                     fieldDiv.className = 'editable-field';
+                    if(isDuty(eventText)) fieldDiv.classList.add('duty-shift');
+                    
+                    const cellId = `${day}-${field}`;
                     fieldDiv.dataset.day = day;
                     fieldDiv.dataset.field = field;
-                    fieldDiv.textContent = dayEvents[field] || '';
-                    
+                    fieldDiv.dataset.cellId = cellId;
+
+                    if (selected.has(cellId)) fieldDiv.classList.add('selected');
+                    if (eventText) fieldDiv.draggable = true;
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'event-text';
+                    textSpan.textContent = eventText;
+                    fieldDiv.appendChild(textSpan);
                     fieldCell.appendChild(fieldDiv);
-                    calendarBody.appendChild(fieldCell);
+                    fragment.appendChild(fieldCell);
                 });
             }
+            dom.body.appendChild(fragment);
         };
 
-        const updateCalendar = () => {
+        const update = () => {
             if (!db) return;
-            unsubscribeFromEvents();
-            loadingIndicator.style.display = 'block';
-            calendarBody.innerHTML = '';
+            unsubscribe();
+            dom.loading.style.display = 'block';
+            dom.body.innerHTML = '';
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
             const calendarId = `${year}-${month + 1}`;
-            const eventsCollectionRef = collection(db, calendarId);
-
-            unsubscribeFromEvents = onSnapshot(eventsCollectionRef, (snapshot) => {
+            unsubscribe = onSnapshot(collection(db, calendarId), snap => {
                 const events = {};
-                snapshot.forEach(doc => {
-                    events[doc.id] = doc.data();
-                });
-                renderCalendar(year, month, events);
-            }, (error) => {
-                console.error("Firestore Read Error:", error);
-                loadingIndicator.textContent = `Błąd odczytu z bazy: ${error.message}. Sprawdź reguły bezpieczeństwa w panelu Firestore.`;
+                snap.forEach(doc => { events[doc.id] = doc.data(); });
+                render(year, month, events);
             });
         };
 
-        // --- Obsługa edycji danych ---
-        calendarBody.addEventListener('click', (e) => {
-            const fieldDiv = e.target.closest('.editable-field');
-            if (fieldDiv) {
-                if (fieldDiv.querySelector('textarea')) return;
+        // --- Edycja ---
+        const handleEdit = (fieldDiv) => {
+            if (fieldDiv.querySelector('textarea')) return;
+            const textSpan = fieldDiv.querySelector('.event-text');
+            const currentText = textSpan.textContent;
+            
+            textSpan.style.display = 'none';
+            fieldDiv.draggable = false;
 
-                const currentText = fieldDiv.textContent;
-                fieldDiv.innerHTML = '';
+            const textarea = document.createElement('textarea');
+            textarea.value = currentText;
+            
+            const charCounter = document.createElement('div');
+            charCounter.className = 'char-counter';
+            fieldDiv.appendChild(charCounter);
+            
+            const updateCounter = () => {
+                const len = textarea.value.length;
+                charCounter.textContent = `${len}/${MAX_CHARS}`;
+                charCounter.classList.toggle('warning', len > MAX_CHARS - 10 && len <= MAX_CHARS);
+                charCounter.classList.toggle('error', len > MAX_CHARS);
+            };
+            updateCounter();
+            textarea.addEventListener('input', updateCounter);
 
-                const textarea = document.createElement('textarea');
-                textarea.value = currentText;
+            const save = async () => {
+                let newText = textarea.value.slice(0, MAX_CHARS);
+                textarea.remove();
+                charCounter.remove();
+                textSpan.style.display = '';
+                if (newText) fieldDiv.draggable = true;
                 
-                const saveChanges = async () => {
-                    const newText = textarea.value;
-                    fieldDiv.innerHTML = newText;
-                    
-                    if (newText !== currentText) {
-                        fieldDiv.classList.add('saving');
-                        try {
-                           await saveEvent(fieldDiv.dataset.day, fieldDiv.dataset.field, newText);
-                           fieldDiv.classList.remove('saving');
-                           fieldDiv.classList.add('saved');
-                           setTimeout(() => fieldDiv.classList.remove('saved'), 1500);
-                        } catch (err) {
-                           fieldDiv.classList.remove('saving');
-                        }
-                    }
+                if (newText !== currentText) {
+                    fieldDiv.classList.add('saving');
+                    textSpan.textContent = newText;
+                    if (newText === '') await dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field);
+                    else await dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, newText);
+                    fieldDiv.classList.remove('saving');
+                    fieldDiv.classList.add('saved');
+                    setTimeout(() => fieldDiv.classList.remove('saved'), 1500);
                 }
+            };
+            textarea.addEventListener('blur', save);
+            textarea.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textarea.blur(); } 
+                else if (e.key === 'Escape') {
+                    textarea.remove(); charCounter.remove();
+                    textSpan.style.display = '';
+                    if (currentText) fieldDiv.draggable = true;
+                }
+            });
+            
+            fieldDiv.appendChild(textarea);
+            textarea.focus();
+        };
 
-                textarea.addEventListener('blur', saveChanges);
-                textarea.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        textarea.blur();
-                    } else if (e.key === 'Escape') {
-                        fieldDiv.innerHTML = currentText; // Anuluj
-                    }
-                });
-                
-                fieldDiv.appendChild(textarea);
-                textarea.focus();
-                textarea.style.height = 'auto';
-                textarea.style.height = (textarea.scrollHeight) + 'px';
-                textarea.addEventListener('input', () => {
-                    textarea.style.height = 'auto';
-                    textarea.style.height = (textarea.scrollHeight) + 'px';
-                }, false);
+        dom.body.addEventListener('click', e => {
+            const fieldDiv = e.target.closest('.editable-field');
+            if (!fieldDiv) return;
+            if (e.ctrlKey || e.metaKey) { e.preventDefault(); toggleSelection(fieldDiv); return; }
+            if (selected.size > 0) clearSelection();
+            handleEdit(fieldDiv);
+        });
+
+        // --- Menu Kontekstowe ---
+        dom.body.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            const fieldDiv = e.target.closest('.editable-field');
+            if (!fieldDiv) return;
+            contextTarget = fieldDiv;
+            dom.contextMenu.style.left = `${e.pageX}px`;
+            dom.contextMenu.style.top = `${e.pageY}px`;
+            dom.contextMenu.style.display = 'block';
+        });
+
+        // --- Akcje Masowe ---
+        const toggleSelection = el => {
+            const id = el.dataset.cellId;
+            selected.has(id) ? selected.delete(id) : selected.add(id);
+            el.classList.toggle('selected');
+            updateBulkUI();
+        };
+        const updateBulkUI = () => {
+            const count = selected.size;
+            if (count > 0) {
+                dom.selectionCount.textContent = `Zaznaczono: ${count}`;
+                dom.bulkActions.classList.remove('hidden');
+            } else {
+                dom.bulkActions.classList.add('hidden');
+            }
+        };
+        const clearSelection = () => {
+            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+            selected.clear();
+            updateBulkUI();
+        };
+        dom.bulkDelete.addEventListener('click', async () => {
+            const batch = writeBatch(db);
+            const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
+            selected.forEach(id => {
+                const [day, field] = id.split('-');
+                batch.update(doc(db, calendarId, day), { [field]: deleteField() });
+            });
+            await batch.commit();
+            clearSelection();
+        });
+        dom.clearSelection.addEventListener('click', clearSelection);
+
+        // --- Inne Listenery ---
+        dom.copyBtn.addEventListener('click', () => { clipboard = contextTarget.querySelector('.event-text').textContent; dom.contextMenu.style.display = 'none'; });
+        dom.pasteBtn.addEventListener('click', () => { if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); dom.contextMenu.style.display = 'none'; });
+        dom.deleteBtn.addEventListener('click', () => dbDelete(contextTarget.dataset.day, contextTarget.dataset.field));
+        document.addEventListener('click', e => { if (!e.target.closest('#context-menu')) dom.contextMenu.style.display = 'none'; });
+        document.addEventListener('keydown', e => e.key === 'Escape' && clearSelection());
+        
+        // --- Drag & Drop ---
+        dom.body.addEventListener('dragstart', e => {
+            const field = e.target.closest('.editable-field');
+            if(field && field.draggable) e.dataTransfer.setData('text/plain', field.querySelector('.event-text').textContent);
+        });
+        dom.body.addEventListener('dragover', e => { e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
+        dom.body.addEventListener('dragleave', e => e.target.closest('.editable-field')?.classList.remove('drag-over'));
+        dom.body.addEventListener('drop', e => {
+            e.preventDefault();
+            const field = e.target.closest('.editable-field');
+            if (field) {
+                field.classList.remove('drag-over');
+                const text = e.dataTransfer.getData('text/plain');
+                if (text) dbSave(field.dataset.day, field.dataset.field, text);
             }
         });
 
-        const saveEvent = async (day, field, value) => {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth() + 1;
-            const calendarId = `${year}-${month}`;
-            const dayId = day.toString();
-
-            try {
-                const docRef = doc(db, calendarId, dayId);
-                await setDoc(docRef, { [field]: value }, { merge: true });
-            } catch (error) {
-                console.error("Firestore Write Error:", error);
-                throw error;
-            }
+        // --- Baza Danych ---
+        const dbSave = (day, field, val) => {
+            const id = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
+            return setDoc(doc(db, id, day), { [field]: val }, { merge: true });
+        };
+        const dbDelete = (day, field) => {
+            const id = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
+            return updateDoc(doc(db, id, day), { [field]: deleteField() });
         };
 
-        // --- Główna funkcja inicjalizująca ---
+        // --- Przełącznik Widoku ---
+        const setViewMode = isCompact => {
+            dom.container.classList.toggle('compact-view', isCompact);
+            dom.viewToggle.textContent = isCompact ? 'Powiększ widok' : 'Zmniejsz widok';
+            localStorage.setItem('view', isCompact ? 'compact' : 'standard');
+        };
+
+        // --- Widok Miesiąca ---
+        const renderOverview = async (year, month) => {
+             dom.loading.style.display = 'block';
+             const grid = dom.overviewView.querySelector('.overview-grid');
+             grid.innerHTML = '';
+             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
+             const headers = ['PN','WT','ŚR','CZ','PT','SB','ND'];
+             headers.forEach(h => { grid.innerHTML += `<div class="overview-day-header">${h}</div>`; });
+             
+             const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
+             const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
+             
+             const daysInMonth = new Date(year, month + 1, 0).getDate();
+             const offset = (new Date(year, month, 1).getDay() + 6) % 7;
+             for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
+
+             for (let day = 1; day <= daysInMonth; day++) {
+                let cardHTML = `<div class="overview-day-card"><div class="overview-day-card-header">${day}</div><div class="overview-events-container">`;
+                const dayEvents = events[day] || {};
+                fields.forEach(field => {
+                    if (dayEvents[field]) {
+                        const isDutyClass = isDuty(dayEvents[field]) ? 'duty-shift' : '';
+                        cardHTML += `<div class="overview-event-item color-${field} ${isDutyClass}">${dayEvents[field]}</div>`;
+                    }
+                });
+                cardHTML += `</div></div>`;
+                grid.innerHTML += cardHTML;
+             }
+             dom.loading.style.display = 'none';
+        };
+
+        const toggleOverview = () => {
+            isOverview = !isOverview;
+            dom.mainView.style.display = isOverview ? 'none' : 'flex';
+            dom.overviewView.style.display = isOverview ? 'block' : 'none';
+            if (isOverview) renderOverview(currentDate.getFullYear(), currentDate.getMonth());
+            else update();
+        };
+
+        // --- Inicjalizacja ---
         const initCalendar = () => {
-            prevMonthBtn.addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                updateCalendar();
-            });
-            nextMonthBtn.addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                updateCalendar();
-            });
-            todayBtn.addEventListener('click', () => {
-                currentDate = new Date();
-                updateCalendar();
-            });
+            const navigate = (delta) => {
+                if (isOverview) {
+                     currentDate.setMonth(currentDate.getMonth() + delta);
+                     renderOverview(currentDate.getFullYear(), currentDate.getMonth());
+                } else {
+                     currentDate.setMonth(currentDate.getMonth() + delta);
+                     update();
+                }
+            };
+            dom.prevBtn.addEventListener('click', () => navigate(-1));
+            dom.nextBtn.addEventListener('click', () => navigate(1));
+            dom.todayBtn.addEventListener('click', () => { currentDate = new Date(); isOverview ? renderOverview(currentDate.getFullYear(), currentDate.getMonth()) : update(); });
+            dom.viewToggle.addEventListener('click', () => setViewMode(!dom.container.classList.contains('compact-view')));
+            dom.overviewBtn.addEventListener('click', toggleOverview);
             
-            updateCalendar();
+            setViewMode(localStorage.getItem('view') !== 'standard');
+            update();
         };
-
     </script>
 </body>
 </html>
