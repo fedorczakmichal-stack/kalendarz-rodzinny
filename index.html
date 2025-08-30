@@ -14,701 +14,174 @@
             -moz-osx-font-smoothing: grayscale;
             touch-action: manipulation;
         }
-        
-        /* Nowe kwiatowe logo */
+
+        /* --- LOGO --- */
         .flower-logo {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px; border-radius: 50%;
             background: linear-gradient(135deg, #f9a8d4 0%, #c084fc 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display:flex; align-items:center; justify-content:center; position:relative;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
         }
-        
-        .flower-petal {
-            position: absolute;
-            width: 10px;
-            height: 14px;
-            background: white;
-            border-radius: 50% 0;
-            opacity: 0.9;
+        .flower-petal { position:absolute; width:10px; height:14px; background:#fff; border-radius:50% 0; opacity:.9; }
+        .flower-petal:nth-child(1){transform:rotate(0deg) translateY(-9px)}
+        .flower-petal:nth-child(2){transform:rotate(72deg) translateY(-9px)}
+        .flower-petal:nth-child(3){transform:rotate(144deg) translateY(-9px)}
+        .flower-petal:nth-child(4){transform:rotate(216deg) translateY(-9px)}
+        .flower-petal:nth-child(5){transform:rotate(288deg) translateY(-9px)}
+        .flower-center{width:10px;height:10px;background:#fbbf24;border-radius:50%;z-index:10;position:relative}
+
+        #app-container { display:flex; flex-direction:column; height:100vh; width:100%; }
+
+        /* --- HEADER --- */
+        .modern-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:.75rem 1rem; flex-shrink:0; box-shadow:0 1px 3px 0 rgba(0,0,0,.1); }
+        .header-content{max-width:100%; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem;}
+        .brand{display:flex; align-items:center; gap:.75rem}
+        .brand-text h1{font-size:1.25rem; font-weight:700; color:#1a202c; margin:0; line-height:1.1;}
+        .brand-text p{font-size:.875rem; color:#64748b; margin:0; margin-top:2px;}
+
+        .view-toggle {
+            display:flex; gap:.25rem; background:#fff; padding:.25rem; border:1px solid #e5e7eb; border-radius:.75rem;
         }
-        
-        .flower-petal:nth-child(1) { transform: rotate(0deg) translateY(-9px); }
-        .flower-petal:nth-child(2) { transform: rotate(72deg) translateY(-9px); }
-        .flower-petal:nth-child(3) { transform: rotate(144deg) translateY(-9px); }
-        .flower-petal:nth-child(4) { transform: rotate(216deg) translateY(-9px); }
-        .flower-petal:nth-child(5) { transform: rotate(288deg) translateY(-9px); }
-        
-        .flower-center {
-            width: 10px;
-            height: 10px;
-            background: #fbbf24;
-            border-radius: 50%;
-            z-index: 10;
-            position: relative;
+        .view-btn {
+            display:flex; align-items:center; justify-content:center;
+            width:40px; height:40px; border-radius:.5rem; border:1px solid transparent;
+            transition:all .15s; cursor:pointer;
         }
-        
-        #app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100%;
+        .view-btn:hover { background:#f3f4f6; }
+        .view-btn.active { background:#ede9fe; border-color:#8b5cf6; }
+        .view-btn svg { width:20px; height:20px; color:#475569; }
+
+        .header-actions { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+
+        @media (max-width:768px){
+            .modern-header{padding:.5rem}
+            .header-content{justify-content:center}
+            .brand-text h1{font-size:1.1rem}
+            .header-actions{width:100%; justify-content:center; margin-top:.5rem}
+            .header-actions button{padding:.6rem .8rem; font-size:.8rem; min-height:40px; min-width:40px}
+            #month-year-display{font-size:1rem; width:auto; min-width:140px}
         }
-        
-        .modern-header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0.75rem 1rem;
-            flex-shrink: 0;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        
-        .header-content {
-            max-width: 100%;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-        
-        .brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 0.75rem; 
-        }
-        
-        .brand-text h1 { 
-            font-size: 1.25rem; 
-            font-weight: 700; 
-            color: #1a202c; 
-            margin: 0; 
-            line-height: 1.1; 
-        }
-        
-        .brand-text p { 
-            font-size: 0.875rem; 
-            color: #64748b; 
-            margin: 0;
-            margin-top: 2px;
-        }
-        
-        .header-actions { 
-            display: flex; 
-            gap: 0.5rem; 
-            align-items: center; 
-            flex-wrap: wrap;
-        }
-        
-        /* Ulepszone style mobilne */
-        @media (max-width: 768px) {
-            .modern-header {
-                padding: 0.5rem;
-            }
-            
-            .header-content {
-                justify-content: center;
-            }
-            
-            .brand-text h1 {
-                font-size: 1.1rem;
-            }
-            
-            .header-actions {
-                width: 100%;
-                justify-content: center;
-                margin-top: 0.5rem;
-            }
-            
-            .header-actions button {
-                padding: 0.6rem 0.8rem;
-                font-size: 0.8rem;
-                min-height: 40px;
-                min-width: 40px;
-            }
-            
-            #month-year-display {
-                font-size: 1rem;
-                width: auto;
-                min-width: 140px;
+
+        /* --- DESKTOP GRID --- */
+        .calendar-grid{display:grid; grid-template-columns:minmax(80px,.5fr) repeat(6,1fr); border-top:1px solid #E5E7EB;}
+        .calendar-cell{border-bottom:1px solid #E5E7EB; border-left:1px solid #E5E7EB; min-height:60px; position:relative; padding:4px;}
+        .calendar-cell:first-child,.calendar-cell:nth-child(7n + 1){border-left:none}
+        .calendar-cell.header{min-height:auto; font-weight:600; background:#F9FAFB;}
+        .day-info-cell{cursor:pointer}
+        .day-info{text-align:center; font-weight:600; position:relative; z-index:2}
+        .day-number{font-size:1.25rem; color:#374151}
+        .day-name{font-size:.75rem; color:#6B7280}
+        .today .day-info{background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%); color:#fff; border-radius:12px; padding:4px 0; box-shadow:0 2px 4px rgba(0,0,0,.1)}
+        .day-off::before{content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(219,39,119,.15) 0%,rgba(147,51,234,.15) 100%); z-index:1;}
+
+        .editable-field{font-size:.9rem; line-height:1.4; padding:4px; border-radius:8px; height:100%; cursor:pointer; position:relative; z-index:2; user-select:none; word-wrap:break-word; overflow-wrap:break-word; transition:all .2s;}
+        .editable-field.selected{outline:2px solid #8b5cf6; background:rgba(139,92,246,.1)!important;}
+        .editable-field:hover{background:rgba(147,197,253,.15); transform:translateY(-1px)}
+        .duty-shift{font-weight:600}
+        .editable-field textarea{width:100%; height:100%; border:none; background:#fff; resize:none; padding:4px; margin:0; outline:none; border-radius:8px; box-shadow:0 0 0 2px #8b5cf6; position:absolute; inset:0; font-size:.9rem;}
+        .char-counter{position:absolute; bottom:2px; right:4px; font-size:.65rem; color:#9ca3af; background:rgba(255,255,255,.95); padding:2px 4px; border-radius:4px;}
+        .char-counter.warning{color:#f59e0b}
+        .char-counter.error{color:#ef4444; font-weight:600}
+
+        /* --- KOLORY --- */
+        .color-ania{background:#ffe4e6}
+        .color-aniaPraca{background:#fed7aa}
+        .color-michal{background:#cce7ff}
+        .color-michalPraca{background:#ddd6fe}
+        .color-wspolne{background:#d1fae5}
+        .color-inne{background:#fef3c7}
+        .medium-duty.color-ania{background:#fecdd3!important}
+        .medium-duty.color-aniaPraca{background:#fdba74!important}
+        .medium-duty.color-michal{background:#93c5fd!important}
+        .medium-duty.color-michalPraca{background:#c4b5fd!important}
+        .medium-duty.color-wspolne{background:#a7f3d0!important}
+        .medium-duty.color-inne{background:#fde68a!important}
+        .full-duty.color-ania{background:#fca5a5!important}
+        .full-duty.color-aniaPraca{background:#fb923c!important}
+        .full-duty.color-michal{background:#60a5fa!important}
+        .full-duty.color-michalPraca{background:#a78bfa!important}
+        .full-duty.color-wspolne{background:#86efac!important}
+        .full-duty.color-inne{background:#fcd34d!important}
+        .location-lask{background:#f9a8d4!important; font-weight:600}
+        .location-other{background:#fdba74!important; font-weight:600}
+
+        /* --- MOBILE LIST --- */
+        .mobile-calendar{display:none; padding:1rem;}
+        @media (max-width:768px){
+            .calendar-grid{display:none}
+            .mobile-calendar{display:block!important}
+            .mobile-day-card{background:#fff; border-radius:12px; padding:1rem; margin-bottom:1rem; box-shadow:0 2px 4px rgba(0,0,0,.05); border:1px solid #e5e7eb;}
+            .mobile-day-card.weekend{background:linear-gradient(135deg,rgba(219,39,119,.08) 0%,rgba(147,51,234,.08) 100%); border:1px solid rgba(219,39,119,.2)}
+            .mobile-day-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:2px solid #f3f4f6;}
+            .mobile-day-number{font-size:1.5rem; font-weight:700; color:#1f2937}
+            .mobile-day-name{font-size:.875rem; color:#6b7280; font-weight:500}
+            .mobile-events{display:flex; flex-direction:column; gap:.5rem}
+            .mobile-event-row{display:flex; align-items:stretch; gap:.5rem; min-height:44px}
+            .mobile-event-label{flex:0 0 90px; font-size:.75rem; font-weight:600; padding:.5rem; border-radius:8px; display:flex; align-items:center; color:#4b5563}
+            .mobile-event-content{flex:1; padding:.5rem; border-radius:8px; font-size:.875rem; min-height:44px; display:flex; align-items:center; cursor:pointer; transition:all .2s}
+            .mobile-event-content:active{transform:scale(.98)}
+            /* NIE ROZCIĄGAĆ – przytnij do 2 linii */
+            .mobile-event-content .event-text{
+                display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+                overflow:hidden; line-height:1.2; width:100%;
             }
         }
 
-        /* Style kalendarza - desktop */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: minmax(80px, 0.5fr) repeat(6, 1fr);
-            border-top: 1px solid #E5E7EB;
+        /* --- COMPACT OVERVIEW --- */
+        #compact-view{display:none; padding:1rem; overflow-y:auto}
+        .overview-container{max-width:1200px; margin:0 auto}
+        .overview-day-card{background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:1rem; margin-bottom:1rem; cursor:pointer; transition:.2s}
+        .overview-day-card:hover{transform:translateY(-2px); box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
+        .overview-day-card.weekend{background:linear-gradient(135deg,rgba(219,39,119,.08) 0%,rgba(147,51,234,.08) 100%); border:1px solid rgba(219,39,119,.2)}
+        .overview-day-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:.75rem; padding-bottom:.5rem; border-bottom:2px solid #f3f4f6}
+        .overview-day-info{display:flex; align-items:center; gap:.5rem}
+        .overview-day-number{font-size:1.5rem; font-weight:700; color:#1f2937}
+        .overview-day-name{font-size:.875rem; color:#6b7280; font-weight:500}
+        .overview-events-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.5rem}
+        .overview-event-item{padding:6px 10px; border-radius:6px; font-size:.8rem; display:flex; flex-direction:column; gap:2px}
+        .overview-event-label{font-weight:600; font-size:.7rem; opacity:.7}
+        .overview-event-text{word-wrap:break-word}
+
+        /* --- MONTH VIEW --- */
+        #month-view{display:none; padding:1rem; overflow-y:auto}
+        .month-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:#e5e7eb; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden}
+        .month-header-cell{background:#f9fafb; padding:.75rem .5rem; text-align:center; font-weight:600; font-size:.875rem; color:#6b7280}
+        .month-day-cell{background:#fff; min-height:100px; padding:.5rem; position:relative; cursor:pointer; transition:.2s; overflow:hidden; contain:layout paint;}
+        .month-day-cell:hover{background:#f9fafb}
+        .month-day-cell.other-month{background:#fcfcfc; opacity:.5}
+        .month-day-cell.weekend{background:linear-gradient(135deg,rgba(219,39,119,.05) 0%,rgba(147,51,234,.05) 100%)}
+        .month-day-cell.today{background:#ede9fe; border:2px solid #8b5cf6}
+        .month-day-number{font-weight:600; font-size:.875rem; color:#374151; margin-bottom:.25rem}
+        .month-day-events{display:flex; flex-direction:column; gap:2px}
+        .month-event-item{
+            font-size:.65rem; padding:2px 4px; border-radius:4px;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
         }
-        
-        .calendar-cell {
-            border-bottom: 1px solid #E5E7EB;
-            border-left: 1px solid #E5E7EB;
-            min-height: 60px;
-            position: relative;
-            padding: 4px;
-        }
-        
-        /* Mobilny widok kalendarza */
-        @media (max-width: 768px) {
-            .calendar-grid {
-                display: none;
-            }
-            
-            .mobile-calendar {
-                display: block !important;
-            }
-            
-            .mobile-day-card {
-                background: white;
-                border-radius: 12px;
-                padding: 1rem;
-                margin-bottom: 1rem;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                border: 1px solid #e5e7eb;
-            }
-            
-            .mobile-day-card.weekend {
-                background: linear-gradient(135deg, rgba(219, 39, 119, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
-                border: 1px solid rgba(219, 39, 119, 0.2);
-            }
-            
-            .mobile-day-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 0.75rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 2px solid #f3f4f6;
-            }
-            
-            .mobile-day-number {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #1f2937;
-            }
-            
-            .mobile-day-name {
-                font-size: 0.875rem;
-                color: #6b7280;
-                font-weight: 500;
-            }
-            
-            .mobile-events {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .mobile-event-row {
-                display: flex;
-                align-items: stretch;
-                gap: 0.5rem;
-                min-height: 44px;
-            }
-            
-            .mobile-event-label {
-                flex: 0 0 90px;
-                font-size: 0.75rem;
-                font-weight: 600;
-                padding: 0.5rem;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                color: #4b5563;
-            }
-            
-            .mobile-event-content {
-                flex: 1;
-                padding: 0.5rem;
-                border-radius: 8px;
-                font-size: 0.875rem;
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-            
-            .mobile-event-content:active {
-                transform: scale(0.98);
-            }
-        }
-        
-        .calendar-cell:first-child, .calendar-cell:nth-child(7n + 1) { border-left: none; }
-        .calendar-cell.header { min-height: auto; font-weight: 600; background-color: #F9FAFB; }
-        .day-info-cell { cursor: pointer; }
-        .day-info { text-align: center; font-weight: 600; position: relative; z-index: 2; }
-        .day-number { font-size: 1.25rem; color: #374151; }
-        .day-name { font-size: 0.75rem; color: #6B7280; }
-        
-        .today .day-info { 
-            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
-            color: white; 
-            border-radius: 12px; 
-            padding: 4px 0; 
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Mocniejszy kolor dla weekendów */
-        .day-off::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(219, 39, 119, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
-            z-index: 1;
+        @media (max-width:768px){
+            .month-day-cell{min-height:70px; padding:.25rem}
+            .month-day-number{font-size:.75rem}
+            .month-event-item{font-size:.6rem; padding:1px 2px}
         }
 
-        .editable-field {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            padding: 4px;
-            border-radius: 8px;
-            height: 100%;
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-            -webkit-user-select: none; 
-            user-select: none;
-            word-wrap: break-word; 
-            overflow-wrap: break-word;
-            transition: all 0.2s;
-        }
-        
-        .editable-field.selected { 
-            outline: 2px solid #8b5cf6; 
-            background-color: rgba(139, 92, 246, 0.1) !important; 
-        }
-        
-        .editable-field:hover { 
-            background-color: rgba(147, 197, 253, 0.15); 
-            transform: translateY(-1px);
-        }
-        
-        .duty-shift { font-weight: 600; }
+        /* --- MODALE, MENU, LOADER --- */
+        #context-menu{position:fixed; background:#fff; border-radius:12px; box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04); z-index:1000; min-width:150px; padding:6px; display:none; border:1px solid #e5e7eb;}
+        .context-menu-item{padding:10px 14px; font-size:.875rem; color:#374151; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background-color .2s; border-radius:8px}
+        .context-menu-item:hover{background:#f9fafb}
+        .context-menu-separator{height:1px; background:#e5e7eb; margin:4px 0}
 
-        .editable-field textarea {
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-            background-color: white;
-            resize: none; 
-            padding: 4px; 
-            margin: 0; 
-            outline: none; 
-            border-radius: 8px;
-            box-shadow: 0 0 0 2px #8b5cf6; 
-            position: absolute; 
-            top: 0; 
-            left: 0;
-            font-size: 0.9rem;
-        }
-        
-        .char-counter {
-            position: absolute; 
-            bottom: 2px; 
-            right: 4px; 
-            font-size: 0.65rem; 
-            color: #9ca3af;
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 2px 4px; 
-            border-radius: 4px;
-        }
-        
-        .char-counter.warning { color: #f59e0b; }
-        .char-counter.error { color: #ef4444; font-weight: 600; }
+        #loading{display:flex; align-items:center; justify-content:center; padding:3rem}
+        .loading-spinner{width:40px; height:40px; border:3px solid #f3f4f6; border-top:3px solid #8b5cf6; border-radius:50%; animation:spin 1s linear infinite}
+        @keyframes spin {0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-        #context-menu {
-            position: fixed; 
-            background: white; 
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            z-index: 1000; 
-            min-width: 150px; 
-            padding: 6px; 
-            display: none;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .context-menu-item {
-            padding: 10px 14px; 
-            font-size: 0.875rem; 
-            color: #374151; 
-            cursor: pointer;
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: background-color 0.2s;
-            border-radius: 8px;
-        }
-        
-        .context-menu-item:hover { 
-            background-color: #f9fafb; 
-        }
-        
-        .context-menu-separator { 
-            height: 1px; 
-            background-color: #e5e7eb; 
-            margin: 4px 0; 
-        }
-
-        /* Ulepszone kolory pastelowe z lepszym rozróżnieniem Michał/Michał Praca */
-        .color-ania { background-color: #ffe4e6; }
-        .color-aniaPraca { background-color: #fed7aa; }
-        .color-michal { background-color: #cce7ff; } /* Jaśniejszy niebieski */
-        .color-michalPraca { background-color: #ddd6fe; } /* Bardziej fioletowy */
-        .color-wspolne { background-color: #d1fae5; }
-        .color-inne { background-color: #fef3c7; }
-        
-        .medium-duty.color-ania { background-color: #fecdd3 !important; }
-        .medium-duty.color-aniaPraca { background-color: #fdba74 !important; }
-        .medium-duty.color-michal { background-color: #93c5fd !important; }
-        .medium-duty.color-michalPraca { background-color: #c4b5fd !important; }
-        .medium-duty.color-wspolne { background-color: #a7f3d0 !important; }
-        .medium-duty.color-inne { background-color: #fde68a !important; }
-
-        .full-duty.color-ania { background-color: #fca5a5 !important; }
-        .full-duty.color-aniaPraca { background-color: #fb923c !important; }
-        .full-duty.color-michal { background-color: #60a5fa !important; }
-        .full-duty.color-michalPraca { background-color: #a78bfa !important; }
-        .full-duty.color-wspolne { background-color: #86efac !important; }
-        .full-duty.color-inne { background-color: #fcd34d !important; }
-
-        .location-lask { background-color: #f9a8d4 !important; font-weight: 600; }
-        .location-other { background-color: #fdba74 !important; font-weight: 600; }
-
-        /* Mobilny widok kalendarza */
-        .mobile-calendar {
-            display: none;
-            padding: 1rem;
-        }
-        
-        /* Widok overview - kompaktowy */
-        #compact-view { 
-            display: none; 
-            padding: 1rem; 
-            overflow-y: auto;
-        }
-        
-        .overview-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .overview-day-card { 
-            background: white;
-            border: 1px solid #E5E7EB; 
-            border-radius: 12px; 
-            padding: 1rem;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .overview-day-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .overview-day-card.weekend {
-            background: linear-gradient(135deg, rgba(219, 39, 119, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
-            border: 1px solid rgba(219, 39, 119, 0.2);
-        }
-        
-        .overview-day-header { 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f3f4f6;
-        }
-        
-        .overview-day-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .overview-day-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-        
-        .overview-day-name {
-            font-size: 0.875rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-        
-        .overview-events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.5rem;
-        }
-        
-        .overview-event-item { 
-            padding: 6px 10px; 
-            border-radius: 6px; 
-            font-size: 0.8rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .overview-event-label {
-            font-weight: 600;
-            font-size: 0.7rem;
-            opacity: 0.7;
-        }
-        
-        .overview-event-text {
-            word-wrap: break-word;
-        }
-        
-        /* Widok miesięczny - nowy styl jak Google/Apple Calendar */
-        #month-view {
-            display: none;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-        
-        .month-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background-color: #e5e7eb;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .month-header-cell {
-            background-color: #f9fafb;
-            padding: 0.75rem 0.5rem;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-        
-        .month-day-cell {
-            background-color: white;
-            min-height: 100px;
-            padding: 0.5rem;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .month-day-cell:hover {
-            background-color: #f9fafb;
-        }
-        
-        .month-day-cell.other-month {
-            background-color: #fcfcfc;
-            opacity: 0.5;
-        }
-        
-        .month-day-cell.weekend {
-            background: linear-gradient(135deg, rgba(219, 39, 119, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
-        }
-        
-        .month-day-cell.today {
-            background-color: #ede9fe;
-            border: 2px solid #8b5cf6;
-        }
-        
-        .month-day-number {
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: #374151;
-            margin-bottom: 0.25rem;
-        }
-        
-        .month-day-events {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .month-event-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 4px;
-        }
-        
-        .month-event-item {
-            font-size: 0.65rem;
-            padding: 2px 4px;
-            border-radius: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        @media (max-width: 768px) {
-            .month-day-cell {
-                min-height: 70px;
-                padding: 0.25rem;
-            }
-            
-            .month-day-number {
-                font-size: 0.75rem;
-            }
-            
-            .month-event-item {
-                font-size: 0.6rem;
-                padding: 1px 2px;
-            }
-        }
-        
-        /* Modal dla edycji dnia */
-        .day-edit-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 1rem;
-        }
-        
-        .day-edit-content {
-            background: white;
-            border-radius: 16px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-        
-        .day-edit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f3f4f6;
-        }
-        
-        .day-edit-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-        
-        .day-edit-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: #f3f4f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .day-edit-close:hover {
-            background: #e5e7eb;
-        }
-        
-        .day-edit-fields {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        
-        .day-edit-field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .day-edit-label {
-            font-weight: 600;
-            font-size: 0.875rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-            color: #4b5563;
-        }
-        
-        .day-edit-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-        
-        .day-edit-input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        
-        /* Loading animation */
-        #loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid #8b5cf6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Bulk actions panel */
-        #bulk-actions {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e5e7eb;
-        }
-        
-        @media (max-width: 768px) {
-            #bulk-actions {
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: calc(100% - 2rem);
-                max-width: 350px;
-            }
+        #bulk-actions{background:#fff; border-radius:12px; box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04); border:1px solid #e5e7eb;}
+        @media (max-width:768px){
+            #bulk-actions{bottom:80px; left:50%; transform:translateX(-50%); width:calc(100% - 2rem); max-width:350px;}
         }
     </style>
 </head>
 <body>
     <div id="app-container">
-        <!-- Nagłówek -->
+        <!-- HEADER -->
         <header class="modern-header">
             <div class="header-content">
                 <div class="brand">
@@ -725,36 +198,42 @@
                         <p>Kalendarz 🌸</p>
                     </div>
                 </div>
+
                 <div class="header-actions">
-                    <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
+                    <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Poprzedni miesiąc">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     </button>
+
                     <h2 id="month-year-display" class="text-base md:text-lg font-semibold text-gray-700 text-center">Ładowanie...</h2>
-                    <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
+
+                    <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Następny miesiąc">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
+
                     <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
-                    <button id="compact-btn" class="hidden md:inline-block p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Widok kompaktowy">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                    <button id="month-view-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Widok miesięczny">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </button>
+
+                    <!-- NOWE: trzy osobne ikony widoków -->
+                    <div class="view-toggle" role="tablist" aria-label="Przełącz widok">
+                        <button id="btn-view-standard" class="view-btn active" title="Widok normalny" aria-label="Widok normalny" data-view="standard" role="tab" aria-selected="true">
+                            <!-- Ikona: siatka kolumn (tabela) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 10h18M3 14h18"/></svg>
+                        </button>
+                        <button id="btn-view-compact" class="view-btn" title="Widok kompaktowy" aria-label="Widok kompaktowy" data-view="compact" role="tab" aria-selected="false">
+                            <!-- Ikona: lista -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        </button>
+                        <button id="btn-view-month" class="view-btn" title="Widok miesięczny" aria-label="Widok miesięczny" data-view="month" role="tab" aria-selected="false">
+                            <!-- Ikona: kalendarz -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
         <main id="app" class="w-full bg-white flex flex-col flex-grow">
             <div id="main-view" class="overflow-auto flex-1 flex flex-col">
-                <!-- Widok desktopowy -->
+                <!-- Desktop -->
                 <div id="calendar-wrapper" class="overflow-auto flex-1 hidden md:block">
                     <div id="calendar-container" class="bg-white border-t min-w-[900px]">
                         <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
@@ -769,23 +248,20 @@
                         <div id="calendar-body" class="calendar-grid"></div>
                     </div>
                 </div>
-                
-                <!-- Widok mobilny -->
-                <div id="mobile-calendar" class="mobile-calendar md:hidden">
-                    <!-- Tutaj będą generowane karty dni -->
-                </div>
+                <!-- Mobile list -->
+                <div id="mobile-calendar" class="mobile-calendar md:hidden"></div>
             </div>
-            
+
             <!-- Widok kompaktowy -->
             <div id="compact-view">
                 <div class="overview-container"></div>
             </div>
-            
+
             <!-- Widok miesięczny -->
             <div id="month-view">
                 <div class="month-grid"></div>
             </div>
-            
+
             <div id="loading" class="text-center p-8 text-gray-500 font-semibold">
                 <div class="loading-spinner"></div>
             </div>
@@ -805,26 +281,20 @@
         <span id="selection-count" class="text-sm font-medium text-gray-700"></span>
         <button id="bulk-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md text-sm">Usuń</button>
         <button id="clear-selection-btn" class="text-gray-500 hover:text-gray-700 p-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
     </div>
 
     <!-- Modal edycji dnia -->
-    <div id="day-edit-modal" class="day-edit-modal">
-        <div class="day-edit-content">
-            <div class="day-edit-header">
-                <h3 class="day-edit-title">Edycja dnia</h3>
-                <div class="day-edit-close" onclick="closeDayEdit()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+    <div id="day-edit-modal" class="day-edit-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:1rem;">
+        <div class="day-edit-content" style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:80vh;overflow:auto;padding:1.5rem;">
+            <div class="day-edit-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #f3f4f6;">
+                <h3 class="day-edit-title" style="font-size:1.5rem;font-weight:700;color:#1f2937">Edycja dnia</h3>
+                <div class="day-edit-close" onclick="closeDayEdit()" style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </div>
             </div>
-            <div class="day-edit-fields" id="day-edit-fields">
-                <!-- Pola będą generowane dynamicznie -->
-            </div>
+            <div class="day-edit-fields" id="day-edit-fields" style="display:flex;flex-direction:column;gap:1rem;"></div>
         </div>
     </div>
 
@@ -833,7 +303,7 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, writeBatch, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Konfiguracja Firebase ---
+        // --- Firebase ---
         const userFirebaseConfig = {
             apiKey: "AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
             authDomain: "kalendarz-rodzinny-68d04.firebaseapp.com",
@@ -843,7 +313,7 @@
             appId: "1:1050937545151:web:a85fd1a5f066f4a499910a",
             measurementId: "G-57YKE2XKQ1"
         };
-        
+
         let db;
         try {
             const app = initializeApp(userFirebaseConfig);
@@ -853,7 +323,7 @@
             onAuthStateChanged(auth, user => user && initCalendar());
         } catch (error) { console.error("Firebase Error:", error); }
 
-        // --- Stan Aplikacji ---
+        // --- State ---
         let currentDate = new Date();
         let unsubscribe = () => {};
         let clipboard = null;
@@ -864,17 +334,18 @@
         let currentEditDay = null;
         let currentEvents = {};
         const MAX_CHARS = 50;
-        
-        // --- Elementy DOM ---
+
+        // --- DOM ---
         const dom = {
             monthYear: document.getElementById('month-year-display'),
             prevBtn: document.getElementById('prev-month'),
             nextBtn: document.getElementById('next-month'),
             todayBtn: document.getElementById('today-btn'),
+            mainView: document.getElementById('main-view'),
+            compactView: document.getElementById('compact-view'),
+            monthView: document.getElementById('month-view'),
             container: document.getElementById('calendar-container'),
             mobileCalendar: document.getElementById('mobile-calendar'),
-            compactBtn: document.getElementById('compact-btn'),
-            monthViewBtn: document.getElementById('month-view-btn'),
             body: document.getElementById('calendar-body'),
             loading: document.getElementById('loading'),
             contextMenu: document.getElementById('context-menu'),
@@ -885,819 +356,579 @@
             selectionCount: document.getElementById('selection-count'),
             bulkDelete: document.getElementById('bulk-delete-btn'),
             clearSelection: document.getElementById('clear-selection-btn'),
-            mainView: document.getElementById('main-view'),
-            compactView: document.getElementById('compact-view'),
-            monthView: document.getElementById('month-view'),
             dayEditModal: document.getElementById('day-edit-modal'),
-            dayEditFields: document.getElementById('day-edit-fields')
+            dayEditFields: document.getElementById('day-edit-fields'),
+            btnStandard: document.getElementById('btn-view-standard'),
+            btnCompact: document.getElementById('btn-view-compact'),
+            btnMonth: document.getElementById('btn-view-month'),
         };
 
-        // --- Funkcje Pomocnicze ---
+        // --- Helpers ---
         const getMonthName = m => ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'][m];
         const getDayName = d => ['PN','WT','ŚR','CZ','PT','SB','ND'][d];
         const getDayFullName = d => ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][d];
-        const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
-        const fieldLabels = {
-            'ania': 'Ania',
-            'aniaPraca': 'Ania Praca',
-            'michal': 'Michał',
-            'michalPraca': 'Michał Praca',
-            'wspolne': 'Wspólne',
-            'inne': 'Dom/Finanse'
-        };
-        
-        const fullDutyKeywords = ['jb oit', 'jb znieczuleń'];
-        const locationLaskKeywords = ['łask'];
-        const locationOtherKeywords = ['ortho', 'brzeziny'];
+        const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
+        const fieldLabels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
 
+        const fullDutyKeywords = ['jb oit','jb znieczuleń'];
+        const locationLaskKeywords = ['łask'];
+        const locationOtherKeywords = ['ortho','brzeziny'];
         const getEventType = (text) => {
             if (!text) return 'default';
-            const lowerText = text.toLowerCase();
-            if (fullDutyKeywords.some(k => lowerText.includes(k))) return 'full-duty';
-            if (lowerText.startsWith('jb')) return 'medium-duty';
-            if (locationLaskKeywords.some(k => lowerText.includes(k))) return 'location-lask';
-            if (locationOtherKeywords.some(k => lowerText.includes(k))) return 'location-other';
+            const s = text.toLowerCase();
+            if (fullDutyKeywords.some(k=>s.includes(k))) return 'full-duty';
+            if (s.startsWith('jb')) return 'medium-duty';
+            if (locationLaskKeywords.some(k=>s.includes(k))) return 'location-lask';
+            if (locationOtherKeywords.some(k=>s.includes(k))) return 'location-other';
             return 'default';
         };
 
-        // --- Funkcje do przewijania do konkretnego dnia ---
-        const scrollToToday = () => {
-            const today = new Date();
-            if (today.getMonth() !== currentDate.getMonth() || today.getFullYear() !== currentDate.getFullYear()) {
-                currentDate = new Date(today);
-                update();
-            }
-            
-            setTimeout(() => {
-                if (currentView === 'standard') {
-                    const todayElement = document.querySelector('.today');
-                    if (todayElement) {
-                        todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    
-                    // Dla widoku mobilnego
-                    const todayCard = document.querySelector('.mobile-day-card.ring-2');
-                    if (todayCard) {
-                        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else if (currentView === 'compact') {
-                    const todayCard = document.querySelector('#compact-view .overview-day-card.ring-2');
-                    if (todayCard) {
-                        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                } else if (currentView === 'month') {
-                    const todayCell = document.querySelector('.month-day-cell.today');
-                    if (todayCell) {
-                        todayCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }
-            }, 100);
-        };
-
-        // --- Sprawdzanie czy mobile ---
+        // Responsive flag
         window.addEventListener('resize', () => {
-            const wasDesktop = !isMobile;
+            const wasMobile = isMobile;
             isMobile = window.innerWidth <= 768;
-            if (wasDesktop && isMobile || !wasDesktop && !isMobile) {
-                update();
-            }
+            if (wasMobile !== isMobile) update();
         });
 
-        // --- Renderowanie Kalendarza Desktop ---
+        // --- Renders (desktop) ---
         const renderDesktop = (year, month, events) => {
             dom.loading.style.display = 'none';
             dom.body.innerHTML = '';
             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            const fragment = document.createDocumentFragment();
 
-            for (let day = 1; day <= daysInMonth; day++) {
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const today = new Date();
+            const frag = document.createDocumentFragment();
+
+            for(let day=1; day<=daysInMonth; day++){
                 const date = new Date(year, month, day);
-                const dayOfWeek = date.getDay();
+                const dow = date.getDay();
                 const isToday = today.toDateString() === date.toDateString();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isWeekend = dow===0 || dow===6;
                 const dayEvents = events[day] || {};
                 const isHoliday = dayEvents.isHoliday || false;
                 const isDayOff = isWeekend || isHoliday;
 
                 const dayInfoCell = document.createElement('div');
-                dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today' : ''}`;
+                dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''}`;
                 if (isDayOff) dayInfoCell.classList.add('day-off');
                 dayInfoCell.dataset.day = day;
-                dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}</div></div>`;
-                fragment.appendChild(dayInfoCell);
+                dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName(dow===0?6:dow-1)}</div></div>`;
+                frag.appendChild(dayInfoCell);
 
-                fields.forEach(field => {
+                fields.forEach(field=>{
                     const eventText = dayEvents[field] || '';
-                    const fieldCell = document.createElement('div');
-                    fieldCell.className = `calendar-cell color-${field}`;
-                    if (isDayOff) fieldCell.classList.add('day-off');
-                    
-                    const fieldDiv = document.createElement('div');
-                    fieldDiv.className = 'editable-field';
-                    
-                    const eventType = getEventType(eventText);
-                    if (eventType !== 'default') {
-                        fieldDiv.classList.add(eventType);
-                        if (eventType === 'full-duty' || eventType === 'medium-duty') {
-                            fieldDiv.classList.add('duty-shift');
-                        }
+                    const cell = document.createElement('div');
+                    cell.className = `calendar-cell color-${field}`;
+                    if (isDayOff) cell.classList.add('day-off');
+
+                    const div = document.createElement('div');
+                    div.className = 'editable-field';
+                    const type = getEventType(eventText);
+                    if (type!=='default'){
+                        div.classList.add(type);
+                        if (type==='full-duty' || type==='medium-duty') div.classList.add('duty-shift');
                     }
-                    
-                    const cellId = `${day}-${field}`;
-                    fieldDiv.dataset.day = day;
-                    fieldDiv.dataset.field = field;
-                    fieldDiv.dataset.cellId = cellId;
 
-                    if (selected.has(cellId)) fieldDiv.classList.add('selected');
-                    if (eventText) fieldDiv.draggable = true;
+                    const id = `${day}-${field}`;
+                    div.dataset.day = day; div.dataset.field = field; div.dataset.cellId = id;
+                    if (selected.has(id)) div.classList.add('selected');
+                    if (eventText) div.draggable = true;
 
-                    const textSpan = document.createElement('span');
-                    textSpan.className = 'event-text';
-                    textSpan.textContent = eventText;
-                    fieldDiv.appendChild(textSpan);
-                    fieldCell.appendChild(fieldDiv);
-                    fragment.appendChild(fieldCell);
+                    const span = document.createElement('span');
+                    span.className = 'event-text';
+                    span.textContent = eventText;
+                    div.appendChild(span);
+                    cell.appendChild(div);
+                    frag.appendChild(cell);
                 });
             }
-            dom.body.appendChild(fragment);
+            dom.body.appendChild(frag);
         };
 
-        // --- Renderowanie Kalendarza Mobile ---
+        // --- Render mobile list ---
         const renderMobile = (year, month, events) => {
             dom.loading.style.display = 'none';
             dom.mobileCalendar.innerHTML = '';
             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            const fragment = document.createDocumentFragment();
 
-            for (let day = 1; day <= daysInMonth; day++) {
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const today = new Date();
+            const frag = document.createDocumentFragment();
+
+            for(let day=1; day<=daysInMonth; day++){
                 const date = new Date(year, month, day);
-                const dayOfWeek = date.getDay();
+                const dow = date.getDay();
                 const isToday = today.toDateString() === date.toDateString();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isWeekend = dow===0 || dow===6;
                 const dayEvents = events[day] || {};
                 const isHoliday = dayEvents.isHoliday || false;
 
-                const dayCard = document.createElement('div');
-                dayCard.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400' : ''} ${isWeekend || isHoliday ? 'weekend' : ''}`;
-                
-                let cardHTML = `
-                    <div class="mobile-day-header">
-                        <div>
-                            <span class="mobile-day-number">${day}</span>
-                            <span class="mobile-day-name ml-2">${getDayFullName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}</span>
-                        </div>
-                        ${isToday ? '<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>' : ''}
-                        ${isHoliday ? '<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>' : ''}
+                const card = document.createElement('div');
+                card.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400':''} ${isWeekend||isHoliday ? 'weekend':''}`;
+
+                let html = `
+                  <div class="mobile-day-header">
+                    <div>
+                      <span class="mobile-day-number">${day}</span>
+                      <span class="mobile-day-name ml-2">${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}</span>
                     </div>
-                    <div class="mobile-events">
+                    ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
+                    ${isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>':''}
+                  </div>
+                  <div class="mobile-events">
                 `;
-                
-                fields.forEach(field => {
-                    const eventText = dayEvents[field] || '';
-                    const eventType = getEventType(eventText);
-                    let typeClass = '';
-                    if (eventType !== 'default') {
-                        typeClass = eventType;
-                        if (eventType === 'full-duty' || eventType === 'medium-duty') {
-                            typeClass += ' duty-shift';
-                        }
-                    }
-                    
-                    cardHTML += `
-                        <div class="mobile-event-row">
-                            <div class="mobile-event-label color-${field}">${fieldLabels[field]}</div>
-                            <div class="mobile-event-content color-${field} ${typeClass}" 
-                                 data-day="${day}" 
-                                 data-field="${field}"
-                                 data-cell-id="${day}-${field}">
-                                <span class="event-text">${eventText || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
-                            </div>
+                fields.forEach(field=>{
+                    const t = dayEvents[field] || '';
+                    const type = getEventType(t);
+                    let typeClass = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
+                    html += `
+                      <div class="mobile-event-row">
+                        <div class="mobile-event-label color-${field}">${fieldLabels[field]}</div>
+                        <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}">
+                          <span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
                         </div>
+                      </div>
                     `;
                 });
-                
-                cardHTML += '</div>';
-                dayCard.innerHTML = cardHTML;
-                fragment.appendChild(dayCard);
+                html += `</div>`;
+                card.innerHTML = html;
+                frag.appendChild(card);
             }
-            dom.mobileCalendar.appendChild(fragment);
+            dom.mobileCalendar.appendChild(frag);
         };
 
-        // --- Renderowanie widoku kompaktowego ---
+        // --- Compact view ---
         const renderCompact = async (year, month) => {
             dom.loading.style.display = 'flex';
             const container = dom.compactView.querySelector('.overview-container');
             container.innerHTML = '';
             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-            
-            const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
-            const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
+
+            const { docs } = await getDocs(collection(db, `${year}-${month+1}`));
+            const events = docs.reduce((acc, d)=>({...acc, [d.id]: d.data()}), {});
             currentEvents = events;
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const daysInMonth = new Date(year, month+1, 0).getDate();
             const today = new Date();
 
-            for (let day = 1; day <= daysInMonth; day++) {
+            for(let day=1; day<=daysInMonth; day++){
                 const date = new Date(year, month, day);
-                const dayOfWeek = date.getDay();
+                const dow = date.getDay();
                 const isToday = today.toDateString() === date.toDateString();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isWeekend = dow===0 || dow===6;
                 const dayEvents = events[day] || {};
                 const isHoliday = dayEvents.isHoliday || false;
-                
-                const dayCard = document.createElement('div');
-                dayCard.className = `overview-day-card ${isWeekend || isHoliday ? 'weekend' : ''} ${isToday ? 'ring-2 ring-purple-400' : ''}`;
-                dayCard.dataset.day = day;
-                dayCard.onclick = () => openDayEdit(day, dayEvents);
-                
-                let cardHTML = `
-                    <div class="overview-day-header">
-                        <div class="overview-day-info">
-                            <span class="overview-day-number">${day}</span>
-                            <span class="overview-day-name">${getDayFullName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}</span>
-                        </div>
-                        <div>
-                            ${isToday ? '<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>' : ''}
-                            ${isHoliday ? '<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>' : ''}
-                        </div>
+
+                const card = document.createElement('div');
+                card.className = `overview-day-card ${isWeekend||isHoliday?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
+                card.dataset.day = day;
+                card.onclick = ()=>openDayEdit(day, dayEvents);
+
+                let html = `
+                  <div class="overview-day-header">
+                    <div class="overview-day-info">
+                      <span class="overview-day-number">${day}</span>
+                      <span class="overview-day-name">${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}</span>
                     </div>
-                    <div class="overview-events-grid">
+                    <div>
+                      ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
+                      ${isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>':''}
+                    </div>
+                  </div>
+                  <div class="overview-events-grid">
                 `;
-                
-                fields.forEach(field => {
-                    if (dayEvents[field]) {
-                        const eventType = getEventType(dayEvents[field]);
-                        let typeClass = '';
-                        if (eventType !== 'default') {
-                            typeClass = eventType;
-                            if (eventType === 'full-duty' || eventType === 'medium-duty') {
-                                typeClass += ' duty-shift';
-                            }
-                        }
-                        cardHTML += `
-                            <div class="overview-event-item color-${field} ${typeClass}">
-                                <div class="overview-event-label">${fieldLabels[field]}</div>
-                                <div class="overview-event-text">${dayEvents[field]}</div>
-                            </div>
+                fields.forEach(field=>{
+                    if (dayEvents[field]){
+                        const type = getEventType(dayEvents[field]);
+                        const cls = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
+                        html += `
+                          <div class="overview-event-item color-${field} ${cls}">
+                            <div class="overview-event-label">${fieldLabels[field]}</div>
+                            <div class="overview-event-text">${dayEvents[field]}</div>
+                          </div>
                         `;
                     }
                 });
-                
-                cardHTML += '</div>';
-                dayCard.innerHTML = cardHTML;
-                container.appendChild(dayCard);
+                html += `</div>`;
+                card.innerHTML = html;
+                container.appendChild(card);
             }
-            
+
             dom.loading.style.display = 'none';
-            
-            // Przewiń do dzisiejszego dnia po załadowaniu
-            setTimeout(() => {
+            setTimeout(()=>{
                 const todayCard = container.querySelector('.overview-day-card.ring-2');
-                if (todayCard) {
-                    todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 100);
+                if (todayCard) todayCard.scrollIntoView({behavior:'smooth', block:'center'});
+            },100);
         };
 
-        // --- Renderowanie widoku miesięcznego ---
+        // --- Month view ---
         const renderMonthView = async (year, month) => {
             dom.loading.style.display = 'flex';
             const grid = dom.monthView.querySelector('.month-grid');
             grid.innerHTML = '';
             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-            
-            // Nagłówki dni tygodnia
-            const headers = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Nd'];
-            headers.forEach(header => {
-                const headerCell = document.createElement('div');
-                headerCell.className = 'month-header-cell';
-                headerCell.textContent = header;
-                grid.appendChild(headerCell);
+
+            const headers = ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'];
+            headers.forEach(h=>{
+                const el = document.createElement('div');
+                el.className = 'month-header-cell';
+                el.textContent = h;
+                grid.appendChild(el);
             });
-            
-            const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
-            const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
+
+            const { docs } = await getDocs(collection(db, `${year}-${month+1}`));
+            const events = docs.reduce((acc, d)=>({...acc, [d.id]: d.data()}), {});
             currentEvents = events;
-            
+
             const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
+            const lastDay = new Date(year, month+1, 0);
             const daysInMonth = lastDay.getDate();
-            const startDay = (firstDay.getDay() + 6) % 7; // Poniedziałek = 0
+            const startDay = (firstDay.getDay() + 6) % 7; // Pon=0
             const today = new Date();
-            
-            // Puste komórki przed pierwszym dniem
-            for (let i = 0; i < startDay; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'month-day-cell other-month';
-                grid.appendChild(emptyCell);
+
+            for(let i=0;i<startDay;i++){
+                const empty = document.createElement('div');
+                empty.className = 'month-day-cell other-month';
+                grid.appendChild(empty);
             }
-            
-            // Dni miesiąca
-            for (let day = 1; day <= daysInMonth; day++) {
+
+            for(let day=1; day<=daysInMonth; day++){
                 const date = new Date(year, month, day);
-                const dayOfWeek = date.getDay();
+                const dow = date.getDay();
                 const isToday = today.toDateString() === date.toDateString();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isWeekend = dow===0 || dow===6;
                 const dayEvents = events[day] || {};
                 const isHoliday = dayEvents.isHoliday || false;
-                
-                const dayCell = document.createElement('div');
-                dayCell.className = `month-day-cell ${isWeekend || isHoliday ? 'weekend' : ''} ${isToday ? 'today' : ''}`;
-                dayCell.dataset.day = day;
-                dayCell.onclick = () => openDayEdit(day, dayEvents);
-                
-                let cellHTML = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
-                
-                let eventCount = 0;
-                fields.forEach(field => {
-                    if (dayEvents[field] && eventCount < 3) { // Pokazuj max 3 wydarzenia
-                        const eventType = getEventType(dayEvents[field]);
-                        let typeClass = '';
-                        if (eventType !== 'default') {
-                            typeClass = eventType;
-                        }
-                        cellHTML += `<div class="month-event-item color-${field} ${typeClass}">${dayEvents[field]}</div>`;
-                        eventCount++;
+
+                const cell = document.createElement('div');
+                cell.className = `month-day-cell ${isWeekend||isHoliday?'weekend':''} ${isToday?'today':''}`;
+                cell.dataset.day = day;
+                cell.onclick = ()=>openDayEdit(day, dayEvents);
+
+                let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
+                let shown = 0;
+                for (const field of fields){
+                    if (dayEvents[field] && shown < 3){
+                        const type = getEventType(dayEvents[field]);
+                        const cls = type!=='default' ? type : '';
+                        html += `<div class="month-event-item color-${field} ${cls}">${dayEvents[field]}</div>`;
+                        shown++;
                     }
-                });
-                
-                const totalEvents = fields.filter(f => dayEvents[f]).length;
-                if (totalEvents > 3) {
-                    cellHTML += `<div class="month-event-item" style="font-size: 0.6rem; color: #6b7280;">+${totalEvents - 3} więcej</div>`;
                 }
-                
-                cellHTML += '</div>';
-                dayCell.innerHTML = cellHTML;
-                grid.appendChild(dayCell);
+                const total = fields.filter(f=>dayEvents[f]).length;
+                if (total > 3){
+                    html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`;
+                }
+                html += `</div>`;
+                cell.innerHTML = html;
+                grid.appendChild(cell);
             }
-            
-            // Puste komórki po ostatnim dniu (wypełnienie do 35 lub 42 komórek)
+
             const totalCells = startDay + daysInMonth;
-            const rows = Math.ceil(totalCells / 7);
-            const targetCells = rows * 7;
-            
-            for (let i = totalCells; i < targetCells; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'month-day-cell other-month';
-                grid.appendChild(emptyCell);
+            const rows = Math.ceil(totalCells/7);
+            const target = rows*7;
+            for(let i=totalCells; i<target; i++){
+                const empty = document.createElement('div');
+                empty.className = 'month-day-cell other-month';
+                grid.appendChild(empty);
             }
-            
+
             dom.loading.style.display = 'none';
         };
 
-        // --- Funkcje edycji dnia ---
+        // --- Edit day modal ---
         window.openDayEdit = (day, dayEvents) => {
             currentEditDay = day;
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-            const dayOfWeek = date.getDay();
-            
-            const title = dom.dayEditModal.querySelector('.day-edit-title');
-            title.textContent = `${day} ${getMonthName(currentDate.getMonth())} - ${getDayFullName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}`;
-            
+            const dow = date.getDay();
+            document.querySelector('.day-edit-title').textContent =
+              `${day} ${getMonthName(currentDate.getMonth())} - ${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}`;
+
             dom.dayEditFields.innerHTML = '';
-            
-            fields.forEach(field => {
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'day-edit-field';
-                
-                const eventText = dayEvents[field] || '';
-                const eventType = getEventType(eventText);
-                let typeClass = '';
-                if (eventType !== 'default') {
-                    typeClass = eventType;
-                }
-                
-                fieldDiv.innerHTML = `
-                    <label class="day-edit-label color-${field}">${fieldLabels[field]}</label>
-                    <input type="text" 
-                           class="day-edit-input ${typeClass}" 
-                           data-field="${field}" 
-                           value="${eventText}"
-                           maxlength="${MAX_CHARS}"
-                           placeholder="Kliknij aby dodać">
+            fields.forEach(field=>{
+                const wrap = document.createElement('div');
+                wrap.className = 'day-edit-field';
+                const value = (dayEvents[field]||'');
+                const type = getEventType(value);
+                wrap.innerHTML = `
+                    <label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label>
+                    <input type="text" class="day-edit-input ${type!=='default'?type:''}" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
                 `;
-                
-                dom.dayEditFields.appendChild(fieldDiv);
+                dom.dayEditFields.appendChild(wrap);
             });
-            
-            // Dodaj listenery do inputów
-            dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input => {
-                input.addEventListener('change', async () => {
+
+            dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{
+                input.addEventListener('change', async ()=>{
                     const field = input.dataset.field;
-                    const value = input.value.trim();
-                    
-                    if (value === '') {
-                        await dbDelete(currentEditDay, field);
-                    } else {
-                        await dbSave(currentEditDay, field, value);
-                    }
-                    
-                    // Aktualizuj kolor inputu
-                    const eventType = getEventType(value);
-                    input.className = `day-edit-input ${eventType !== 'default' ? eventType : ''}`;
+                    const val = input.value.trim();
+                    if (!val) await dbDelete(currentEditDay, field);
+                    else await dbSave(currentEditDay, field, val);
+                    const type = getEventType(val);
+                    input.className = `day-edit-input ${type!=='default'?type:''}`;
                 });
             });
-            
+
             dom.dayEditModal.style.display = 'flex';
         };
-
         window.closeDayEdit = () => {
             dom.dayEditModal.style.display = 'none';
-            if (currentView === 'compact') {
-                renderCompact(currentDate.getFullYear(), currentDate.getMonth());
-            } else if (currentView === 'month') {
-                renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
-            }
+            if (currentView==='compact') renderCompact(currentDate.getFullYear(), currentDate.getMonth());
+            else if (currentView==='month') renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
         };
+        dom.dayEditModal.addEventListener('click', (e)=>{ if(e.target===dom.dayEditModal) closeDayEdit(); });
 
-        // Zamknij modal po kliknięciu poza nim
-        dom.dayEditModal.addEventListener('click', (e) => {
-            if (e.target === dom.dayEditModal) {
-                closeDayEdit();
-            }
-        });
-
-        // --- Update funkcja ---
+        // --- Updates ---
         const update = () => {
             if (!db) return;
-            
-            if (currentView === 'compact') {
-                renderCompact(currentDate.getFullYear(), currentDate.getMonth());
-                return;
-            } else if (currentView === 'month') {
-                renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
-                return;
-            }
-            
-            // Standardowy widok
+
+            // widoki
+            if (currentView==='compact'){ renderCompact(currentDate.getFullYear(), currentDate.getMonth()); return; }
+            if (currentView==='month'){ renderMonthView(currentDate.getFullYear(), currentDate.getMonth()); return; }
+
+            // standard
             unsubscribe();
             dom.loading.style.display = 'flex';
             dom.body.innerHTML = '';
             dom.mobileCalendar.innerHTML = '';
-            
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            const calendarId = `${year}-${month + 1}`;
-            unsubscribe = onSnapshot(collection(db, calendarId), snap => {
-                const events = {};
-                snap.forEach(doc => { events[doc.id] = doc.data(); });
+            const y = currentDate.getFullYear();
+            const m = currentDate.getMonth();
+            const id = `${y}-${m+1}`;
+            unsubscribe = onSnapshot(collection(db, id), snap=>{
+                const events = {}; snap.forEach(d=>events[d.id]=d.data());
                 currentEvents = events;
-                
-                if (isMobile) {
-                    renderMobile(year, month, events);
-                } else {
-                    renderDesktop(year, month, events);
-                }
+                if (isMobile) renderMobile(y, m, events); else renderDesktop(y, m, events);
             });
         };
 
-        // --- Przełączanie widoków ---
-        const switchView = (newView) => {
-            currentView = newView;
-            
-            // Ukryj wszystkie widoki
+        // --- Switch view + active buttons ---
+        const setActiveViewButton = () => {
+            [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(b=>{
+                b.classList.remove('active');
+                b.setAttribute('aria-selected','false');
+            });
+            const map = {standard:dom.btnStandard, compact:dom.btnCompact, month:dom.btnMonth};
+            map[currentView].classList.add('active');
+            map[currentView].setAttribute('aria-selected','true');
+        };
+        const switchView = (view) => {
+            currentView = view;
             dom.mainView.style.display = 'none';
             dom.compactView.style.display = 'none';
             dom.monthView.style.display = 'none';
-            
-            // Pokaż odpowiedni widok
-            if (newView === 'standard') {
-                dom.mainView.style.display = 'flex';
-            } else if (newView === 'compact') {
-                dom.compactView.style.display = 'block';
-            } else if (newView === 'month') {
-                dom.monthView.style.display = 'block';
-            }
-            
+            if (view==='standard') dom.mainView.style.display = 'flex';
+            if (view==='compact') dom.compactView.style.display = 'block';
+            if (view==='month') dom.monthView.style.display = 'block';
+            setActiveViewButton();
             update();
         };
 
-        // --- Edycja mobilna ---
-        const handleMobileEdit = (element) => {
-            const currentText = element.querySelector('.event-text').textContent;
-            const isPlaceholder = currentText.includes('Kliknij aby dodać');
-            const actualText = isPlaceholder ? '' : currentText;
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = actualText;
-            textarea.className = 'w-full p-2 border-2 border-purple-400 rounded-md';
-            textarea.style.minHeight = '60px';
-            
-            element.innerHTML = '';
-            element.appendChild(textarea);
-            
-            const charCounter = document.createElement('div');
-            charCounter.className = 'char-counter text-xs mt-1';
-            element.appendChild(charCounter);
-            
-            const updateCounter = () => {
-                const len = textarea.value.length;
-                charCounter.textContent = `${len}/${MAX_CHARS}`;
-                charCounter.classList.toggle('text-yellow-500', len > MAX_CHARS - 10 && len <= MAX_CHARS);
-                charCounter.classList.toggle('text-red-500', len > MAX_CHARS);
+        // --- Mobile inline edit ---
+        const handleMobileEdit = (el) => {
+            const cur = el.querySelector('.event-text').textContent;
+            const isPH = cur.includes('Kliknij aby dodać');
+            const val = isPH ? '' : cur;
+
+            const ta = document.createElement('textarea');
+            ta.value = val;
+            ta.className = 'w-full p-2 border-2 border-purple-400 rounded-md';
+            ta.style.minHeight = '60px';
+            el.innerHTML = '';
+            el.appendChild(ta);
+
+            const cc = document.createElement('div');
+            cc.className = 'char-counter text-xs mt-1';
+            el.appendChild(cc);
+
+            const upd = () => {
+                const len = ta.value.length;
+                cc.textContent = `${len}/${MAX_CHARS}`;
+                cc.classList.toggle('text-yellow-500', len > MAX_CHARS-10 && len <= MAX_CHARS);
+                cc.classList.toggle('text-red-500', len > MAX_CHARS);
             };
-            updateCounter();
-            textarea.addEventListener('input', updateCounter);
-            
+            upd();
+
             const save = async () => {
-                const newText = textarea.value.slice(0, MAX_CHARS);
-                element.innerHTML = `<span class="event-text">${newText || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>`;
-                
-                if (newText !== actualText) {
-                    if (newText === '') {
-                        await dbDelete(element.dataset.day, element.dataset.field);
-                    } else {
-                        await dbSave(element.dataset.day, element.dataset.field, newText);
-                    }
+                const txt = ta.value.slice(0, MAX_CHARS);
+                el.innerHTML = `<span class="event-text">${txt || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>`;
+                if (txt !== val){
+                    if (!txt) await dbDelete(el.dataset.day, el.dataset.field);
+                    else await dbSave(el.dataset.day, el.dataset.field, txt);
                 }
             };
-            
-            textarea.addEventListener('blur', save);
-            textarea.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    textarea.blur();
-                }
+            ta.addEventListener('input', upd);
+            ta.addEventListener('blur', save);
+            ta.addEventListener('keydown', e=>{
+                if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); }
             });
-            
-            textarea.focus();
+            ta.focus();
         };
 
-        // --- Edycja i Zaznaczanie ---
+        // --- Desktop edit/select ---
         const handleEdit = (fieldDiv) => {
-            const activeTextarea = document.querySelector('.editable-field textarea');
-            if (activeTextarea && activeTextarea.parentElement === fieldDiv) {
-                activeTextarea.blur();
-                return;
-            }
-            if(activeTextarea) activeTextarea.blur();
+            const active = document.querySelector('.editable-field textarea');
+            if (active && active.parentElement === fieldDiv){ active.blur(); return; }
+            if (active) active.blur();
 
-            const textSpan = fieldDiv.querySelector('.event-text');
-            const currentText = textSpan.textContent;
-            
-            textSpan.style.display = 'none';
+            const span = fieldDiv.querySelector('.event-text');
+            const cur = span.textContent;
+            span.style.display = 'none';
             fieldDiv.draggable = false;
 
-            const textarea = document.createElement('textarea');
-            textarea.value = currentText;
-            
-            const charCounter = document.createElement('div');
-            charCounter.className = 'char-counter';
-            fieldDiv.appendChild(charCounter);
-            
-            const updateCounter = () => {
-                const len = textarea.value.length;
-                charCounter.textContent = `${len}/${MAX_CHARS}`;
-                charCounter.classList.toggle('warning', len > MAX_CHARS - 10 && len <= MAX_CHARS);
-                charCounter.classList.toggle('error', len > MAX_CHARS);
-            };
-            updateCounter();
-            textarea.addEventListener('input', updateCounter);
+            const ta = document.createElement('textarea');
+            ta.value = cur;
 
-            const save = async () => {
-                let newText = textarea.value.slice(0, MAX_CHARS);
-                textarea.remove();
-                charCounter.remove();
-                textSpan.style.display = '';
-                if (newText) fieldDiv.draggable = true;
-                
-                if (newText !== currentText) {
-                    textSpan.textContent = newText;
-                    if (newText === '') await dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field);
-                    else await dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, newText);
+            const cc = document.createElement('div');
+            cc.className = 'char-counter';
+            fieldDiv.appendChild(cc);
+
+            const upd = ()=>{
+                const len = ta.value.length;
+                cc.textContent = `${len}/${MAX_CHARS}`;
+                cc.classList.toggle('warning', len > MAX_CHARS-10 && len <= MAX_CHARS);
+                cc.classList.toggle('error', len > MAX_CHARS);
+            };
+            upd();
+            ta.addEventListener('input', upd);
+
+            const save = async ()=>{
+                let txt = ta.value.slice(0, MAX_CHARS);
+                ta.remove(); cc.remove(); span.style.display = '';
+                if (txt) fieldDiv.draggable = true;
+                if (txt !== cur){
+                    span.textContent = txt;
+                    if (!txt) await dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field);
+                    else await dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, txt);
                 }
             };
-            textarea.addEventListener('blur', save);
-            textarea.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textarea.blur(); } 
-                else if (e.key === 'Escape') {
-                    textarea.remove(); charCounter.remove();
-                    textSpan.style.display = '';
-                    if (currentText) fieldDiv.draggable = true;
-                }
+            ta.addEventListener('blur', save);
+            ta.addEventListener('keydown', e=>{
+                if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); }
+                else if (e.key==='Escape'){ ta.remove(); cc.remove(); span.style.display=''; if (cur) fieldDiv.draggable = true; }
             });
-            
-            fieldDiv.appendChild(textarea);
-            textarea.focus();
+
+            fieldDiv.appendChild(ta);
+            ta.focus();
         };
 
-        // Event listeners dla obu widoków
-        dom.body.addEventListener('click', e => {
+        // --- Listeners (grid + mobile) ---
+        document.getElementById('calendar-body').addEventListener('click', e=>{
             const dayInfoCell = e.target.closest('.day-info-cell');
-            if (dayInfoCell) {
-                if (e.target.closest('.editable-field')) return;
-                toggleHoliday(dayInfoCell.dataset.day);
-                return;
-            }
-
+            if (dayInfoCell){ if (e.target.closest('.editable-field')) return; toggleHoliday(dayInfoCell.dataset.day); return; }
             const fieldDiv = e.target.closest('.editable-field');
-            if (!fieldDiv) {
-                if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection();
-                return;
-            }
-
-            if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                toggleSelection(fieldDiv);
-            } else {
-                if (selected.size > 0 && !fieldDiv.classList.contains('selected')) {
-                    clearSelection();
-                }
-                handleEdit(fieldDiv);
-            }
+            if (!fieldDiv){ if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); return; }
+            if (e.ctrlKey || e.metaKey){ e.preventDefault(); toggleSelection(fieldDiv); }
+            else { if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); handleEdit(fieldDiv); }
         });
 
-        // Event listener dla widoku mobilnego
-        dom.mobileCalendar.addEventListener('click', e => {
-            const eventContent = e.target.closest('.mobile-event-content');
-            if (eventContent) {
-                handleMobileEdit(eventContent);
-            }
+        dom.mobileCalendar.addEventListener('click', e=>{
+            const el = e.target.closest('.mobile-event-content');
+            if (el) handleMobileEdit(el);
         });
 
-        // --- Menu Kontekstowe ---
-        const showContextMenu = (e, target) => {
+        // --- Context menu ---
+        const showContextMenu = (e,target)=>{
             contextTarget = target;
             dom.contextMenu.style.left = `${e.pageX}px`;
             dom.contextMenu.style.top = `${e.pageY}px`;
             dom.contextMenu.style.display = 'block';
         };
-
-        dom.body.addEventListener('contextmenu', e => {
+        dom.body.addEventListener('contextmenu', e=>{
             e.preventDefault();
-            const fieldDiv = e.target.closest('.editable-field');
-            if (fieldDiv) showContextMenu(e, fieldDiv);
+            const field = e.target.closest('.editable-field');
+            if (field) showContextMenu(e, field);
         });
-
-        dom.mobileCalendar.addEventListener('contextmenu', e => {
+        dom.mobileCalendar.addEventListener('contextmenu', e=>{
             e.preventDefault();
-            const eventContent = e.target.closest('.mobile-event-content');
-            if (eventContent) showContextMenu(e, eventContent);
+            const ec = e.target.closest('.mobile-event-content');
+            if (ec) showContextMenu(e, ec);
         });
+        dom.copyBtn.addEventListener('click', ()=>{ clipboard = contextTarget.querySelector('.event-text').textContent; dom.contextMenu.style.display='none'; });
+        dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); dom.contextMenu.style.display='none'; });
+        dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); dom.contextMenu.style.display='none'; });
+        document.addEventListener('click', e=>{ if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; });
 
-        // --- Akcje Masowe ---
-        const toggleSelection = el => {
-            const id = el.dataset.cellId;
-            selected.has(id) ? selected.delete(id) : selected.add(id);
-            el.classList.toggle('selected');
-            updateBulkUI();
-        };
-        
-        const updateBulkUI = () => {
-            const count = selected.size;
-            if (count > 0) {
-                dom.selectionCount.textContent = `Zaznaczono: ${count}`;
-                dom.bulkActions.classList.remove('hidden');
-            } else {
-                dom.bulkActions.classList.add('hidden');
-            }
-        };
-        
-        const clearSelection = () => {
-            document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
-            selected.clear();
-            updateBulkUI();
-        };
-        
-        dom.bulkDelete.addEventListener('click', async () => {
+        // --- Bulk selection ---
+        const toggleSelection = el => { const id = el.dataset.cellId; selected.has(id) ? selected.delete(id) : selected.add(id); el.classList.toggle('selected'); updateBulkUI(); };
+        const updateBulkUI = () => { const c = selected.size; if (c>0){ dom.selectionCount.textContent = `Zaznaczono: ${c}`; dom.bulkActions.classList.remove('hidden'); } else dom.bulkActions.classList.add('hidden'); };
+        const clearSelection = () => { document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); selected.clear(); updateBulkUI(); };
+        dom.bulkDelete.addEventListener('click', async ()=>{
             const batch = writeBatch(db);
-            const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-            selected.forEach(id => {
+            const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+            selected.forEach(id=>{
                 const [day, field] = id.split('-');
-                batch.update(doc(db, calendarId, day), { [field]: deleteField() });
+                batch.update(doc(db, calendarId, day), {[field]: deleteField()});
             });
             await batch.commit();
             clearSelection();
         });
-        
         dom.clearSelection.addEventListener('click', clearSelection);
 
-        // --- Inne Listenery ---
-        dom.copyBtn.addEventListener('click', () => { 
-            clipboard = contextTarget.querySelector('.event-text').textContent; 
-            dom.contextMenu.style.display = 'none'; 
+        // --- Drag & drop (desktop) ---
+        dom.body.addEventListener('dragstart', e=>{
+            const f = e.target.closest('.editable-field');
+            if (f && f.draggable) e.dataTransfer.setData('text/plain', f.querySelector('.event-text').textContent);
         });
-        
-        dom.pasteBtn.addEventListener('click', () => { 
-            if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); 
-            dom.contextMenu.style.display = 'none'; 
-        });
-        
-        dom.deleteBtn.addEventListener('click', () => {
-            dbDelete(contextTarget.dataset.day, contextTarget.dataset.field);
-            dom.contextMenu.style.display = 'none';
-        });
-        
-        document.addEventListener('click', e => { 
-            if (!e.target.closest('#context-menu')) dom.contextMenu.style.display = 'none'; 
-        });
-        
-        document.addEventListener('keydown', e => e.key === 'Escape' && clearSelection());
-        
-        // --- Drag & Drop (tylko desktop) ---
-        dom.body.addEventListener('dragstart', e => {
-            const field = e.target.closest('.editable-field');
-            if(field && field.draggable) e.dataTransfer.setData('text/plain', field.querySelector('.event-text').textContent);
-        });
-        
-        dom.body.addEventListener('dragover', e => { 
-            e.preventDefault(); 
-            e.target.closest('.editable-field')?.classList.add('drag-over'); 
-        });
-        
-        dom.body.addEventListener('dragleave', e => e.target.closest('.editable-field')?.classList.remove('drag-over'));
-        
-        dom.body.addEventListener('drop', e => {
+        dom.body.addEventListener('dragover', e=>{ e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
+        dom.body.addEventListener('dragleave', e=> e.target.closest('.editable-field')?.classList.remove('drag-over'));
+        dom.body.addEventListener('drop', e=>{
             e.preventDefault();
-            const field = e.target.closest('.editable-field');
-            if (field) {
-                field.classList.remove('drag-over');
-                const text = e.dataTransfer.getData('text/plain');
-                if (text) dbSave(field.dataset.day, field.dataset.field, text);
-            }
+            const f = e.target.closest('.editable-field');
+            if (f){ f.classList.remove('drag-over'); const t = e.dataTransfer.getData('text/plain'); if (t) dbSave(f.dataset.day, f.dataset.field, t); }
         });
 
-        // --- Baza Danych ---
-        const dbSave = (day, field, val) => {
-            const id = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-            return setDoc(doc(db, id, day), { [field]: val }, { merge: true });
-        };
-        
-        const dbDelete = (day, field) => {
-            const id = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-            return updateDoc(doc(db, id, day), { [field]: deleteField() });
-        };
-        
+        // --- DB helpers ---
+        const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
+        const dbDelete = (day, field) => updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: deleteField() });
         const toggleHoliday = async (day) => {
-            const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-            const dayId = day.toString();
-            const docRef = doc(db, calendarId, dayId);
-            try {
-                const docSnap = await getDoc(docRef);
-                const isCurrentlyHoliday = docSnap.exists() ? docSnap.data().isHoliday || false : false;
-                await setDoc(docRef, { isHoliday: !isCurrentlyHoliday }, { merge: true });
-            } catch (error) {
-                console.error("Error toggling holiday:", error);
-            }
+            const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+            const ref = doc(db, calendarId, String(day));
+            try{
+                const snap = await getDoc(ref);
+                const cur = snap.exists() ? (snap.data().isHoliday || false) : false;
+                await setDoc(ref, { isHoliday: !cur }, { merge:true });
+            }catch(e){ console.error(e); }
         };
 
-        // --- Inicjalizacja ---
-        const initCalendar = () => {
-            const navigate = (delta) => {
-                currentDate.setMonth(currentDate.getMonth() + delta);
-                update();
-            };
-            
-            dom.prevBtn.addEventListener('click', () => navigate(-1));
-            dom.nextBtn.addEventListener('click', () => navigate(1));
-            dom.todayBtn.addEventListener('click', scrollToToday);
-            
-            // Przełączniki widoków
-            if (!isMobile) {
-                dom.compactBtn.addEventListener('click', () => {
-                    if (currentView === 'compact') {
-                        switchView('standard');
-                    } else {
-                        switchView('compact');
-                    }
-                });
-            }
-            
-            dom.monthViewBtn.addEventListener('click', () => {
-                if (currentView === 'month') {
-                    switchView(isMobile ? 'standard' : 'standard');
-                } else {
-                    switchView('month');
+        // --- Navigation ---
+        const scrollToToday = () => {
+            const t = new Date();
+            if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ currentDate = new Date(t); update(); }
+            setTimeout(()=>{
+                if (currentView==='standard'){
+                    document.querySelector('.today')?.scrollIntoView({behavior:'smooth', block:'center'});
+                    document.querySelector('.mobile-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'});
+                } else if (currentView==='compact'){
+                    document.querySelector('#compact-view .overview-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'});
+                } else if (currentView==='month'){
+                    document.querySelector('.month-day-cell.today')?.scrollIntoView({behavior:'smooth', block:'center'});
                 }
+            },100);
+        };
+
+        // --- Init ---
+        const initCalendar = () => {
+            const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
+            dom.prevBtn.addEventListener('click', ()=>nav(-1));
+            dom.nextBtn.addEventListener('click', ()=>nav(1));
+            dom.todayBtn.addEventListener('click', scrollToToday);
+
+            // Nowe przyciski widoków
+            [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(btn=>{
+                btn.addEventListener('click', ()=>{
+                    const v = btn.dataset.view;
+                    if (currentView!==v) switchView(v);
+                });
             });
-            
-            // Touch events dla lepszej obsługi mobilnej
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            const handleSwipe = () => {
-                if (touchEndX < touchStartX - 50) navigate(1); // Swipe left - next month
-                if (touchEndX > touchStartX + 50) navigate(-1); // Swipe right - prev month
-            };
-            
-            if (isMobile) {
-                document.addEventListener('touchstart', e => {
-                    touchStartX = e.changedTouches[0].screenX;
-                });
-                
-                document.addEventListener('touchend', e => {
-                    touchEndX = e.changedTouches[0].screenX;
-                    handleSwipe();
-                });
+
+            // Gesty mobile
+            let sx=0, ex=0;
+            if (isMobile){
+                document.addEventListener('touchstart', e=>{ sx = e.changedTouches[0].screenX; });
+                document.addEventListener('touchend', e=>{ ex = e.changedTouches[0].screenX; if (ex < sx - 50) nav(1); if (ex > sx + 50) nav(-1); });
             }
-            
+
+            setActiveViewButton();
             update();
         };
     </script>
