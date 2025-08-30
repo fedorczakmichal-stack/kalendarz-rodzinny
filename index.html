@@ -255,7 +255,7 @@
     .context-menu-separator{height:1px;background:#e5e7eb;margin:4px 0}
 
     #loading{display:flex;align-items:center;justify-content:center;padding:3rem}
-    .loading-spinner{width:40px;height:40px;border:3px solid:#f3f4f6;border-top:3px solid:#8b5cf6;border-radius:50%;animation:spin 1s linear infinite}
+    .loading-spinner{width:40px;height:40px;border:3px solid:#f3f4f6;border-top:3px solid #8b5cf6;border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
     #bulk-actions{background:#fff;border-radius:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);border:1px solid #e5e7eb}
@@ -671,41 +671,52 @@
 
     const renderDesktop = (year, month, events) => {
       dom.body.innerHTML = '';
-      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
       const today = new Date();
-      const frag = document.createDocumentFragment();
-      for(let day=1; day<=daysInMonth; day++){
-        const date = new Date(year, month, day);
-        const dow = date.getDay();
-        const isToday = today.toDateString() === date.toDateString();
-        const dayEvents = events[day] || {};
-        const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
+      
+      for(let day = 1; day <= daysInMonth; day++) {
+        try {
+          const date = new Date(year, month, day);
+          const dow = date.getDay();
+          const isToday = today.toDateString() === date.toDateString();
+          const dayEvents = events[day] || {};
+          const isDayOff = (dow === 0 || dow === 6) || dayEvents.isHoliday;
 
-        const dayInfoCell = document.createElement('div');
-        dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''} ${isDayOff ? 'day-off' : ''}`;
-        dayInfoCell.dataset.day = day;
-        dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName((dow+6)%7)}</div></div>`;
-        frag.appendChild(dayInfoCell);
+          // Create and append day info cell directly
+          const dayInfoCell = document.createElement('div');
+          dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''} ${isDayOff ? 'day-off' : ''}`;
+          dayInfoCell.dataset.day = day;
+          dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName((dow + 6) % 7)}</div></div>`;
+          dom.body.appendChild(dayInfoCell);
 
-        fields.forEach(field=>{
-          const eventText = dayEvents[field] || '';
-          const cell = document.createElement('div');
-          cell.className = `calendar-cell color-${field} ${isDayOff ? 'day-off' : ''}`;
-          const div = document.createElement('div');
-          div.className = 'editable-field';
-          const type = getEventType(eventText);
-          if (type!=='default'){ div.classList.add(type, (type==='full-duty' || type==='medium-duty') ? 'duty-shift' : ''); }
-          const id = `${day}-${field}`;
-          div.dataset.day = day; div.dataset.field = field; div.dataset.cellId = id;
-          if (selected.has(id)) div.classList.add('selected');
-          if (eventText) div.draggable = true;
-          const span = document.createElement('span');
-          span.className = 'event-text';
-          span.textContent = eventText;
-          div.appendChild(span); cell.appendChild(div); frag.appendChild(cell);
-        });
+          // Create and append each field cell directly
+          fields.forEach(field => {
+            const eventText = dayEvents[field] || '';
+            const cell = document.createElement('div');
+            cell.className = `calendar-cell color-${field} ${isDayOff ? 'day-off' : ''}`;
+            const div = document.createElement('div');
+            div.className = 'editable-field';
+            const type = getEventType(eventText);
+            if (type !== 'default') {
+              div.classList.add(type, (type === 'full-duty' || type === 'medium-duty') ? 'duty-shift' : '');
+            }
+            const id = `${day}-${field}`;
+            div.dataset.day = day;
+            div.dataset.field = field;
+            div.dataset.cellId = id;
+            if (selected.has(id)) div.classList.add('selected');
+            if (eventText) div.draggable = true;
+            const span = document.createElement('span');
+            span.className = 'event-text';
+            span.textContent = eventText;
+            div.appendChild(span);
+            cell.appendChild(div);
+            dom.body.appendChild(cell);
+          });
+        } catch (e) {
+          console.error(`Błąd podczas renderowania dnia ${day}:`, e);
+        }
       }
-      dom.body.appendChild(frag);
     };
 
     const renderMobile = (year, month, events) => {
@@ -1104,7 +1115,9 @@
             const target = e.target.closest('.mobile-event-content');
             if (!target) return;
             longPressTimer = setTimeout(() => {
-                showContextMenu({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }, target);
+                if(touchDragData) { // Prevent context menu if dragging starts
+                    showContextMenu({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }, target);
+                }
                 longPressTimer = null;
             }, 500);
 
@@ -1118,8 +1131,11 @@
         });
 
         dom.mobileCalendar.addEventListener('touchmove', async e => {
+            if (!touchDragData) return;
+            
             clearLongPress();
-            if (touchDragData && !ghostEl) {
+            
+            if (!ghostEl) {
                 const sourceData = await getFullEventData(touchDragData.day, touchDragData.field);
                 if (!sourceData || !sourceData.text) {
                     touchDragData = null;
@@ -1132,6 +1148,7 @@
                 ghostEl.classList.add('touch-drag-ghost');
                 document.body.appendChild(ghostEl);
             }
+
             if (ghostEl) {
                 e.preventDefault();
                 ghostEl.style.left = `${e.touches[0].clientX}px`;
@@ -1169,10 +1186,9 @@
         
         dom.mobileCalendar.addEventListener('click', e => {
             const target = e.target.closest('.mobile-event-content');
-            if (target && !longPressTimer) { // Ensure click doesn't fire after a long press
+            if (target && !ghostEl) { 
                 handleMobileEdit(target);
             }
-            clearLongPress();
         });
     };
 
