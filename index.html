@@ -95,6 +95,22 @@
     .char-counter.warning{color:#f59e0b}
     .char-counter.error{color:#ef4444;font-weight:600}
 
+    /* Badge godzin */
+    .hours-badge{
+      position:absolute;top:2px;right:2px;
+      background:rgba(0,0,0,0.7);color:#fff;
+      font-size:0.65rem;font-weight:600;
+      padding:2px 5px;border-radius:4px;
+      z-index:3;
+    }
+    .continuation-arrow{
+      position:absolute;top:2px;left:2px;
+      background:#10b981;color:#fff;
+      font-size:0.6rem;font-weight:600;
+      padding:2px 4px;border-radius:4px;
+      z-index:3;
+    }
+
     /* --- KOLORY --- */
     .color-ania{background:#ffe4e6}
     .color-aniaPraca{background:#fed7aa}
@@ -117,10 +133,6 @@
     .location-lask{background:#f9a8d4!important;font-weight:600}
     .location-other{background:#fdba74!important;font-weight:600}
 
-    /* --- JB – delikatne przyciemnienie --- */
-    .jb-darken{position:relative}
-    .jb-darken::after{content:"";position:absolute;inset:0;border-radius:8px;background:rgba(0,0,0,0.08);pointer-events:none}
-
     /* --- MOBILE LIST --- */
     .mobile-calendar{display:none;padding:1rem}
     @media (max-width:768px){
@@ -134,7 +146,7 @@
       .mobile-events{display:flex;flex-direction:column;gap:.5rem}
       .mobile-event-row{display:flex;align-items:stretch;gap:.5rem;min-height:44px}
       .mobile-event-label{flex:0 0 90px;font-size:.75rem;font-weight:600;padding:.5rem;border-radius:8px;display:flex;align-items:center;color:#4b5563}
-      .mobile-event-content{flex:1;padding:.5rem;border-radius:8px;font-size:.875rem;min-height:44px;display:flex;align-items:center;cursor:pointer;transition:all .2s}
+      .mobile-event-content{flex:1;padding:.5rem;border-radius:8px;font-size:.875rem;min-height:44px;display:flex;align-items:center;cursor:pointer;transition:all .2s;position:relative}
       .mobile-event-content:active{transform:scale(.98)}
       .mobile-event-content .event-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;width:100%}
     }
@@ -150,7 +162,7 @@
     .overview-day-number{font-size:1.5rem;font-weight:700;color:#1f2937}
     .overview-day-name{font-size:.875rem;color:#6b7280;font-weight:500}
     .overview-events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem}
-    .overview-event-item{padding:6px 10px;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:2px}
+    .overview-event-item{padding:6px 10px;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:2px;position:relative}
     .overview-event-label{font-weight:600;font-size:.7rem;opacity:.7}
     .overview-event-text{word-wrap:break-word}
 
@@ -170,6 +182,53 @@
       .month-day-cell{min-height:70px;padding:.25rem}
       .month-day-number{font-size:.75rem}
       .month-event-item{font-size:.6rem;padding:1px 2px}
+    }
+
+    /* --- Hours selector in modal --- */
+    .hours-selector{
+      display:flex;gap:0.5rem;align-items:center;margin-top:0.5rem;
+    }
+    .hours-btn{
+      padding:0.5rem 0.75rem;
+      border:1px solid #e5e7eb;
+      border-radius:0.5rem;
+      background:#fff;
+      cursor:pointer;
+      font-size:0.875rem;
+      transition:all 0.2s;
+    }
+    .hours-btn:hover{
+      background:#f3f4f6;
+    }
+    .hours-btn.active{
+      background:#8b5cf6;
+      color:#fff;
+      border-color:#8b5cf6;
+    }
+    .hours-input{
+      width:60px;
+      padding:0.5rem;
+      border:1px solid #e5e7eb;
+      border-radius:0.5rem;
+      font-size:0.875rem;
+      text-align:center;
+    }
+    .stay-morning-checkbox{
+      display:flex;
+      align-items:center;
+      gap:0.5rem;
+      margin-top:0.5rem;
+      padding:0.5rem;
+      background:#fef3c7;
+      border-radius:0.5rem;
+    }
+    .continuation-info{
+      margin-top:0.5rem;
+      padding:0.5rem;
+      background:#dcfce7;
+      border-radius:0.5rem;
+      font-size:0.75rem;
+      color:#166534;
     }
 
     /* --- MODALE, MENU, LOADER --- */
@@ -243,7 +302,7 @@
 
     <!-- FAB (mobile) -->
     <button id="summary-fab" aria-label="Pokaż podsumowanie">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M3 12h18M12 3v18"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/></svg>
       Suma
     </button>
 
@@ -272,7 +331,7 @@
             <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
               <div class="calendar-cell header p-3">Dzień</div>
               <div class="calendar-cell header p-3 color-ania">Ania</div>
-              <class class="calendar-cell header p-3 color-aniaPraca">Ania Praca</class>
+              <div class="calendar-cell header p-3 color-aniaPraca">Ania Praca</div>
               <div class="calendar-cell header p-3 color-michal">Michał</div>
               <div class="calendar-cell header p-3 color-michalPraca">Michał Praca</div>
               <div class="calendar-cell header p-3 color-wspolne">Wspólne</div>
@@ -320,7 +379,7 @@
 
   <!-- Modal edycji dnia -->
   <div id="day-edit-modal" class="day-edit-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:1rem;">
-    <div class="day-edit-content" style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:80vh;overflow:auto;padding:1.5rem;">
+    <div class="day-edit-content" style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow:auto;padding:1.5rem;">
       <div class="day-edit-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #f3f4f6;">
         <h3 class="day-edit-title" style="font-size:1.5rem;font-weight:700;color:#1f2937">Edycja dnia</h3>
         <div class="day-edit-close" onclick="closeDayEdit()" style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s">
@@ -362,7 +421,7 @@
     let clipboard = null;
     let contextTarget = null;
     const selected = new Set();
-    let currentView = 'standard'; // 'standard', 'compact', 'month'
+    let currentView = 'standard';
     let isMobile = window.innerWidth <= 768;
     let currentEditDay = null;
     let currentEvents = {};
@@ -394,12 +453,10 @@
       btnStandard: document.getElementById('btn-view-standard'),
       btnCompact: document.getElementById('btn-view-compact'),
       btnMonth: document.getElementById('btn-view-month'),
-      // summary desktop
       sumOrtho: document.getElementById('sum-ortho'),
       sumBrzeziny: document.getElementById('sum-brzeziny'),
       sumJB: document.getElementById('sum-jb'),
       sumPorts: document.getElementById('sum-ports'),
-      // summary mobile sheet
       mSumOrtho: document.getElementById('m-sum-ortho'),
       mSumBrzeziny: document.getElementById('m-sum-brzeziny'),
       mSumJB: document.getElementById('m-sum-jb'),
@@ -417,11 +474,11 @@
     const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
     const fieldLabels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
 
-    // --- Reguły rozpoznania rodzaju pracy ---
-    const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz']; // JB 24h
-    const morningKeywords = ['rano','poranna','7:30','7.30','07:30','07.30'];         // 6h
-    const locationLaskKeywords = ['łask'];                                            // 24h
-    const locationOtherKeywords = ['ortho','brzeziny'];                                // 10h
+    // Rozpoznawanie rodzaju pracy
+    const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz'];
+    const morningKeywords = ['rano','poranna','7:30','7.30','07:30','07.30','chirurgia'];
+    const locationLaskKeywords = ['łask'];
+    const locationOtherKeywords = ['ortho','brzeziny'];
 
     const getEventType = (text) => {
       if (!text) return 'default';
@@ -432,11 +489,13 @@
       if (locationOtherKeywords.some(k=>s.includes(k))) return 'location-other';
       return 'default';
     };
+    
     const isJBDuty = (text) => {
       if (!text) return false;
       const s = text.toLowerCase();
-      return s.includes('jb oit') || s.includes('jb znieczuleń') || s.includes('jb znieczulenia') || s.startsWith('jb') || s.includes('jb ');
+      return s.includes('jb ') || s.startsWith('jb');
     };
+    
     const isOrtho = (t) => t && /ortho/i.test(t);
     const isBrzeziny = (t) => t && /brzeziny/i.test(t);
     const isLask = (t) => t && /łask/i.test(t);
@@ -446,68 +505,121 @@
       return morningKeywords.some(k=>s.includes(k));
     };
 
-    // --- Parsowanie/wyliczanie godzin & portów ---
-    const getHoursToken = (t) => {
-      if (!t) return null;
-      const m = t.match(/(?:#h\s*(\d+))|(?:\bh\s*[:=]\s*(\d+))/i); // #h12, h:12, h=12
-      return m ? parseInt(m[1]||m[2]||'0',10) : null;
+    // System godzin - prosty, z zapisem w bazie
+    const getHoursFromDB = (day, field) => {
+      const key = `hours_${day}_${field}`;
+      return currentEvents[key] || null;
     };
-    const setHoursToken = (txt, hours) => {
-      let t = (txt||'').trim();
-      // usuń istniejący token
-      t = t.replace(/(#h\s*\d+)|(\bh\s*[:=]\s*\d+)/ig,'').replace(/\s{2,}/g,' ').trim();
-      if (hours===null) return t; // usunięcie
-      return `${t} #h${hours}`.trim();
+
+    const setHoursToDB = async (day, field, hours) => {
+      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+      const key = `hours_${day}_${field}`;
+      if (hours === null) {
+        await updateDoc(doc(db, calendarId, 'metadata'), { [key]: deleteField() });
+      } else {
+        await setDoc(doc(db, calendarId, 'metadata'), { [key]: hours }, { merge: true });
+      }
     };
-    const getPortsFromText = (t) => {
-      if (!t) return 0;
-      const m = t.match(/(?:#p\s*(\d+))|(?:\bporty?\s*[:=]\s*(\d+))/i);
-      return m ? parseInt(m[1]||m[2]||'0',10) : 0;
-    };
-    const getDefaultHours = (t) => {
-      if (!t) return 0;
-      const s = t.toLowerCase();
+
+    const getDefaultHours = (text, day, field, allEvents) => {
+      if (!text) return 0;
+      const s = text.toLowerCase();
+      
+      // Sprawdź czy to kontynuacja z poprzedniego dnia
+      if (day > 1 && isMorningShift(s)) {
+        const prevDay = day - 1;
+        const prevText = (allEvents[prevDay] && allEvents[prevDay][field]) || '';
+        if (isJBDuty(prevText)) {
+          return 6; // Poranna kontynuacja po dyżurze
+        }
+      }
+      
+      // Domyślne godziny
       if (isOrtho(s) || isBrzeziny(s)) return 10;
       if (isLask(s)) return 24;
       if (fullDutyKeywords.some(k=>s.includes(k)) || s.startsWith('jb')) return 24;
       if (isMorningShift(s)) return 6;
       return 0;
     };
-    const getEffectiveHours = (t) => {
-      const tk = getHoursToken(t);
-      return tk!==null ? tk : getDefaultHours(t);
+
+    const checkContinuation = (day, field, allEvents) => {
+      if (day < 1 || day > 31) return null;
+      const text = allEvents[day] && allEvents[day][field];
+      if (!text) return null;
+      
+      // Sprawdź następny dzień
+      const nextDay = day + 1;
+      const nextText = allEvents[nextDay] && allEvents[nextDay][field];
+      if (nextText && isMorningShift(nextText) && isJBDuty(text)) {
+        return { type: 'morning', extraHours: 6 };
+      }
+      
+      return null;
     };
 
-    // --- Responsive flag ---
+    const getEffectiveHours = (text, day, field, allEvents) => {
+      const saved = getHoursFromDB(day, field);
+      if (saved !== null) return saved;
+      
+      const defaultHours = getDefaultHours(text, day, field, allEvents);
+      const continuation = checkContinuation(day, field, allEvents);
+      
+      if (continuation) {
+        return defaultHours + continuation.extraHours;
+      }
+      
+      return defaultHours;
+    };
+
+    const getPortsFromText = (t) => {
+      if (!t) return 0;
+      const m = t.match(/port[y]?\s*[:\-]?\s*(\d+)/i);
+      return m ? parseInt(m[1], 10) : 0;
+    };
+
+    // Responsive flag
     window.addEventListener('resize', () => {
       const wasMobile = isMobile;
       isMobile = window.innerWidth <= 768;
       if (wasMobile !== isMobile) update();
     });
 
-    // --- Summary compute ---
-    const computeMonthlySummary = (events) => {
+    // Summary compute
+    const computeMonthlySummary = async () => {
       let orthoH=0, brzezH=0, jbH=0, ports=0;
-      const days = Object.keys(events).map(x=>parseInt(x,10)).filter(n=>!isNaN(n));
+      
+      // Pobierz metadata z godzinami
+      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+      const metadataDoc = await getDoc(doc(db, calendarId, 'metadata'));
+      const metadata = metadataDoc.exists() ? metadataDoc.data() : {};
+      
+      // Dodaj metadata do currentEvents
+      Object.assign(currentEvents, metadata);
+      
+      const days = Object.keys(currentEvents).filter(k => !isNaN(parseInt(k,10))).map(x=>parseInt(x,10));
+      
       for (const d of days){
-        const ev = events[d];
+        const ev = currentEvents[d];
+        if (!ev) continue;
+        
         for (const f of fields){
           const txt = ev[f];
           if (!txt) continue;
-          const hours = getEffectiveHours(txt);
+          
+          const hours = getEffectiveHours(txt, d, f, currentEvents);
           const p = getPortsFromText(txt);
+          
           if (isOrtho(txt)) orthoH += hours;
           if (isBrzeziny(txt)) brzezH += hours;
-          if (isJBDuty(txt) || isLask(txt)) jbH += hours; // Łask zaliczamy do JB
+          if (isJBDuty(txt) || isLask(txt)) jbH += hours;
           if (p>0) ports += p;
         }
       }
-      // desktop bar
+      
       dom.sumOrtho.textContent = `${orthoH}h`;
       dom.sumBrzeziny.textContent = `${brzezH}h`;
       dom.sumJB.textContent = `${jbH}h`;
       dom.sumPorts.textContent = `${ports}`;
-      // mobile sheet
       dom.mSumOrtho.textContent = `${orthoH}h`;
       dom.mSumBrzeziny.textContent = `${brzezH}h`;
       dom.mSumJB.textContent = `${jbH}h`;
@@ -516,7 +628,7 @@
       dom.summaryTitle.textContent = `Podsumowanie: ${getMonthName(m)} ${y}`;
     };
 
-    // --- Renders (desktop) ---
+    // Renders
     const renderDesktop = (year, month, events) => {
       dom.loading.style.display = 'none';
       dom.body.innerHTML = '';
@@ -555,10 +667,11 @@
             div.classList.add(type);
             if (type==='full-duty' || type==='medium-duty') div.classList.add('duty-shift');
           }
-          if (isJBDuty(eventText)) div.classList.add('jb-darken');
 
           const id = `${day}-${field}`;
-          div.dataset.day = day; div.dataset.field = field; div.dataset.cellId = id;
+          div.dataset.day = day; 
+          div.dataset.field = field; 
+          div.dataset.cellId = id;
           if (selected.has(id)) div.classList.add('selected');
           if (eventText) div.draggable = true;
 
@@ -567,9 +680,23 @@
           span.textContent = eventText;
           div.appendChild(span);
 
-          // podpowiedź godzin (bez wizualnych badge'y)
-          const hrs = getEffectiveHours(eventText);
-          if (hrs>0) div.title = `Godziny: ${hrs}`;
+          // Badge godzin
+          const hrs = getEffectiveHours(eventText, day, field, events);
+          if (hrs > 0) {
+            const badge = document.createElement('span');
+            badge.className = 'hours-badge';
+            badge.textContent = `${hrs}h`;
+            div.appendChild(badge);
+          }
+
+          // Strzałka kontynuacji
+          const continuation = checkContinuation(day, field, events);
+          if (continuation) {
+            const arrow = document.createElement('span');
+            arrow.className = 'continuation-arrow';
+            arrow.textContent = '→+6h';
+            div.appendChild(arrow);
+          }
 
           cell.appendChild(div);
           frag.appendChild(cell);
@@ -578,7 +705,6 @@
       dom.body.appendChild(frag);
     };
 
-    // --- Render mobile list ---
     const renderMobile = (year, month, events) => {
       dom.loading.style.display = 'none';
       dom.mobileCalendar.innerHTML = '';
@@ -603,27 +729,33 @@
           <div class="mobile-day-header">
             <div>
               <span class="mobile-day-number">${day}</span>
-              <span class="mobile-day-name ml-2">${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}</span>
+              <span class="mobile-day-name ml-2">${getDayFullName(dow===0?6:dow-1)}</span>
             </div>
             ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
             ${isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>':''}
           </div>
           <div class="mobile-events">
         `;
+        
         fields.forEach(field=>{
           const t = dayEvents[field] || '';
           const type = getEventType(t);
-          let typeClass = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
-          if (isJBDuty(t)) typeClass += ' jb-darken';
+          let typeClass = type!=='default' ? type : '';
+          const hrs = getEffectiveHours(t, day, field, events);
+          const continuation = checkContinuation(day, field, events);
+          
           html += `
             <div class="mobile-event-row">
               <div class="mobile-event-label color-${field}">${fieldLabels[field]}</div>
-              <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}" title="${getEffectiveHours(t)>0?('Godziny: '+getEffectiveHours(t)):'Dodaj wpis'}">
+              <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}">
                 <span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
+                ${hrs > 0 ? `<span class="hours-badge">${hrs}h</span>` : ''}
+                ${continuation ? '<span class="continuation-arrow">→+6h</span>' : ''}
               </div>
             </div>
           `;
         });
+        
         html += `</div>`;
         card.innerHTML = html;
         frag.appendChild(card);
@@ -631,7 +763,6 @@
       dom.mobileCalendar.appendChild(frag);
     };
 
-    // --- Compact view ---
     const renderCompact = async (year, month) => {
       dom.loading.style.display = 'flex';
       const container = dom.compactView.querySelector('.overview-container');
@@ -662,7 +793,7 @@
           <div class="overview-day-header">
             <div class="overview-day-info">
               <span class="overview-day-number">${day}</span>
-              <span class="overview-day-name">${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}</span>
+              <span class="overview-day-name">${getDayFullName(dow===0?6:dow-1)}</span>
             </div>
             <div>
               ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
@@ -671,27 +802,30 @@
           </div>
           <div class="overview-events-grid">
         `;
+        
         fields.forEach(field=>{
           if (dayEvents[field]){
             const type = getEventType(dayEvents[field]);
-            const cls = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
-            const isJB = isJBDuty(dayEvents[field]);
-            const hrs = getEffectiveHours(dayEvents[field]);
+            const hrs = getEffectiveHours(dayEvents[field], day, field, events);
+            const continuation = checkContinuation(day, field, events);
+            
             html += `
-              <div class="overview-event-item color-${field} ${cls} ${isJB?'jb-darken':''}" title="${hrs>0?('Godziny: '+hrs):''}">
+              <div class="overview-event-item color-${field} ${type!=='default'?type:''}">
                 <div class="overview-event-label">${fieldLabels[field]}</div>
                 <div class="overview-event-text">${dayEvents[field]}</div>
+                ${hrs > 0 ? `<span class="hours-badge">${hrs}h</span>` : ''}
+                ${continuation ? '<span class="continuation-arrow">→+6h</span>' : ''}
               </div>
             `;
           }
         });
+        
         html += `</div>`;
         card.innerHTML = html;
         container.appendChild(card);
       }
 
       dom.loading.style.display = 'none';
-      // Autoprzewijanie „Dziś” tylko desktop
       setTimeout(()=>{
         if (!isMobile) {
           const todayCard = container.querySelector('.overview-day-card.ring-2');
@@ -699,11 +833,9 @@
         }
       },100);
 
-      // sumy
-      computeMonthlySummary(events);
+      computeMonthlySummary();
     };
 
-    // --- Month view ---
     const renderMonthView = async (year, month) => {
       dom.loading.style.display = 'flex';
       const grid = dom.monthView.querySelector('.month-grid');
@@ -725,7 +857,7 @@
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month+1, 0);
       const daysInMonth = lastDay.getDate();
-      const startDay = (firstDay.getDay() + 6) % 7; // Pon=0
+      const startDay = (firstDay.getDay() + 6) % 7;
       const today = new Date();
 
       for(let i=0;i<startDay;i++){
@@ -748,19 +880,20 @@
 
         let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
         let shown = 0;
+        
         for (const field of fields){
           if (dayEvents[field] && shown < 3){
             const type = getEventType(dayEvents[field]);
-            const cls = type!=='default' ? type : '';
-            const isJB = isJBDuty(dayEvents[field]);
-            html += `<div class="month-event-item color-${field} ${cls} ${isJB?'jb-darken':''}" title="${getEffectiveHours(dayEvents[field])>0?('Godziny: '+getEffectiveHours(dayEvents[field])):''}">${dayEvents[field]}</div>`;
+            html += `<div class="month-event-item color-${field} ${type!=='default'?type:''}}">${dayEvents[field]}</div>`;
             shown++;
           }
         }
+        
         const total = fields.filter(f=>dayEvents[f]).length;
         if (total > 3){
           html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`;
         }
+        
         html += `</div>`;
         cell.innerHTML = html;
         grid.appendChild(cell);
@@ -769,6 +902,7 @@
       const totalCells = startDay + daysInMonth;
       const rows = Math.ceil(totalCells/7);
       const target = rows*7;
+      
       for(let i=totalCells; i<target; i++){
         const empty = document.createElement('div');
         empty.className = 'month-day-cell other-month';
@@ -776,91 +910,136 @@
       }
 
       dom.loading.style.display = 'none';
-
-      computeMonthlySummary(events);
+      computeMonthlySummary();
     };
 
-    // --- Edit day modal ---
+    // Edit day modal with hours selector
     window.openDayEdit = (day, dayEvents) => {
       currentEditDay = day;
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dow = date.getDay();
       document.querySelector('.day-edit-title').textContent =
-        `${day} ${getMonthName(currentDate.getMonth())} - ${['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][dow===0?6:dow-1]}`;
+        `${day} ${getMonthName(currentDate.getMonth())} - ${getDayFullName(dow===0?6:dow-1)}`;
 
       dom.dayEditFields.innerHTML = '';
+      
       fields.forEach(field=>{
         const wrap = document.createElement('div');
         wrap.className = 'day-edit-field';
         const value = (dayEvents[field]||'');
-        const type = getEventType(value);
+        const savedHours = getHoursFromDB(day, field);
+        const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
+        const continuation = checkContinuation(day, field, currentEvents);
 
         wrap.innerHTML = `
           <label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label>
-          <input type="text" class="day-edit-input ${type!=='default'?type:''} ${isJBDuty(value)?'jb-darken':''}" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
-          <div style="display:flex;gap:.5rem;margin-top:.4rem;flex-wrap:wrap">
-            <button data-act="set-h" data-h="6"  data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">6h</button>
-            <button data-act="set-h" data-h="10" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">10h</button>
-            <button data-act="set-h" data-h="24" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">24h</button>
-            <button data-act="clr-h"             data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-red-300 text-red-700 hover:bg-red-50">− usuń godziny</button>
-            <button data-act="add-port"          data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-pink-300 text-pink-700 hover:bg-pink-50">+port</button>
+          <input type="text" class="day-edit-input" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
+          
+          <div class="hours-selector">
+            <label style="font-size:0.75rem;color:#6b7280;margin-right:0.5rem;">Godziny:</label>
+            <button class="hours-btn" data-hours="0" data-field="${field}">Auto</button>
+            <button class="hours-btn" data-hours="6" data-field="${field}">6h</button>
+            <button class="hours-btn" data-hours="10" data-field="${field}">10h</button>
+            <button class="hours-btn" data-hours="12" data-field="${field}">12h</button>
+            <button class="hours-btn" data-hours="24" data-field="${field}">24h</button>
+            <input type="number" class="hours-input" data-field="${field}" value="${savedHours || effectiveHours}" min="0" max="48" placeholder="h">
           </div>
-          <div class="text-xs text-gray-500 mt-1">Domyślnie: JB/Łask 24h · Ortho/Brzeziny 10h · „rano” 6h. Token #hX nadpisuje.</div>
+          
+          ${value && isJBDuty(value) ? `
+            <div class="stay-morning-checkbox">
+              <input type="checkbox" id="stay-${field}" data-field="${field}">
+              <label for="stay-${field}" style="font-size:0.875rem;">Zostaję rano (kolejny dzień +6h)</label>
+            </div>
+          ` : ''}
+          
+          ${continuation ? `
+            <div class="continuation-info">
+              ✓ Wykryto kontynuację: następny dzień zawiera "${currentEvents[day+1] && currentEvents[day+1][field]}" → automatycznie +6h
+            </div>
+          ` : ''}
+          
+          ${day > 1 && value && isMorningShift(value) && currentEvents[day-1] && isJBDuty(currentEvents[day-1][field]) ? `
+            <div class="continuation-info">
+              ✓ To jest kontynuacja po dyżurze z poprzedniego dnia
+            </div>
+          ` : ''}
         `;
+        
         dom.dayEditFields.appendChild(wrap);
       });
 
-      // input change
+      // Event listeners
       dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{
         input.addEventListener('change', async ()=>{
           const field = input.dataset.field;
           const val = input.value.trim();
           if (!val) await dbDelete(currentEditDay, field);
           else await dbSave(currentEditDay, field, val);
-          const type = getEventType(val);
-          input.className = `day-edit-input ${type!=='default'?type:''} ${isJBDuty(val)?'jb-darken':''}`;
         });
       });
 
-      // quick actions
-      dom.dayEditFields.querySelectorAll('button[data-act]').forEach(btn=>{
+      // Hours buttons
+      dom.dayEditFields.querySelectorAll('.hours-btn').forEach(btn=>{
         btn.addEventListener('click', async ()=>{
-          const field = btn.getAttribute('data-field');
-          const act = btn.getAttribute('data-act');
-          const inp = dom.dayEditFields.querySelector(`.day-edit-input[data-field="${field}"]`);
-          if (!inp) return;
-          let v = inp.value.trim();
-          if (act==='set-h'){
-            const h = parseInt(btn.getAttribute('data-h'),10);
-            v = setHoursToken(v, h);
-          } else if (act==='clr-h'){
-            v = setHoursToken(v, null);
-          } else if (act==='add-port'){
-            // jeśli nie ma portów → #p1, jeśli są → +1
-            const cur = getPortsFromText(v);
-            const nv = cur>0 ? (cur+1) : 1;
-            v = v.replace(/(#p\s*\d+)|(\bporty?\s*[:=]\s*\d+)/ig,'').trim();
-            v = `${v} #p${nv}`.trim();
+          const field = btn.dataset.field;
+          const hours = parseInt(btn.dataset.hours);
+          const input = dom.dayEditFields.querySelector(`.hours-input[data-field="${field}"]`);
+          
+          if (hours === 0) {
+            // Auto mode - remove saved hours
+            await setHoursToDB(currentEditDay, field, null);
+            input.value = getDefaultHours(dom.dayEditFields.querySelector(`.day-edit-input[data-field="${field}"]`).value, currentEditDay, field, currentEvents);
+          } else {
+            await setHoursToDB(currentEditDay, field, hours);
+            input.value = hours;
           }
-          if (v.length > MAX_CHARS) v = v.slice(0, MAX_CHARS);
-          inp.value = v;
-          await dbSave(currentEditDay, field, v);
-          const type = getEventType(v);
-          inp.className = `day-edit-input ${type!=='default'?type:''} ${isJBDuty(v)?'jb-darken':''}`;
+          
+          // Update button states
+          dom.dayEditFields.querySelectorAll(`.hours-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // Hours input
+      dom.dayEditFields.querySelectorAll('.hours-input').forEach(input=>{
+        input.addEventListener('change', async ()=>{
+          const field = input.dataset.field;
+          const hours = parseInt(input.value) || 0;
+          await setHoursToDB(currentEditDay, field, hours);
+          
+          // Clear button states
+          dom.dayEditFields.querySelectorAll(`.hours-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('active'));
+        });
+      });
+
+      // Stay morning checkbox
+      dom.dayEditFields.querySelectorAll('.stay-morning-checkbox input').forEach(cb=>{
+        cb.addEventListener('change', async ()=>{
+          const field = cb.dataset.field;
+          if (cb.checked) {
+            // Add morning shift to next day
+            const nextDay = currentEditDay + 1;
+            if (nextDay <= 31) {
+              await dbSave(nextDay, field, 'chirurgia rano');
+              await setHoursToDB(nextDay, field, 6);
+            }
+          }
         });
       });
 
       dom.dayEditModal.style.display = 'flex';
     };
+    
     window.closeDayEdit = () => {
       dom.dayEditModal.style.display = 'none';
-      if (currentView==='compact') renderCompact(currentDate.getFullYear(), currentDate.getMonth());
-      else if (currentView==='month') renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
-      else update();
+      update();
     };
-    dom.dayEditModal.addEventListener('click', (e)=>{ if(e.target===dom.dayEditModal) closeDayEdit(); });
+    
+    dom.dayEditModal.addEventListener('click', (e)=>{ 
+      if(e.target===dom.dayEditModal) closeDayEdit(); 
+    });
 
-    // --- Updates ---
+    // Updates
     const update = () => {
       if (!db) return;
 
@@ -875,15 +1054,27 @@
       const y = currentDate.getFullYear();
       const m = currentDate.getMonth();
       const id = `${y}-${m+1}`;
-      unsubscribe = onSnapshot(collection(db, id), snap=>{
-        const events = {}; snap.forEach(d=>events[d.id]=d.data());
+      
+      unsubscribe = onSnapshot(collection(db, id), async snap=>{
+        const events = {}; 
+        snap.forEach(d=>{ 
+          if (d.id !== 'metadata') events[d.id]=d.data(); 
+        });
         currentEvents = events;
-        if (isMobile) renderMobile(y, m, events); else renderDesktop(y, m, events);
-        computeMonthlySummary(events);
+        
+        // Load metadata
+        const metadataDoc = await getDoc(doc(db, id, 'metadata'));
+        if (metadataDoc.exists()) {
+          Object.assign(currentEvents, metadataDoc.data());
+        }
+        
+        if (isMobile) renderMobile(y, m, events); 
+        else renderDesktop(y, m, events);
+        computeMonthlySummary();
       });
     };
 
-    // --- Switch view + active buttons ---
+    // View switching
     const setActiveViewButton = () => {
       [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(b=>{
         b.classList.remove('active');
@@ -893,6 +1084,7 @@
       map[currentView].classList.add('active');
       map[currentView].setAttribute('aria-selected','true');
     };
+    
     const switchView = (view) => {
       currentView = view;
       dom.mainView.style.display = 'none';
@@ -905,7 +1097,7 @@
       update();
     };
 
-    // --- Mobile inline edit ---
+    // Mobile inline edit
     const handleMobileEdit = (el) => {
       const cur = el.querySelector('.event-text').textContent;
       const isPH = cur.includes('Kliknij aby dodać');
@@ -938,6 +1130,7 @@
           else await dbSave(el.dataset.day, el.dataset.field, txt);
         }
       };
+      
       ta.addEventListener('input', upd);
       ta.addEventListener('blur', save);
       ta.addEventListener('keydown', e=>{
@@ -946,7 +1139,7 @@
       ta.focus();
     };
 
-    // --- Desktop edit/select ---
+    // Desktop edit
     const handleEdit = (fieldDiv) => {
       const active = document.querySelector('.editable-field textarea');
       if (active && active.parentElement === fieldDiv){ active.blur(); return; }
@@ -983,6 +1176,7 @@
           else await dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, txt);
         }
       };
+      
       ta.addEventListener('blur', save);
       ta.addEventListener('keydown', e=>{
         if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); }
@@ -993,14 +1187,28 @@
       ta.focus();
     };
 
-    // --- Listeners (grid + mobile) ---
+    // Event listeners
     document.getElementById('calendar-body').addEventListener('click', e=>{
       const dayInfoCell = e.target.closest('.day-info-cell');
-      if (dayInfoCell){ if (e.target.closest('.editable-field')) return; toggleHoliday(dayInfoCell.dataset.day); return; }
+      if (dayInfoCell){ 
+        if (e.target.closest('.editable-field')) return; 
+        toggleHoliday(dayInfoCell.dataset.day); 
+        return; 
+      }
+      
       const fieldDiv = e.target.closest('.editable-field');
-      if (!fieldDiv){ if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); return; }
-      if (e.ctrlKey || e.metaKey){ e.preventDefault(); toggleSelection(fieldDiv); }
-      else { if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); handleEdit(fieldDiv); }
+      if (!fieldDiv){ 
+        if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); 
+        return; 
+      }
+      
+      if (e.ctrlKey || e.metaKey){ 
+        e.preventDefault(); 
+        toggleSelection(fieldDiv); 
+      } else { 
+        if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); 
+        handleEdit(fieldDiv); 
+      }
     });
 
     dom.mobileCalendar.addEventListener('click', e=>{
@@ -1008,32 +1216,69 @@
       if (el) handleMobileEdit(el);
     });
 
-    // --- Context menu ---
+    // Context menu
     const showContextMenu = (e,target)=>{
       contextTarget = target;
       dom.contextMenu.style.left = `${e.pageX}px`;
       dom.contextMenu.style.top = `${e.pageY}px`;
       dom.contextMenu.style.display = 'block';
     };
+    
     dom.body.addEventListener('contextmenu', e=>{
       e.preventDefault();
       const field = e.target.closest('.editable-field');
       if (field) showContextMenu(e, field);
     });
+    
     dom.mobileCalendar.addEventListener('contextmenu', e=>{
       e.preventDefault();
       const ec = e.target.closest('.mobile-event-content');
       if (ec) showContextMenu(e, ec);
     });
-    dom.copyBtn.addEventListener('click', ()=>{ clipboard = contextTarget.querySelector('.event-text').textContent; dom.contextMenu.style.display='none'; });
-    dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); dom.contextMenu.style.display='none'; });
-    dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); dom.contextMenu.style.display='none'; });
-    document.addEventListener('click', e=>{ if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; });
+    
+    dom.copyBtn.addEventListener('click', ()=>{ 
+      clipboard = contextTarget.querySelector('.event-text').textContent; 
+      dom.contextMenu.style.display='none'; 
+    });
+    
+    dom.pasteBtn.addEventListener('click', ()=>{ 
+      if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); 
+      dom.contextMenu.style.display='none'; 
+    });
+    
+    dom.deleteBtn.addEventListener('click', ()=>{ 
+      dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); 
+      dom.contextMenu.style.display='none'; 
+    });
+    
+    document.addEventListener('click', e=>{ 
+      if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; 
+    });
 
-    // --- Bulk selection ---
-    const toggleSelection = el => { const id = el.dataset.cellId; selected.has(id) ? selected.delete(id) : selected.add(id); el.classList.toggle('selected'); updateBulkUI(); };
-    const updateBulkUI = () => { const c = selected.size; if (c>0){ dom.selectionCount.textContent = `Zaznaczono: ${c}`; dom.bulkActions.classList.remove('hidden'); } else dom.bulkActions.classList.add('hidden'); };
-    const clearSelection = () => { document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); selected.clear(); updateBulkUI(); };
+    // Bulk selection
+    const toggleSelection = el => { 
+      const id = el.dataset.cellId; 
+      selected.has(id) ? selected.delete(id) : selected.add(id); 
+      el.classList.toggle('selected'); 
+      updateBulkUI(); 
+    };
+    
+    const updateBulkUI = () => { 
+      const c = selected.size; 
+      if (c>0){ 
+        dom.selectionCount.textContent = `Zaznaczono: ${c}`; 
+        dom.bulkActions.classList.remove('hidden'); 
+      } else {
+        dom.bulkActions.classList.add('hidden'); 
+      }
+    };
+    
+    const clearSelection = () => { 
+      document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); 
+      selected.clear(); 
+      updateBulkUI(); 
+    };
+    
     dom.bulkDelete.addEventListener('click', async ()=>{
       const batch = writeBatch(db);
       const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
@@ -1044,22 +1289,33 @@
       await batch.commit();
       clearSelection();
     });
+    
     dom.clearSelection.addEventListener('click', clearSelection);
 
-    // --- Drag & drop (desktop) ---
+    // Drag & drop
     dom.body.addEventListener('dragstart', e=>{
       const f = e.target.closest('.editable-field');
       if (f && f.draggable) e.dataTransfer.setData('text/plain', f.querySelector('.event-text').textContent);
     });
-    dom.body.addEventListener('dragover', e=>{ e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
+    
+    dom.body.addEventListener('dragover', e=>{ 
+      e.preventDefault(); 
+      e.target.closest('.editable-field')?.classList.add('drag-over'); 
+    });
+    
     dom.body.addEventListener('dragleave', e=> e.target.closest('.editable-field')?.classList.remove('drag-over'));
+    
     dom.body.addEventListener('drop', e=>{
       e.preventDefault();
       const f = e.target.closest('.editable-field');
-      if (f){ f.classList.remove('drag-over'); const t = e.dataTransfer.getData('text/plain'); if (t) dbSave(f.dataset.day, f.dataset.field, t); }
+      if (f){ 
+        f.classList.remove('drag-over'); 
+        const t = e.dataTransfer.getData('text/plain'); 
+        if (t) dbSave(f.dataset.day, f.dataset.field, t); 
+      }
     });
 
-    // --- DB helpers ---
+    // DB helpers
     const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
     const dbDelete = (day, field) => updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: deleteField() });
     const toggleHoliday = async (day) => {
@@ -1072,10 +1328,14 @@
       }catch(e){ console.error(e); }
     };
 
-    // --- Navigation ---
+    // Navigation
     const scrollToToday = () => {
       const t = new Date();
-      if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ currentDate = new Date(t); update(); }
+      if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ 
+        currentDate = new Date(t); 
+        update(); 
+      }
+      
       setTimeout(()=>{
         if (currentView==='standard'){
           document.querySelector('.today')?.scrollIntoView({behavior:'smooth', block:'center'});
@@ -1088,14 +1348,20 @@
       },100);
     };
 
-    // --- Summary FAB / Sheet (mobile) ---
+    // Summary FAB / Sheet
     dom.summaryFab.addEventListener('click', ()=> dom.summarySheet.classList.add('open'));
     dom.closeSheet.addEventListener('click', ()=> dom.summarySheet.classList.remove('open'));
-    dom.summarySheet.addEventListener('click', (e)=>{ if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); });
+    dom.summarySheet.addEventListener('click', (e)=>{ 
+      if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); 
+    });
 
-    // --- Init ---
+    // Init
     const initCalendar = () => {
-      const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
+      const nav = (d)=>{ 
+        currentDate.setMonth(currentDate.getMonth()+d); 
+        update(); 
+      };
+      
       dom.prevBtn.addEventListener('click', ()=>nav(-1));
       dom.nextBtn.addEventListener('click', ()=>nav(1));
       dom.todayBtn.addEventListener('click', scrollToToday);
@@ -1107,11 +1373,15 @@
         });
       });
 
-      // Gesty mobile
+      // Mobile gestures
       let sx=0, ex=0;
       if (isMobile){
         document.addEventListener('touchstart', e=>{ sx = e.changedTouches[0].screenX; });
-        document.addEventListener('touchend', e=>{ ex = e.changedTouches[0].screenX; if (ex < sx - 50) nav(1); if (ex > sx + 50) nav(-1); });
+        document.addEventListener('touchend', e=>{ 
+          ex = e.changedTouches[0].screenX; 
+          if (ex < sx - 50) nav(1); 
+          if (ex > sx + 50) nav(-1); 
+        });
       }
 
       setActiveViewButton();
