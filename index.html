@@ -1,31 +1,3 @@
-Doskonale rozumiem. Obecny system godzin, mimo że precyzyjny, mógł stać się zbyt "techniczny" i zaśmiecać widok kalendarza. Wprowadzam zmiany oparte na Twoich uwagach i podpowiedziach, stawiając na minimalizm, przejrzystość i intuicyjność.
-
-### Główne wprowadzone zmiany:
-
-1.  **Czysty i przejrzysty widok kalendarza:**
-
-      * **Usunięto wszystkie wskaźniki godzin:** Zgodnie z sugestią, z kalendarza (w każdym widoku: standardowym, mobilnym i kompaktowym) zniknęły czarne plakietki z godzinami (`hours-badge`) oraz zielone strzałki kontynuacji (`continuation-arrow`).
-      * **Wizualny spokój:** Teraz kalendarz pokazuje tylko treść wydarzeń, bez dodatkowych nakładek. Liczba godzin jest niewidoczna w głównym widoku, ale **nadal jest liczona w tle** i poprawnie uwzględniana w podsumowaniu miesiąca.
-
-2.  **Uproszczony i intuicyjny system edycji godzin:**
-
-      * W oknie edycji dnia (`modal`), skomplikowany panel z przyciskami został zastąpiony **jednym, prostym polem do wpisania liczby godzin**.
-      * **Inteligentne działanie w tle:**
-          * Jeśli pole godzin pozostawisz **puste**, system automatycznie obliczy godziny na podstawie treści wpisu (np. "jb oit" -\> 24h, "ortho" -\> 10h). Sugerowana automatyczna wartość jest widoczna jako podpowiedź w polu.
-          * Jeśli wpiszesz **własną wartość** (np. 12), zostanie ona zapisana i będzie miała priorytet.
-          * Aby wrócić do trybu automatycznego, wystarczy wyczyścić pole godzin.
-
-3.  **Brak automatycznego przewijania w widoku kompaktowym:**
-
-      * Naprawiłem zachowanie, które wskazałeś. Teraz, po kliknięciu na ikonę widoku kompaktowego, kalendarz **nie będzie już automatycznie przewijał się do dzisiejszego dnia**. Pozostanie na aktualnie wybranym miesiącu, dając Ci pełną kontrolę nad nawigacją. Przycisk "Dziś" nadal działa, jeśli zechcesz świadomie przejść do bieżącej daty.
-
-Poniżej znajdziesz kompletny, zaktualizowany kod. Wystarczy, że podmienisz całą zawartość swojego pliku `index.html` na poniższą.
-
------
-
-### Zaktualizowany kod do wklejenia:
-
-```html
 <!DOCTYPE html>
 <html lang="pl">
 <head>
