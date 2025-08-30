@@ -171,7 +171,7 @@
       .month-event-item{font-size:.6rem;padding:1px 2px}
     }
 
-    /* UPROSZCZONY INPUT GODZIN W MODALU */
+    /* INPUTY W MODALU */
     .hours-input, .ports-input {
       width:80px;
       padding:0.5rem;
@@ -180,6 +180,11 @@
       font-size:0.875rem;
       text-align:center;
     }
+    .delete-field-btn {
+      background: transparent; border: none; cursor: pointer; padding: 0.5rem;
+      color: #9ca3af; transition: color 0.2s;
+    }
+    .delete-field-btn:hover { color: #ef4444; }
 
     /* --- MODALE, MENU, LOADER --- */
     #context-menu{position:fixed;background:#fff;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);z-index:1000;min-width:150px;padding:6px;display:none;border:1px solid #e5e7eb}
@@ -216,23 +221,19 @@
           <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Poprzedni miesiąc">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
           </button>
-
           <h2 id="month-year-display" class="text-base md:text-lg font-semibold text-gray-700 text-center">Ładowanie...</h2>
-
           <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Następny miesiąc">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </button>
-
           <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
-
           <div class="view-toggle" role="tablist" aria-label="Przełącz widok">
-            <button id="btn-view-standard" class="view-btn active" title="Widok normalny" aria-label="Widok normalny" data-view="standard" role="tab" aria-selected="true">
+            <button id="btn-view-standard" class="view-btn active" title="Widok normalny" data-view="standard" role="tab" aria-selected="true">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 10h18M3 14h18"/></svg>
             </button>
-            <button id="btn-view-compact" class="view-btn" title="Widok kompaktowy" aria-label="Widok kompaktowy" data-view="compact" role="tab" aria-selected="false">
+            <button id="btn-view-compact" class="view-btn" title="Widok kompaktowy" data-view="compact" role="tab" aria-selected="false">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <button id="btn-view-month" class="view-btn" title="Widok miesięczny" aria-label="Widok miesięczny" data-view="month" role="tab" aria-selected="false">
+            <button id="btn-view-month" class="view-btn" title="Widok miesięczny" data-view="month" role="tab" aria-selected="false">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
             </button>
           </div>
@@ -243,7 +244,8 @@
     <div id="summary-bar" class="summary-bar">
       <span class="summary-chip"><span class="summary-dot" style="background:#a7f3d0"></span> Ortho: <b id="sum-ortho">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fde68a"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB (OIT+Zniecz.+Łask): <b id="sum-jb">0h</b></span>
+      <span class="summary-chip"><span class="summary-dot" style="background:#f9a8d4"></span> Łask: <b id="sum-lask">0h</b></span>
+      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB (OIT+Zniecz.): <b id="sum-jb">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
     </div>
 
@@ -259,7 +261,8 @@
         <div class="grid">
           <div class="item"><div class="text-xs text-gray-500">Ortho</div><div class="text-lg font-bold" id="m-sum-ortho">0h</div></div>
           <div class="item"><div class="text-xs text-gray-500">Brzeziny</div><div class="text-lg font-bold" id="m-sum-brzeziny">0h</div></div>
-          <div class="item"><div class="text-xs text-gray-500">JB (OIT+Zniecz.+Łask)</div><div class="text-lg font-bold" id="m-sum-jb">0h</div></div>
+          <div class="item"><div class="text-xs text-gray-500">Łask</div><div class="text-lg font-bold" id="m-sum-lask">0h</div></div>
+          <div class="item"><div class="text-xs text-gray-500">JB (OIT+Zniecz.)</div><div class="text-lg font-bold" id="m-sum-jb">0h</div></div>
           <div class="item"><div class="text-xs text-gray-500">Porty</div><div class="text-lg font-bold" id="m-sum-ports">0</div></div>
         </div>
         <div class="mt-3 text-right">
@@ -393,10 +396,12 @@
       btnMonth: document.getElementById('btn-view-month'),
       sumOrtho: document.getElementById('sum-ortho'),
       sumBrzeziny: document.getElementById('sum-brzeziny'),
+      sumLask: document.getElementById('sum-lask'),
       sumJB: document.getElementById('sum-jb'),
       sumPorts: document.getElementById('sum-ports'),
       mSumOrtho: document.getElementById('m-sum-ortho'),
       mSumBrzeziny: document.getElementById('m-sum-brzeziny'),
+      mSumLask: document.getElementById('m-sum-lask'),
       mSumJB: document.getElementById('m-sum-jb'),
       mSumPorts: document.getElementById('m-sum-ports'),
       summarySheet: document.getElementById('summary-sheet'),
@@ -451,11 +456,11 @@
     const detectMultiShift = (text) => {
         if (!text) return { detected: false };
         const s = text.toLowerCase();
-        const hasJB = isJBDuty(s);
+        const hasMorning = isMorningShift(s);
         const hasOrtho = isOrtho(s);
         const hasLask = isLask(s);
-        if (hasJB && (hasOrtho || hasLask)) {
-            return { detected: true, part1: 'JB', part2: hasOrtho ? 'Ortho' : 'Łask' };
+        if (hasMorning && (hasOrtho || hasLask)) {
+            return { detected: true, part1: 'Poranna', part2: hasOrtho ? 'Ortho' : 'Łask' };
         }
         return { detected: false };
     };
@@ -470,6 +475,12 @@
       const key = `hours_${field}`;
       return dayData[key] !== undefined ? dayData[key] : null;
     };
+    
+    const getPortsFromDB = (day, field) => {
+      const dayData = currentEvents[day] || {};
+      const key = `ports_${field}`;
+      return dayData[key] !== undefined ? dayData[key] : null;
+    };
 
     const setHoursToDB = async (day, field, hours) => {
       const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
@@ -479,6 +490,18 @@
         await updateDoc(docRef, { [key]: deleteField() }).catch(() => setDoc(docRef, {}));
       } else {
         await setDoc(docRef, { [key]: hours }, { merge: true });
+      }
+    };
+    
+    const setPortsToDB = async (day, field, count) => {
+      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+      const docRef = doc(db, calendarId, String(day));
+      const key = `ports_${field}`;
+      const countNum = parseInt(count, 10);
+      if (count === '' || isNaN(countNum) || countNum <= 0) {
+          await updateDoc(docRef, { [key]: deleteField() }).catch(() => setDoc(docRef, {}));
+      } else {
+          await setDoc(docRef, { [key]: countNum }, { merge: true });
       }
     };
 
@@ -537,20 +560,6 @@
       return m ? parseInt(m[1], 10) : 0;
     };
     
-    const updatePortsInText = (text, count) => {
-        const portRegex = /port[y]?\s*[:\-]?\s*\d+/i;
-        const countNum = parseInt(count, 10);
-        if (count === '' || isNaN(countNum) || countNum <= 0) {
-            let newText = text.replace(portRegex, '').replace(/\s\s+/g, ' ').trim();
-            return newText;
-        }
-        const newPortStr = `porty ${countNum}`;
-        if (text.match(portRegex)) {
-            return text.replace(portRegex, newPortStr);
-        }
-        return `${text} ${newPortStr}`;
-    };
-
     window.addEventListener('resize', () => {
       const wasMobile = isMobile;
       isMobile = window.innerWidth <= 768;
@@ -558,7 +567,7 @@
     });
 
     const computeMonthlySummary = async () => {
-      let orthoH=0, brzezH=0, jbH=0, ports=0;
+      let orthoH=0, brzezH=0, jbH=0, ports=0, laskH=0;
       const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
       for (let day = 1; day <= daysInMonth; day++) {
         const ev = currentEvents[day];
@@ -566,19 +575,28 @@
         for (const f of fields){
           const txt = ev[f];
           if (!txt) continue;
+          
           const hours = getEffectiveHours(txt, day, f, currentEvents);
-          ports += getPortsFromText(txt);
+          const savedPorts = getPortsFromDB(day, f);
+          ports += (savedPorts !== null) ? savedPorts : getPortsFromText(txt);
+          
+          if (isLask(txt)) {
+              laskH += hours;
+          } else if (isJBDuty(txt)) {
+              jbH += hours;
+          }
           if (isOrtho(txt)) orthoH += hours;
           if (isBrzeziny(txt)) brzezH += hours;
-          if (isJBDuty(txt) || isLask(txt)) jbH += hours;
         }
       }
       dom.sumOrtho.textContent = `${orthoH}h`;
       dom.sumBrzeziny.textContent = `${brzezH}h`;
+      dom.sumLask.textContent = `${laskH}h`;
       dom.sumJB.textContent = `${jbH}h`;
       dom.sumPorts.textContent = `${ports}`;
       dom.mSumOrtho.textContent = `${orthoH}h`;
       dom.mSumBrzeziny.textContent = `${brzezH}h`;
+      dom.mSumLask.textContent = `${laskH}h`;
       dom.mSumJB.textContent = `${jbH}h`;
       dom.mSumPorts.textContent = `${ports}`;
       dom.summaryTitle.textContent = `Podsumowanie: ${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
@@ -651,8 +669,7 @@
 
     const renderStaticView = async (viewType) => {
         dom.loading.style.display = 'flex';
-        unsubscribe(); // Stop any live updates from standard view
-        
+        unsubscribe();
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
@@ -662,9 +679,64 @@
         docs.forEach(d => { currentEvents[d.id] = d.data(); });
 
         if (viewType === 'compact') {
-            renderCompact(year, month, currentEvents);
+            const container = dom.compactView.querySelector('.overview-container');
+            container.innerHTML = '';
+            // Simplified render logic here, you can extract it to a function if needed
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const today = new Date();
+            for(let day=1; day<=daysInMonth; day++){
+                const date = new Date(year, month, day);
+                const dow = date.getDay();
+                const isToday = today.toDateString() === date.toDateString();
+                const dayEvents = currentEvents[day] || {};
+                const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
+                const card = document.createElement('div');
+                card.className = `overview-day-card ${isDayOff?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
+                card.dataset.day = day;
+                card.onclick = ()=>openDayEdit(day, dayEvents);
+                let html = `<div class="overview-day-header"><div class="overview-day-info"><span class="overview-day-number">${day}</span><span class="overview-day-name">${getDayFullName((dow+6)%7)}</span></div><div>${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}${dayEvents.isHoliday ?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>':''}</div></div><div class="overview-events-grid">`;
+                fields.forEach(field=>{
+                  if (dayEvents[field]){
+                    const type = getEventType(dayEvents[field]);
+                    html += `<div class="overview-event-item color-${field} ${type!=='default'?type:''}">
+                        <div class="overview-event-label">${fieldLabels[field]}</div>
+                        <div class="overview-event-text">${dayEvents[field]}</div>
+                      </div>`;
+                  }
+                });
+                html += `</div>`;
+                card.innerHTML = html;
+                container.appendChild(card);
+            }
         } else if (viewType === 'month') {
-            renderMonthView(year, month, currentEvents);
+            const grid = dom.monthView.querySelector('.month-grid');
+            grid.innerHTML = '';
+            ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'].forEach(h=>{ const el = document.createElement('div'); el.className = 'month-header-cell'; el.textContent = h; grid.appendChild(el); });
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const startDay = (firstDay.getDay() + 6) % 7;
+            const today = new Date();
+            for(let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='month-day-cell other-month'; grid.appendChild(e); }
+            for(let day=1; day<=daysInMonth; day++){
+                const dow = new Date(year, month, day).getDay();
+                const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
+                const dayEvents = currentEvents[day] || {};
+                const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
+                const cell = document.createElement('div');
+                cell.className = `month-day-cell ${isDayOff?'weekend':''} ${isToday?'today':''}`;
+                cell.dataset.day = day; cell.onclick = ()=>openDayEdit(day, dayEvents);
+                let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
+                let shown = 0;
+                for (const field of fields){
+                  if (dayEvents[field] && shown < 3){ html += `<div class="month-event-item color-${field} ${getEventType(dayEvents[field])!=='default'?getEventType(dayEvents[field]):''}">${dayEvents[field]}</div>`; shown++; }
+                }
+                const total = fields.filter(f=>dayEvents[f]).length;
+                if (total > 3){ html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`; }
+                html += `</div>`;
+                cell.innerHTML = html; grid.appendChild(cell);
+            }
+            const totalCells = startDay + daysInMonth;
+            for(let i=totalCells; i<Math.ceil(totalCells/7)*7; i++){ const e=document.createElement('div'); e.className='month-day-cell other-month'; grid.appendChild(e); }
         }
         
         dom.loading.style.display = 'none';
@@ -687,24 +759,30 @@
         let hoursHTML = '';
         if (multiShift.detected) {
             const defaultPartHours = getDefaultPartHours(multiShift);
-            const savedPart1 = (typeof savedHours === 'object' && savedHours.part1 !== undefined && savedHours.part1 !== null) ? savedHours.part1 : '';
-            const savedPart2 = (typeof savedHours === 'object' && savedHours.part2 !== undefined && savedHours.part2 !== null) ? savedHours.part2 : '';
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction: column; gap:0.5rem; background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex: 1;">Godziny (${multiShift.part1}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part1" value="${savedPart1}" min="0" max="48" placeholder="${defaultPartHours.part1}h"></div>
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex: 1;">Godziny (${multiShift.part2}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part2" value="${savedPart2}" min="0" max="48" placeholder="${defaultPartHours.part2}h"></div>
-                <div style="font-size: 0.7rem; color: #9ca3af; text-align: right; margin-top: 0.25rem;">Puste = auto</div></div>`;
+            const savedPart1 = (typeof savedHours==='object' && savedHours.part1!==null) ? savedHours.part1 : '';
+            const savedPart2 = (typeof savedHours==='object' && savedHours.part2!==null) ? savedHours.part2 : '';
+            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.5rem; background-color:#f9fafb; padding:0.75rem; border-radius:0.5rem; border:1px solid #e5e7eb;">
+                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny (${multiShift.part1}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part1" value="${savedPart1}" placeholder="${defaultPartHours.part1}h"></div>
+                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny (${multiShift.part2}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part2" value="${savedPart2}" placeholder="${defaultPartHours.part2}h"></div>
+                <div style="font-size:0.7rem; color:#9ca3af; text-align:right; margin-top:0.25rem;">Puste = auto</div></div>`;
         } else if (jbPorts) {
             const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
-            const portCount = getPortsFromText(value);
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction: column; gap:0.5rem; background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex: 1;">Godziny:</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number') ? savedHours : ''}" min="0" max="48" placeholder="${effectiveHours}h"></div>
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex: 1;">Ilość portów:</label><input type="number" class="ports-input" data-field="${field}" value="${portCount || ''}" min="0" max="20" placeholder="0"></div>
+            const savedPorts = getPortsFromDB(day, field);
+            const portCount = savedPorts !== null ? savedPorts : getPortsFromText(value);
+            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.5rem; background-color:#f9fafb; padding:0.75rem; border-radius:0.5rem; border:1px solid #e5e7eb;">
+                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny:</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number')?savedHours:''}" placeholder="${effectiveHours}h"></div>
+                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Ilość portów:</label><input type="number" class="ports-input" data-field="${field}" value="${portCount || ''}" placeholder="0"></div>
             </div>`;
         } else {
             const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280;">Godziny (puste = auto):</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number') ? savedHours : ''}" min="0" max="48" placeholder="${effectiveHours}h"></div>`;
+            hoursHTML = `<div style="margin-top:0.5rem; display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280;">Godziny (puste=auto):</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number')?savedHours:''}" placeholder="${effectiveHours}h"></div>`;
         }
-        wrap.innerHTML = `<label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label><input type="text" class="day-edit-input" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">${hoursHTML}`;
+        wrap.innerHTML = `<div style="display:flex; align-items:center; gap:0.5rem;">
+          <label class="day-edit-label color-${field}" style="font-weight:600; font-size:.875rem; padding:.5rem; border-radius:8px; color:#4b5563; flex:1;">${fieldLabels[field]}</label>
+          <button class="delete-field-btn" data-field="${field}" title="Usuń wpis"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+          </div>
+          <input type="text" class="day-edit-input" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
+          ${hoursHTML}`;
         dom.dayEditFields.appendChild(wrap);
       });
 
@@ -719,12 +797,13 @@
           else { await setHoursToDB(currentEditDay, field, { part1: v1!==''?parseInt(v1,10):null, part2: v2!==''?parseInt(v2,10):null }); }
         }
       });});
-      dom.dayEditFields.querySelectorAll('.ports-input').forEach(input=>{ input.addEventListener('change', async () => {
-        const field = input.dataset.field;
-        const mainInput = dom.dayEditFields.querySelector(`.day-edit-input[data-field="${field}"]`);
-        const newText = updatePortsInText(mainInput.value, input.value);
-        mainInput.value = newText;
-        await dbSave(currentEditDay, field, newText);
+      dom.dayEditFields.querySelectorAll('.ports-input').forEach(input=>{ input.addEventListener('change', async () => { await setPortsToDB(currentEditDay, input.dataset.field, input.value); }); });
+      dom.dayEditFields.querySelectorAll('.delete-field-btn').forEach(btn=>{ btn.addEventListener('click', async () => {
+          const field = btn.dataset.field;
+          await dbDelete(currentEditDay, field);
+          const input = dom.dayEditFields.querySelector(`.day-edit-input[data-field="${field}"]`);
+          if (input) input.value = '';
+          openDayEdit(currentEditDay, { ...currentEvents[currentEditDay], [field]: undefined });
       });});
 
       dom.dayEditModal.style.display = 'flex';
@@ -736,24 +815,17 @@
     const update = () => {
       if (!db) return;
       dom.monthYear.textContent = `${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
-
-      if (currentView !== 'standard') {
-          renderStaticView(currentView);
-          return;
-      }
-      
+      if (currentView !== 'standard') { renderStaticView(currentView); return; }
       dom.loading.style.display = 'flex';
       unsubscribe();
       const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
       unsubscribe = onSnapshot(collection(db, id), snap=>{
         currentEvents = {}; snap.forEach(d=>{ currentEvents[d.id]=d.data(); });
-        const scrollable = isMobile ? dom.mobileCalendar : dom.calendarWrapper;
-        const scrollPos = scrollable.scrollTop;
+        const scrollable = isMobile ? window : dom.calendarWrapper;
+        const scrollPos = isMobile ? scrollable.scrollY : scrollable.scrollTop;
         const year = currentDate.getFullYear(), month = currentDate.getMonth();
-
         isMobile ? renderMobile(year, month, currentEvents) : renderDesktop(year, month, currentEvents);
-        
-        scrollable.scrollTop = scrollPos;
+        isMobile ? scrollable.scrollTo(0, scrollPos) : (scrollable.scrollTop = scrollPos);
         dom.loading.style.display = 'none';
         computeMonthlySummary();
       });
