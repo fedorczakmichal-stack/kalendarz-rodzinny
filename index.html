@@ -105,6 +105,17 @@
         .location-lask{background:#f9a8d4!important; font-weight:600}
         .location-other{background:#fdba74!important; font-weight:600}
 
+        /* --- JB: delikatne przyciemnienie pola --- */
+        .jb-darken { position: relative; }
+        .jb-darken::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.08); /* możesz podbić do 0.12 jeśli chcesz mocniej */
+            pointer-events: none;
+        }
+
         /* --- MOBILE LIST --- */
         .mobile-calendar{display:none; padding:1rem;}
         @media (max-width:768px){
@@ -212,18 +223,15 @@
 
                     <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
 
-                    <!-- NOWE: trzy osobne ikony widoków -->
+                    <!-- 3 ikony widoków -->
                     <div class="view-toggle" role="tablist" aria-label="Przełącz widok">
                         <button id="btn-view-standard" class="view-btn active" title="Widok normalny" aria-label="Widok normalny" data-view="standard" role="tab" aria-selected="true">
-                            <!-- Ikona: siatka kolumn (tabela) -->
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 10h18M3 14h18"/></svg>
                         </button>
                         <button id="btn-view-compact" class="view-btn" title="Widok kompaktowy" aria-label="Widok kompaktowy" data-view="compact" role="tab" aria-selected="false">
-                            <!-- Ikona: lista -->
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
                         </button>
                         <button id="btn-view-month" class="view-btn" title="Widok miesięczny" aria-label="Widok miesięczny" data-view="month" role="tab" aria-selected="false">
-                            <!-- Ikona: kalendarz -->
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
                         </button>
                     </div>
@@ -370,9 +378,11 @@
         const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
         const fieldLabels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
 
-        const fullDutyKeywords = ['jb oit','jb znieczuleń'];
+        // Słowa kluczowe i rozpoznanie JB
+        const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz'];
         const locationLaskKeywords = ['łask'];
         const locationOtherKeywords = ['ortho','brzeziny'];
+
         const getEventType = (text) => {
             if (!text) return 'default';
             const s = text.toLowerCase();
@@ -381,6 +391,11 @@
             if (locationLaskKeywords.some(k=>s.includes(k))) return 'location-lask';
             if (locationOtherKeywords.some(k=>s.includes(k))) return 'location-other';
             return 'default';
+        };
+        const isJBDuty = (text) => {
+            if (!text) return false;
+            const s = text.toLowerCase();
+            return s.includes('jb oit') || s.includes('jb znieczuleń') || s.includes('jb znieczulenia') || s.includes('jb zniecz');
         };
 
         // Responsive flag
@@ -429,6 +444,7 @@
                         div.classList.add(type);
                         if (type==='full-duty' || type==='medium-duty') div.classList.add('duty-shift');
                     }
+                    if (isJBDuty(eventText)) div.classList.add('jb-darken');
 
                     const id = `${day}-${field}`;
                     div.dataset.day = day; div.dataset.field = field; div.dataset.cellId = id;
@@ -482,6 +498,7 @@
                     const t = dayEvents[field] || '';
                     const type = getEventType(t);
                     let typeClass = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
+                    if (isJBDuty(t)) typeClass += ' jb-darken';
                     html += `
                       <div class="mobile-event-row">
                         <div class="mobile-event-label color-${field}">${fieldLabels[field]}</div>
@@ -542,8 +559,9 @@
                     if (dayEvents[field]){
                         const type = getEventType(dayEvents[field]);
                         const cls = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
+                        const isJB = isJBDuty(dayEvents[field]);
                         html += `
-                          <div class="overview-event-item color-${field} ${cls}">
+                          <div class="overview-event-item color-${field} ${cls} ${isJB?'jb-darken':''}">
                             <div class="overview-event-label">${fieldLabels[field]}</div>
                             <div class="overview-event-text">${dayEvents[field]}</div>
                           </div>
@@ -556,9 +574,12 @@
             }
 
             dom.loading.style.display = 'none';
+            // Autoprzewijanie do „Dziś” TYLKO na desktopie
             setTimeout(()=>{
-                const todayCard = container.querySelector('.overview-day-card.ring-2');
-                if (todayCard) todayCard.scrollIntoView({behavior:'smooth', block:'center'});
+                if (!isMobile) {
+                    const todayCard = container.querySelector('.overview-day-card.ring-2');
+                    if (todayCard) todayCard.scrollIntoView({behavior:'smooth', block:'center'});
+                }
             },100);
         };
 
@@ -612,7 +633,8 @@
                     if (dayEvents[field] && shown < 3){
                         const type = getEventType(dayEvents[field]);
                         const cls = type!=='default' ? type : '';
-                        html += `<div class="month-event-item color-${field} ${cls}">${dayEvents[field]}</div>`;
+                        const isJB = isJBDuty(dayEvents[field]);
+                        html += `<div class="month-event-item color-${field} ${cls} ${isJB?'jb-darken':''}">${dayEvents[field]}</div>`;
                         shown++;
                     }
                 }
@@ -653,7 +675,7 @@
                 const type = getEventType(value);
                 wrap.innerHTML = `
                     <label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label>
-                    <input type="text" class="day-edit-input ${type!=='default'?type:''}" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
+                    <input type="text" class="day-edit-input ${type!=='default'?type:''} ${isJBDuty(value)?'jb-darken':''}" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
                 `;
                 dom.dayEditFields.appendChild(wrap);
             });
@@ -665,7 +687,7 @@
                     if (!val) await dbDelete(currentEditDay, field);
                     else await dbSave(currentEditDay, field, val);
                     const type = getEventType(val);
-                    input.className = `day-edit-input ${type!=='default'?type:''}`;
+                    input.className = `day-edit-input ${type!=='default'?type:''} ${isJBDuty(val)?'jb-darken':''}`;
                 });
             });
 
@@ -899,7 +921,10 @@
                     document.querySelector('.today')?.scrollIntoView({behavior:'smooth', block:'center'});
                     document.querySelector('.mobile-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'});
                 } else if (currentView==='compact'){
-                    document.querySelector('#compact-view .overview-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'});
+                    // na mobile nie przewijamy – tylko desktop (obsłużone w renderCompact)
+                    if (!isMobile) {
+                        document.querySelector('#compact-view .overview-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'});
+                    }
                 } else if (currentView==='month'){
                     document.querySelector('.month-day-cell.today')?.scrollIntoView({behavior:'smooth', block:'center'});
                 }
