@@ -344,14 +344,12 @@
     </main>
   </div>
 
-  <!-- Mobile Summary Button -->
   <button id="mobile-summary-btn" class="show">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M3 12h18m-9-9v18"/>
     </svg>
   </button>
 
-  <!-- Mobile Summary Modal -->
   <div id="mobile-summary-modal">
     <h3 style="font-size:1rem;font-weight:700;color:#1f2937;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f3f4f6;">Podsumowanie</h3>
     <div style="display:flex;flex-direction:column;gap:0.5rem;">
@@ -752,12 +750,18 @@
             container.innerHTML = '';
             const daysInMonth = new Date(year, month+1, 0).getDate();
             const today = new Date();
+            let hasAnyEvents = false;
             for(let day=1; day<=daysInMonth; day++){
                 const date = new Date(year, month, day);
                 const dow = date.getDay();
                 const isToday = today.toDateString() === date.toDateString();
                 const dayEvents = currentEvents[day] || {};
                 const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
+                
+                const hasEventsForDay = fields.some(field => dayEvents[field]);
+                if (!hasEventsForDay) continue;
+                hasAnyEvents = true;
+
                 const card = document.createElement('div');
                 card.className = `overview-day-card ${isDayOff?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
                 card.dataset.day = day;
@@ -776,6 +780,9 @@
                 html += `</div>`;
                 card.innerHTML = html;
                 container.appendChild(card);
+            }
+            if (!hasAnyEvents) {
+                container.innerHTML = `<p class="text-center text-gray-500 py-8">Brak zaplanowanych wydarzeń w tym miesiącu.</p>`;
             }
         } else if (viewType === 'month') {
             const grid = dom.monthView.querySelector('.month-grid');
@@ -884,7 +891,10 @@
     const update = async () => {
       if (!db) return;
       dom.monthYear.textContent = `${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
-      if (currentView !== 'standard') { renderStaticView(currentView); return; }
+      if (currentView !== 'standard') {
+        renderStaticView(currentView);
+        return;
+      }
       
       dom.loading.style.display = 'flex';
       unsubscribe();
@@ -897,7 +907,9 @@
       const scrollable = isMobile ? window : dom.calendarWrapper;
       const scrollPos = isMobile ? scrollable.scrollY : scrollable.scrollTop;
       const year = currentDate.getFullYear(), month = currentDate.getMonth();
+      
       isMobile ? renderMobile(year, month, currentEvents) : renderDesktop(year, month, currentEvents);
+      
       isMobile ? scrollable.scrollTo(0, scrollPos) : (scrollable.scrollTop = scrollPos);
       dom.loading.style.display = 'none';
       computeMonthlySummary();
@@ -1073,6 +1085,21 @@
         let ghostEl = null;
         let lastTouchTarget = null;
         
+        const clearLongPress = () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        };
+
+        const cleanupMobileDrag = () => {
+            clearLongPress();
+            if (ghostEl) {
+                ghostEl.remove();
+                ghostEl = null;
+            }
+            touchDragData = null;
+            lastTouchTarget?.classList.remove('drag-over');
+            lastTouchTarget = null;
+        };
+        
         dom.mobileCalendar.addEventListener('touchstart', e => {
             const target = e.target.closest('.mobile-event-content');
             if (!target) return;
@@ -1089,16 +1116,15 @@
                 };
             }
         });
-        
-        const clearLongPress = () => {
-            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        };
 
         dom.mobileCalendar.addEventListener('touchmove', async e => {
             clearLongPress();
             if (touchDragData && !ghostEl) {
                 const sourceData = await getFullEventData(touchDragData.day, touchDragData.field);
-                if (!sourceData || !sourceData.text) { touchDragData = null; return; }
+                if (!sourceData || !sourceData.text) {
+                    touchDragData = null;
+                    return;
+                }
                 touchDragData.fullData = sourceData;
 
                 const target = e.target.closest('.mobile-event-content');
@@ -1124,7 +1150,6 @@
         });
 
         dom.mobileCalendar.addEventListener('touchend', e => {
-            clearLongPress();
             if (ghostEl && lastTouchTarget) {
                 const target = lastTouchTarget;
                 const source = { day: touchDragData.day, field: touchDragData.field, data: touchDragData.fullData };
@@ -1133,17 +1158,21 @@
                     moveFullEventData(source, targetData);
                 }
             }
-            if (ghostEl) { ghostEl.remove(); }
-            ghostEl = null; touchDragData = null;
-            lastTouchTarget?.classList.remove('drag-over');
-            lastTouchTarget = null;
+            cleanupMobileDrag();
+        });
+        
+        dom.mobileCalendar.addEventListener('touchcancel', e => {
+            cleanupMobileDrag();
         });
 
         dom.mobileCalendar.addEventListener('contextmenu', e => { e.preventDefault(); });
         
         dom.mobileCalendar.addEventListener('click', e => {
             const target = e.target.closest('.mobile-event-content');
-            if (target) handleMobileEdit(target);
+            if (target && !longPressTimer) { // Ensure click doesn't fire after a long press
+                handleMobileEdit(target);
+            }
+            clearLongPress();
         });
     };
 
