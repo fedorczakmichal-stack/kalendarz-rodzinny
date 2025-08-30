@@ -13,6 +13,20 @@
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
       touch-action:manipulation;
     }
+    .touch-drag-ghost {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1001;
+        pointer-events: none;
+        opacity: 0.7;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,.3);
+    }
+    .drag-over {
+        outline: 2px dashed #8b5cf6;
+        background-color: #ede9fe !important;
+    }
 
     /* --- LOGO --- */
     .flower-logo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4 0%,#c084fc 100%);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
@@ -54,26 +68,7 @@
     .summary-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:9999px;padding:.35rem .6rem}
     .summary-dot{width:.5rem;height:.5rem;border-radius:9999px}
     @media (max-width:768px){ .summary-bar{display:none} }
-
-    /* --- FAB (mobile) --- */
-    #summary-fab{
-      position:fixed;right:16px;bottom:16px;z-index:50;
-      display:none;align-items:center;gap:.5rem;
-      background:#111827;color:#fff;border-radius:9999px;padding:.6rem .9rem;
-      box-shadow:0 10px 25px -5px rgba(0,0,0,.3),0 8px 10px -6px rgba(0,0,0,.2);
-      font-size:.9rem;font-weight:600
-    }
-    #summary-fab svg{width:18px;height:18px}
-    @media (max-width:768px){ #summary-fab{display:inline-flex} }
-
-    /* --- SUMMARY SHEET (mobile modal) --- */
-    #summary-sheet{position:fixed;left:0;right:0;bottom:0;transform:translateY(100%);transition:transform .25s ease-out;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -10px 25px -5px rgba(0,0,0,.2);z-index:60}
-    #summary-sheet.open{transform:translateY(0)}
-    #summary-sheet .handle{width:48px;height:5px;border-radius:9999px;background:#e5e7eb;margin:8px auto}
-    #summary-sheet .content{padding:12px 16px 16px}
-    #summary-sheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    #summary-sheet .item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px}
-
+    
     /* --- DESKTOP GRID --- */
     .calendar-grid{display:grid;grid-template-columns:minmax(80px,.5fr) repeat(6,1fr);border-top:1px solid #E5E7EB}
     .calendar-cell{border-bottom:1px solid #E5E7EB;border-left:1px solid #E5E7EB;min-height:60px;position:relative;padding:4px}
@@ -257,28 +252,6 @@
       <span class="summary-chip"><span class="summary-dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
     </div>
 
-    <button id="summary-fab" aria-label="Pokaż podsumowanie">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/></svg>
-      Suma
-    </button>
-
-    <div id="summary-sheet" role="dialog" aria-modal="true" aria-label="Podsumowanie miesiąca">
-      <div class="handle"></div>
-      <div class="content">
-        <div class="text-sm text-gray-500 mb-2" id="summary-title">Podsumowanie</div>
-        <div class="grid">
-          <div class="item"><div class="text-xs text-gray-500">Ortho</div><div class="text-lg font-bold" id="m-sum-ortho">0h</div></div>
-          <div class="item"><div class="text-xs text-gray-500">Brzeziny</div><div class="text-lg font-bold" id="m-sum-brzeziny">0h</div></div>
-          <div class="item"><div class="text-xs text-gray-500">Łask</div><div class="text-lg font-bold" id="m-sum-lask">0h</div></div>
-          <div class="item"><div class="text-xs text-gray-500">JB (OIT+Zniecz.)</div><div class="text-lg font-bold" id="m-sum-jb">0h</div></div>
-          <div class="item"><div class="text-xs text-gray-500">Porty</div><div class="text-lg font-bold" id="m-sum-ports">0</div></div>
-        </div>
-        <div class="mt-3 text-right">
-          <button id="close-sheet" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button>
-        </div>
-      </div>
-    </div>
-
     <main id="app" class="w-full bg-white flex flex-col flex-grow">
       <div id="main-view" class="overflow-auto flex-1 flex flex-col">
         <div id="calendar-wrapper" class="overflow-auto flex-1 hidden md:block">
@@ -412,10 +385,6 @@
       mSumLask: document.getElementById('m-sum-lask'),
       mSumJB: document.getElementById('m-sum-jb'),
       mSumPorts: document.getElementById('m-sum-ports'),
-      summarySheet: document.getElementById('summary-sheet'),
-      summaryFab: document.getElementById('summary-fab'),
-      summaryTitle: document.getElementById('summary-title'),
-      closeSheet: document.getElementById('close-sheet'),
     };
 
     // --- Helpers ---
@@ -583,9 +552,11 @@
         for (const f of fields){
           const txt = ev[f];
           if (!txt) continue;
+          
           const hours = getEffectiveHours(txt, day, f, currentEvents);
           const savedPorts = getPortsFromDB(day, f);
           ports += (savedPorts !== null) ? savedPorts : getPortsFromText(txt);
+          
           if (isLask(txt)) {
               laskH += hours;
           } else if (isJBDuty(txt)) {
@@ -664,7 +635,7 @@
         fields.forEach(field=>{
           const t = dayEvents[field] || '';
           const type = getEventType(t);
-          html += `<div class="mobile-event-row"><div class="mobile-event-label color-${field}">${fieldLabels[field]}</div><div class="mobile-event-content color-${field} ${type!=='default' ? type : ''}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}"><span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span></div></div>`;
+          html += `<div class="mobile-event-row"><div class="mobile-event-label color-${field}">${fieldLabels[field]}</div><div class="mobile-event-content color-${field} ${type!=='default' ? type : ''}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}" draggable="${!!t}"><span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span></div></div>`;
         });
         html += `</div>`;
         card.innerHTML = html;
@@ -792,7 +763,7 @@
         dom.dayEditFields.appendChild(wrap);
       });
 
-      dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{ input.addEventListener('change', async () => { const val = input.value.trim(); await (val === '' ? dbDelete(currentEditDay, input.dataset.field) : dbSave(currentEditDay, input.dataset.field, val)); }); });
+      dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{ input.addEventListener('change', async () => { const val = input.value.trim(); await (val === '' ? dbDelete(currentEditDay, input.dataset.field, true) : dbSave(currentEditDay, input.dataset.field, val)); }); });
       dom.dayEditFields.querySelectorAll('.hours-input').forEach(input=>{ input.addEventListener('change', async () => {
         const field = input.dataset.field, part = input.dataset.part;
         if (part === 'single') { await setHoursToDB(currentEditDay, field, input.value === '' ? null : (parseInt(input.value, 10) || 0)); }
@@ -806,7 +777,7 @@
       dom.dayEditFields.querySelectorAll('.ports-input').forEach(input=>{ input.addEventListener('change', async () => { await setPortsToDB(currentEditDay, input.dataset.field, input.value); }); });
       dom.dayEditFields.querySelectorAll('.delete-field-btn').forEach(btn=>{ btn.addEventListener('click', async () => {
           const field = btn.dataset.field;
-          await dbDelete(currentEditDay, field);
+          await dbDelete(currentEditDay, field, true);
           const dayEvents = { ...currentEvents[currentEditDay] };
           delete dayEvents[field];
           openDayEdit(currentEditDay, dayEvents);
@@ -882,7 +853,7 @@
       const save = async () => {
         const txt = ta.value.slice(0, MAX_CHARS);
         el.innerHTML = `<span class="event-text">${txt || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>`;
-        if (txt !== val){ await (!txt ? dbDelete(el.dataset.day, el.dataset.field) : dbSave(el.dataset.day, el.dataset.field, txt)); }
+        if (txt !== val){ await (!txt ? dbDelete(el.dataset.day, el.dataset.field, true) : dbSave(el.dataset.day, el.dataset.field, txt)); }
       };
       ta.addEventListener('input', upd); ta.addEventListener('blur', save);
       ta.addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } });
@@ -903,7 +874,7 @@
       const save = async ()=>{
         let txt = ta.value.slice(0, MAX_CHARS);
         ta.remove(); cc.remove(); span.style.display = ''; if (txt) fieldDiv.draggable = true;
-        if (txt !== cur){ span.textContent = txt; await (!txt ? dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field) : dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, txt)); }
+        if (txt !== cur){ span.textContent = txt; await (!txt ? dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field, true) : dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, txt)); }
       };
       ta.addEventListener('blur', save);
       ta.addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } else if (e.key==='Escape'){ ta.remove(); cc.remove(); span.style.display=''; if (cur) fieldDiv.draggable = true; } });
@@ -918,7 +889,6 @@
       if (e.ctrlKey || e.metaKey){ e.preventDefault(); toggleSelection(fieldDiv); } 
       else { if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); handleEdit(fieldDiv); }
     });
-    dom.mobileCalendar.addEventListener('click', e=>{ const el = e.target.closest('.mobile-event-content'); if (el) handleMobileEdit(el); });
     
     const showContextMenu = (e, target) => {
         contextTarget = target;
@@ -926,31 +896,75 @@
         menu.style.display = 'block';
         const targetRect = target.getBoundingClientRect();
         const menuRect = menu.getBoundingClientRect();
-        let top = targetRect.bottom, left = targetRect.left;
-        if (top + menuRect.height > window.innerHeight) { top = targetRect.top - menuRect.height; }
-        if (left + menuRect.width > window.innerWidth) { left = targetRect.right - menuRect.width; }
+        let top = e.clientY, left = e.clientX;
+        if (top + menuRect.height > window.innerHeight) { top = e.clientY - menuRect.height; }
+        if (left + menuRect.width > window.innerWidth) { left = e.clientX - menuRect.width; }
         if (top < 0) top = 5; if (left < 0) left = 5;
         menu.style.top = `${top}px`;
         menu.style.left = `${left}px`;
     };
 
     dom.body.addEventListener('contextmenu', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f) showContextMenu(e, f); });
-    dom.mobileCalendar.addEventListener('contextmenu', e=>{ e.preventDefault(); const ec = e.target.closest('.mobile-event-content'); if (ec) showContextMenu(e, ec); });
-    dom.copyBtn.addEventListener('click', ()=>{ clipboard = contextTarget.querySelector('.event-text').textContent; dom.contextMenu.style.display='none'; });
-    dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); dom.contextMenu.style.display='none'; });
-    dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); dom.contextMenu.style.display='none'; });
+    
     document.addEventListener('click', e=>{ if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; });
     const toggleSelection = el => { const id = el.dataset.cellId; selected.has(id) ? selected.delete(id) : selected.add(id); el.classList.toggle('selected'); updateBulkUI(); };
     const updateBulkUI = () => { const c = selected.size; if (c>0){ dom.selectionCount.textContent = `Zaznaczono: ${c}`; dom.bulkActions.classList.remove('hidden'); } else { dom.bulkActions.classList.add('hidden'); } };
     const clearSelection = () => { document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); selected.clear(); updateBulkUI(); };
-    dom.bulkDelete.addEventListener('click', async ()=>{ const b = writeBatch(db); const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`; selected.forEach(s=>{ const [d,f] = s.split('-'); b.update(doc(db, id, d), {[f]: deleteField()}); }); await b.commit(); clearSelection(); });
+    dom.bulkDelete.addEventListener('click', async ()=>{ const b = writeBatch(db); const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`; selected.forEach(s=>{ const [day,field] = s.split('-'); b.update(doc(db, id, day), {[field]:deleteField(),[`hours_${field}`]:deleteField(),[`ports_${field}`]:deleteField()}); }); await b.commit(); clearSelection(); });
     dom.clearSelection.addEventListener('click', clearSelection);
-    dom.body.addEventListener('dragstart', e=>{ const f = e.target.closest('.editable-field'); if (f && f.draggable) e.dataTransfer.setData('text/plain', f.querySelector('.event-text').textContent); });
+    
+    const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
+    const dbDelete = (day, field, withSubfields = false) => {
+        const payload = { [field]: deleteField() };
+        if (withSubfields) {
+            payload[`hours_${field}`] = deleteField();
+            payload[`ports_${field}`] = deleteField();
+        }
+        return updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), payload);
+    };
+
+    const getFullEventData = async (day, field) => {
+        const docRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day));
+        const docSnap = await getDoc(docRef);
+        if (!docSnap.exists()) return null;
+        const data = docSnap.data();
+        return { text: data[field], hours: data[`hours_${field}`], ports: data[`ports_${field}`] };
+    };
+    
+    const pasteFullEventData = (day, field, data) => {
+        const batch = writeBatch(db);
+        const docRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day));
+        const payload = { [field]: data.text };
+        if (data.hours !== undefined) payload[`hours_${field}`] = data.hours;
+        if (data.ports !== undefined) payload[`ports_${field}`] = data.ports;
+        batch.set(docRef, payload, { merge: true });
+        return batch.commit();
+    };
+
+    const moveFullEventData = (source, target) => {
+        const batch = writeBatch(db);
+        const sourceRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(source.day));
+        const targetRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(target.day));
+        
+        const sourcePayload = { [source.field]: deleteField(), [`hours_${source.field}`]: deleteField(), [`ports_${source.field}`]: deleteField() };
+        const targetPayload = { [target.field]: source.data.text };
+        if (source.data.hours !== undefined) targetPayload[`hours_${target.field}`] = source.data.hours;
+        if (source.data.ports !== undefined) targetPayload[`ports_${target.field}`] = source.data.ports;
+
+        batch.update(sourceRef, sourcePayload);
+        batch.set(targetRef, targetPayload, { merge: true });
+        return batch.commit();
+    };
+
+    dom.copyBtn.addEventListener('click', async () => { const { day, field } = contextTarget.dataset; clipboard = await getFullEventData(day, field); dom.contextMenu.style.display='none'; });
+    dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) { const { day, field } = contextTarget.dataset; pasteFullEventData(day, field, clipboard); } dom.contextMenu.style.display='none'; });
+    dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field, true); dom.contextMenu.style.display='none'; });
+
+    dom.body.addEventListener('dragstart', async e=>{ const f = e.target.closest('.editable-field'); if (f && f.draggable) { const {day, field} = f.dataset; const data = await getFullEventData(day, field); e.dataTransfer.setData('application/json', JSON.stringify({ ...data, sourceDay: day, sourceField: field })); } });
     dom.body.addEventListener('dragover', e=>{ e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
     dom.body.addEventListener('dragleave', e=> e.target.closest('.editable-field')?.classList.remove('drag-over'));
-    dom.body.addEventListener('drop', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f){ f.classList.remove('drag-over'); const t = e.dataTransfer.getData('text/plain'); if (t) dbSave(f.dataset.day, f.dataset.field, t); } });
-    const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
-    const dbDelete = (day, field) => updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: deleteField() });
+    dom.body.addEventListener('drop', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f){ f.classList.remove('drag-over'); const data = JSON.parse(e.dataTransfer.getData('application/json')); const target = { day: f.dataset.day, field: f.dataset.field }; const source = { day: data.sourceDay, field: data.sourceField, data: data }; moveFullEventData(source, target); } });
+
     const toggleHoliday = async (day) => { const ref = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)); try{ const snap = await getDoc(ref); const cur = snap.exists() ? (snap.data().isHoliday || false) : false; await setDoc(ref, { isHoliday: !cur }, { merge:true }); }catch(e){ console.error(e); } };
     const scrollToToday = () => {
       const t = new Date(); if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ currentDate = new Date(t); update(); }
@@ -960,28 +974,100 @@
         else if (currentView==='month'){ document.querySelector('.month-day-cell.today')?.scrollIntoView({behavior:'smooth', block:'center'}); }
       },100);
     };
-    dom.summaryFab.addEventListener('click', ()=> dom.summarySheet.classList.add('open'));
-    dom.closeSheet.addEventListener('click', ()=> dom.summarySheet.classList.remove('open'));
-    dom.summarySheet.addEventListener('click', (e)=>{ if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); });
-    
+
+    const initMobileInteractions = () => {
+        let longPressTimer;
+        let touchDragData = null;
+        let ghostEl = null;
+        let lastTouchTarget = null;
+        
+        dom.mobileCalendar.addEventListener('touchstart', e => {
+            const target = e.target.closest('.mobile-event-content');
+            if (!target) return;
+            longPressTimer = setTimeout(() => {
+                showContextMenu({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }, target);
+                longPressTimer = null;
+            }, 500);
+
+            if (target.draggable) {
+                touchDragData = {
+                    day: target.dataset.day,
+                    field: target.dataset.field,
+                    text: target.querySelector('.event-text').textContent
+                };
+            }
+        });
+        
+        const clearLongPress = () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        };
+
+        dom.mobileCalendar.addEventListener('touchmove', async e => {
+            clearLongPress();
+            if (touchDragData && !ghostEl) {
+                const sourceData = await getFullEventData(touchDragData.day, touchDragData.field);
+                if (!sourceData || !sourceData.text) { touchDragData = null; return; }
+                touchDragData.fullData = sourceData;
+
+                const target = e.target.closest('.mobile-event-content');
+                ghostEl = target.cloneNode(true);
+                ghostEl.classList.add('touch-drag-ghost');
+                document.body.appendChild(ghostEl);
+            }
+            if (ghostEl) {
+                e.preventDefault();
+                ghostEl.style.left = `${e.touches[0].clientX}px`;
+                ghostEl.style.top = `${e.touches[0].clientY}px`;
+                
+                ghostEl.style.display = 'none';
+                const dropTarget = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)?.closest('.mobile-event-content');
+                ghostEl.style.display = '';
+
+                if (lastTouchTarget !== dropTarget) {
+                    lastTouchTarget?.classList.remove('drag-over');
+                    if(dropTarget) dropTarget.classList.add('drag-over');
+                    lastTouchTarget = dropTarget;
+                }
+            }
+        });
+
+        dom.mobileCalendar.addEventListener('touchend', e => {
+            clearLongPress();
+            if (ghostEl && lastTouchTarget) {
+                const target = lastTouchTarget;
+                const source = { day: touchDragData.day, field: touchDragData.field, data: touchDragData.fullData };
+                const targetData = { day: target.dataset.day, field: target.dataset.field };
+                if (source.day !== targetData.day || source.field !== targetData.field) {
+                    moveFullEventData(source, targetData);
+                }
+            }
+            if (ghostEl) { ghostEl.remove(); }
+            ghostEl = null; touchDragData = null;
+            lastTouchTarget?.classList.remove('drag-over');
+            lastTouchTarget = null;
+        });
+
+        dom.mobileCalendar.addEventListener('contextmenu', e => { e.preventDefault(); });
+    };
+
     const initCalendar = () => {
       const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
       dom.prevBtn.addEventListener('click', ()=>nav(-1)); dom.nextBtn.addEventListener('click', ()=>nav(1)); dom.todayBtn.addEventListener('click', scrollToToday);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dom.dayEditModal.style.display === 'flex') { closeDayEdit(); } });
       [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(btn=>{ btn.addEventListener('click', ()=>{ const v = btn.dataset.view; if (currentView!==v) switchView(v); }); });
-      if (isMobile){ let sx=0; document.addEventListener('touchstart', e=>{ sx = e.changedTouches[0].screenX; }); document.addEventListener('touchend', e=>{ const ex = e.changedTouches[0].screenX; if (ex < sx - 50) nav(1); if (ex > sx + 50) nav(-1); }); }
       
       dom.compactView.addEventListener('click', async (e) => {
           const deleteBtn = e.target.closest('.compact-delete-btn');
           if (deleteBtn) {
               const { day, field } = deleteBtn.dataset;
               if (confirm(`Czy na pewno chcesz usunąć ten wpis?`)) {
-                  await dbDelete(day, field);
+                  await dbDelete(day, field, true);
                   renderStaticView('compact');
               }
           }
       });
-
+      
+      initMobileInteractions();
       switchView(isMobile ? 'standard' : 'month');
     };
   </script>
