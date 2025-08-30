@@ -49,10 +49,30 @@
       #month-year-display{font-size:1rem;width:auto;min-width:140px}
     }
 
-    /* --- SUMMARY BAR (godziny/porty) --- */
+    /* --- SUMMARY BAR (desktop only) --- */
     .summary-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem;display:flex;gap:.75rem;flex-wrap:wrap}
     .summary-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:9999px;padding:.35rem .6rem}
     .summary-dot{width:.5rem;height:.5rem;border-radius:9999px}
+    @media (max-width:768px){ .summary-bar{display:none} }
+
+    /* --- FAB (mobile) --- */
+    #summary-fab{
+      position:fixed;right:16px;bottom:16px;z-index:50;
+      display:none;align-items:center;gap:.5rem;
+      background:#111827;color:#fff;border-radius:9999px;padding:.6rem .9rem;
+      box-shadow:0 10px 25px -5px rgba(0,0,0,.3),0 8px 10px -6px rgba(0,0,0,.2);
+      font-size:.9rem;font-weight:600
+    }
+    #summary-fab svg{width:18px;height:18px}
+    @media (max-width:768px){ #summary-fab{display:inline-flex} }
+
+    /* --- SUMMARY SHEET (mobile modal) --- */
+    #summary-sheet{position:fixed;left:0;right:0;bottom:0;transform:translateY(100%);transition:transform .25s ease-out;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -10px 25px -5px rgba(0,0,0,.2);z-index:60}
+    #summary-sheet.open{transform:translateY(0)}
+    #summary-sheet .handle{width:48px;height:5px;border-radius:9999px;background:#e5e7eb;margin:8px auto}
+    #summary-sheet .content{padding:12px 16px 16px}
+    #summary-sheet .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    #summary-sheet .item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px}
 
     /* --- DESKTOP GRID --- */
     .calendar-grid{display:grid;grid-template-columns:minmax(80px,.5fr) repeat(6,1fr);border-top:1px solid #E5E7EB}
@@ -65,16 +85,6 @@
     .day-name{font-size:.75rem;color:#6B7280}
     .today .day-info{background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%);color:#fff;border-radius:12px;padding:4px 0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
     .day-off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(219,39,119,.15) 0%,rgba(147,51,234,.15) 100%);z-index:1}
-
-    /* --- ŁĄCZENIE „JB → RANO” (drugi dzień) --- */
-    .after-duty-morning{position:relative}
-    .after-duty-morning::after{
-      content:"JB → RANO";
-      position:absolute;top:6px;right:6px;
-      font-size:.62rem;font-weight:700;color:#6d28d9;
-      background:#ede9fe;border:1px solid #c4b5fd;border-radius:9999px;padding:2px 6px;z-index:3
-    }
-    .after-duty-morning .day-info{box-shadow:0 0 0 2px #c4b5fd inset;border-radius:12px}
 
     .editable-field{font-size:.9rem;line-height:1.4;padding:4px;border-radius:8px;height:100%;cursor:pointer;position:relative;z-index:2;user-select:none;word-wrap:break-word;overflow-wrap:break-word;transition:all .2s}
     .editable-field.selected{outline:2px solid #8b5cf6;background:rgba(139,92,246,.1)!important}
@@ -127,10 +137,6 @@
       .mobile-event-content{flex:1;padding:.5rem;border-radius:8px;font-size:.875rem;min-height:44px;display:flex;align-items:center;cursor:pointer;transition:all .2s}
       .mobile-event-content:active{transform:scale(.98)}
       .mobile-event-content .event-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;width:100%}
-      /* badge na mobile */
-      .mobile-day-card.after-duty-morning::after{
-        content:"JB → RANO";position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:700;color:#6d28d9;background:#ede9fe;border:1px solid #c4b5fd;border-radius:9999px;padding:2px 6px
-      }
     }
 
     /* --- COMPACT OVERVIEW --- */
@@ -139,9 +145,6 @@
     .overview-day-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:1rem;margin-bottom:1rem;cursor:pointer;transition:.2s;position:relative}
     .overview-day-card:hover{transform:translateY(-2px);box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
     .overview-day-card.weekend{background:linear-gradient(135deg,rgba(219,39,119,.08) 0%,rgba(147,51,234,.08) 100%);border:1px solid rgba(219,39,119,.2)}
-    .overview-day-card.after-duty-morning::after{
-      content:"JB → RANO";position:absolute;top:10px;right:10px;font-size:.62rem;font-weight:700;color:#6d28d9;background:#ede9fe;border:1px solid #c4b5fd;border-radius:9999px;padding:2px 6px
-    }
     .overview-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
     .overview-day-info{display:flex;align-items:center;gap:.5rem}
     .overview-day-number{font-size:1.5rem;font-weight:700;color:#1f2937}
@@ -160,9 +163,6 @@
     .month-day-cell.other-month{background:#fcfcfc;opacity:.5}
     .month-day-cell.weekend{background:linear-gradient(135deg,rgba(219,39,119,.05) 0%,rgba(147,51,234,.05) 100%)}
     .month-day-cell.today{background:#ede9fe;border:2px solid #8b5cf6}
-    .month-day-cell.after-duty-morning::after{
-      content:"JB → RANO";position:absolute;top:6px;right:6px;font-size:.6rem;font-weight:700;color:#6d28d9;background:#ede9fe;border:1px solid #c4b5fd;border-radius:9999px;padding:1px 6px
-    }
     .month-day-number{font-weight:600;font-size:.875rem;color:#374151;margin-bottom:.25rem}
     .month-day-events{display:flex;flex-direction:column;gap:2px}
     .month-event-item{font-size:.65rem;padding:2px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -179,7 +179,7 @@
     .context-menu-separator{height:1px;background:#e5e7eb;margin:4px 0}
 
     #loading{display:flex;align-items:center;justify-content:center;padding:3rem}
-    .loading-spinner{width:40px;height:40px;border:3px solid #f3f4f6;border-top:3px solid #8b5cf6;border-radius:50%;animation:spin 1s linear infinite}
+    .loading-spinner{width:40px;height:40px;border:3px solid:#f3f4f6;border-top:3px solid:#8b5cf6;border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
     #bulk-actions{background:#fff;border-radius:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);border:1px solid #e5e7eb}
@@ -233,12 +233,35 @@
       </div>
     </header>
 
-    <!-- SUMMARY BAR -->
+    <!-- SUMMARY BAR (desktop only) -->
     <div id="summary-bar" class="summary-bar">
       <span class="summary-chip"><span class="summary-dot" style="background:#a7f3d0"></span> Ortho: <b id="sum-ortho">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fde68a"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB (OIT+Zniecz.): <b id="sum-jb">0h</b></span>
+      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB (OIT+Zniecz.+Łask): <b id="sum-jb">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
+    </div>
+
+    <!-- FAB (mobile) -->
+    <button id="summary-fab" aria-label="Pokaż podsumowanie">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M3 12h18M12 3v18"/></svg>
+      Suma
+    </button>
+
+    <!-- SUMMARY SHEET (mobile) -->
+    <div id="summary-sheet" role="dialog" aria-modal="true" aria-label="Podsumowanie miesiąca">
+      <div class="handle"></div>
+      <div class="content">
+        <div class="text-sm text-gray-500 mb-2" id="summary-title">Podsumowanie</div>
+        <div class="grid">
+          <div class="item"><div class="text-xs text-gray-500">Ortho</div><div class="text-lg font-bold" id="m-sum-ortho">0h</div></div>
+          <div class="item"><div class="text-xs text-gray-500">Brzeziny</div><div class="text-lg font-bold" id="m-sum-brzeziny">0h</div></div>
+          <div class="item"><div class="text-xs text-gray-500">JB (OIT+Zniecz.+Łask)</div><div class="text-lg font-bold" id="m-sum-jb">0h</div></div>
+          <div class="item"><div class="text-xs text-gray-500">Porty</div><div class="text-lg font-bold" id="m-sum-ports">0</div></div>
+        </div>
+        <div class="mt-3 text-right">
+          <button id="close-sheet" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button>
+        </div>
+      </div>
     </div>
 
     <main id="app" class="w-full bg-white flex flex-col flex-grow">
@@ -249,7 +272,7 @@
             <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
               <div class="calendar-cell header p-3">Dzień</div>
               <div class="calendar-cell header p-3 color-ania">Ania</div>
-              <div class="calendar-cell header p-3 color-aniaPraca">Ania Praca</div>
+              <class class="calendar-cell header p-3 color-aniaPraca">Ania Praca</class>
               <div class="calendar-cell header p-3 color-michal">Michał</div>
               <div class="calendar-cell header p-3 color-michalPraca">Michał Praca</div>
               <div class="calendar-cell header p-3 color-wspolne">Wspólne</div>
@@ -371,26 +394,34 @@
       btnStandard: document.getElementById('btn-view-standard'),
       btnCompact: document.getElementById('btn-view-compact'),
       btnMonth: document.getElementById('btn-view-month'),
-      // summary
+      // summary desktop
       sumOrtho: document.getElementById('sum-ortho'),
       sumBrzeziny: document.getElementById('sum-brzeziny'),
       sumJB: document.getElementById('sum-jb'),
       sumPorts: document.getElementById('sum-ports'),
+      // summary mobile sheet
+      mSumOrtho: document.getElementById('m-sum-ortho'),
+      mSumBrzeziny: document.getElementById('m-sum-brzeziny'),
+      mSumJB: document.getElementById('m-sum-jb'),
+      mSumPorts: document.getElementById('m-sum-ports'),
+      summarySheet: document.getElementById('summary-sheet'),
+      summaryFab: document.getElementById('summary-fab'),
+      summaryTitle: document.getElementById('summary-title'),
+      closeSheet: document.getElementById('close-sheet'),
     };
 
-    // --- Helpers (nazwy, pola) ---
+    // --- Helpers ---
     const getMonthName = m => ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'][m];
     const getDayName = d => ['PN','WT','ŚR','CZ','PT','SB','ND'][d];
     const getDayFullName = d => ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][d];
     const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
     const fieldLabels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
 
-    // --- Słowa kluczowe i rozpoznawanie typów ---
-    const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz'];
-    const morningKeywords = ['rano','poranna','7:30','7.30','07:30','07.30'];
-
-    const locationLaskKeywords = ['łask'];
-    const locationOtherKeywords = ['ortho','brzeziny'];
+    // --- Reguły rozpoznania rodzaju pracy ---
+    const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz']; // JB 24h
+    const morningKeywords = ['rano','poranna','7:30','7.30','07:30','07.30'];         // 6h
+    const locationLaskKeywords = ['łask'];                                            // 24h
+    const locationOtherKeywords = ['ortho','brzeziny'];                                // 10h
 
     const getEventType = (text) => {
       if (!text) return 'default';
@@ -406,27 +437,46 @@
       const s = text.toLowerCase();
       return s.includes('jb oit') || s.includes('jb znieczuleń') || s.includes('jb znieczulenia') || s.startsWith('jb') || s.includes('jb ');
     };
-    const isMorningShift = (text) => {
-      if (!text) return false;
-      const s = text.toLowerCase();
+    const isOrtho = (t) => t && /ortho/i.test(t);
+    const isBrzeziny = (t) => t && /brzeziny/i.test(t);
+    const isLask = (t) => t && /łask/i.test(t);
+    const isMorningShift = (t) => {
+      if (!t) return false;
+      const s = t.toLowerCase();
       return morningKeywords.some(k=>s.includes(k));
     };
 
-    // --- Parsowanie tokenów godzin/portów ---
-    const getHoursFromText = (t) => {
-      if (!t) return 0;
-      // #h12 , h:12 , h=12
-      const m = t.match(/(?:#h\s*(\d+))|(?:\bh\s*[:=]\s*(\d+))/i);
-      return m ? parseInt(m[1]||m[2]||'0',10) : 0;
+    // --- Parsowanie/wyliczanie godzin & portów ---
+    const getHoursToken = (t) => {
+      if (!t) return null;
+      const m = t.match(/(?:#h\s*(\d+))|(?:\bh\s*[:=]\s*(\d+))/i); // #h12, h:12, h=12
+      return m ? parseInt(m[1]||m[2]||'0',10) : null;
+    };
+    const setHoursToken = (txt, hours) => {
+      let t = (txt||'').trim();
+      // usuń istniejący token
+      t = t.replace(/(#h\s*\d+)|(\bh\s*[:=]\s*\d+)/ig,'').replace(/\s{2,}/g,' ').trim();
+      if (hours===null) return t; // usunięcie
+      return `${t} #h${hours}`.trim();
     };
     const getPortsFromText = (t) => {
       if (!t) return 0;
-      // #p3 , porty:3 , port:3
       const m = t.match(/(?:#p\s*(\d+))|(?:\bporty?\s*[:=]\s*(\d+))/i);
       return m ? parseInt(m[1]||m[2]||'0',10) : 0;
     };
-    const isOrtho = (t) => t && /ortho/i.test(t);
-    const isBrzeziny = (t) => t && /brzeziny/i.test(t);
+    const getDefaultHours = (t) => {
+      if (!t) return 0;
+      const s = t.toLowerCase();
+      if (isOrtho(s) || isBrzeziny(s)) return 10;
+      if (isLask(s)) return 24;
+      if (fullDutyKeywords.some(k=>s.includes(k)) || s.startsWith('jb')) return 24;
+      if (isMorningShift(s)) return 6;
+      return 0;
+    };
+    const getEffectiveHours = (t) => {
+      const tk = getHoursToken(t);
+      return tk!==null ? tk : getDefaultHours(t);
+    };
 
     // --- Responsive flag ---
     window.addEventListener('resize', () => {
@@ -444,31 +494,26 @@
         for (const f of fields){
           const txt = ev[f];
           if (!txt) continue;
-          const h = getHoursFromText(txt);
+          const hours = getEffectiveHours(txt);
           const p = getPortsFromText(txt);
-          if (isOrtho(txt)) orthoH += h;
-          if (isBrzeziny(txt)) brzezH += h;
-          if (isJBDuty(txt)) jbH += h;
+          if (isOrtho(txt)) orthoH += hours;
+          if (isBrzeziny(txt)) brzezH += hours;
+          if (isJBDuty(txt) || isLask(txt)) jbH += hours; // Łask zaliczamy do JB
           if (p>0) ports += p;
         }
       }
+      // desktop bar
       dom.sumOrtho.textContent = `${orthoH}h`;
       dom.sumBrzeziny.textContent = `${brzezH}h`;
       dom.sumJB.textContent = `${jbH}h`;
       dom.sumPorts.textContent = `${ports}`;
-    };
-
-    // --- Łączenie „dyżur → ranek” (drugi dzień) ---
-    const isAfterDutyMorningDay = (day, events) => {
-      const today = events[day] || {};
-      const yesterday = events[day-1] || {};
-      // „rano” dziś w kolumnie Michała (praca lub ogólna)
-      const todayText = (today.michalPraca || today.michal || '');
-      const hasMorning = isMorningShift(todayText);
-      if (!hasMorning) return false;
-      // wczoraj JB (OIT / zniecz)
-      const yTexts = [yesterday.michalPraca, yesterday.michal, yesterday.aniaPraca, yesterday.ania].filter(Boolean).join(' || ');
-      return isJBDuty(yTexts);
+      // mobile sheet
+      dom.mSumOrtho.textContent = `${orthoH}h`;
+      dom.mSumBrzeziny.textContent = `${brzezH}h`;
+      dom.mSumJB.textContent = `${jbH}h`;
+      dom.mSumPorts.textContent = `${ports}`;
+      const m = currentDate.getMonth(), y = currentDate.getFullYear();
+      dom.summaryTitle.textContent = `Podsumowanie: ${getMonthName(m)} ${y}`;
     };
 
     // --- Renders (desktop) ---
@@ -489,10 +534,9 @@
         const dayEvents = events[day] || {};
         const isHoliday = dayEvents.isHoliday || false;
         const isDayOff = isWeekend || isHoliday;
-        const afterDutyMorning = isAfterDutyMorningDay(day, events);
 
         const dayInfoCell = document.createElement('div');
-        dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''} ${afterDutyMorning?'after-duty-morning':''}`;
+        dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''}`;
         if (isDayOff) dayInfoCell.classList.add('day-off');
         dayInfoCell.dataset.day = day;
         dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName(dow===0?6:dow-1)}</div></div>`;
@@ -523,17 +567,9 @@
           span.textContent = eventText;
           div.appendChild(span);
 
-          // mini chip „JB → RANO” także w komórkach (drugi dzień)
-          if (afterDutyMorning && (field==='michal' || field==='michalPraca')){
-            const chip = document.createElement('div');
-            chip.textContent = 'JB → RANO';
-            chip.style.position='absolute'; chip.style.bottom='4px'; chip.style.right='4px';
-            chip.style.fontSize='.6rem'; chip.style.fontWeight='700';
-            chip.style.color='#6d28d9'; chip.style.background='#ede9fe';
-            chip.style.border='1px solid #c4b5fd'; chip.style.borderRadius='9999px';
-            chip.style.padding='1px 6px';
-            div.appendChild(chip);
-          }
+          // podpowiedź godzin (bez wizualnych badge'y)
+          const hrs = getEffectiveHours(eventText);
+          if (hrs>0) div.title = `Godziny: ${hrs}`;
 
           cell.appendChild(div);
           frag.appendChild(cell);
@@ -559,10 +595,9 @@
         const isWeekend = dow===0 || dow===6;
         const dayEvents = events[day] || {};
         const isHoliday = dayEvents.isHoliday || false;
-        const afterDutyMorning = isAfterDutyMorningDay(day, events);
 
         const card = document.createElement('div');
-        card.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400':''} ${isWeekend||isHoliday ? 'weekend':''} ${afterDutyMorning?'after-duty-morning':''}`;
+        card.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400':''} ${isWeekend||isHoliday ? 'weekend':''}`;
 
         let html = `
           <div class="mobile-day-header">
@@ -583,7 +618,7 @@
           html += `
             <div class="mobile-event-row">
               <div class="mobile-event-label color-${field}">${fieldLabels[field]}</div>
-              <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}">
+              <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}" title="${getEffectiveHours(t)>0?('Godziny: '+getEffectiveHours(t)):'Dodaj wpis'}">
                 <span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
               </div>
             </div>
@@ -617,10 +652,9 @@
         const isWeekend = dow===0 || dow===6;
         const dayEvents = events[day] || {};
         const isHoliday = dayEvents.isHoliday || false;
-        const afterDutyMorning = isAfterDutyMorningDay(day, events);
 
         const card = document.createElement('div');
-        card.className = `overview-day-card ${isWeekend||isHoliday?'weekend':''} ${isToday?'ring-2 ring-purple-400':''} ${afterDutyMorning?'after-duty-morning':''}`;
+        card.className = `overview-day-card ${isWeekend||isHoliday?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
         card.dataset.day = day;
         card.onclick = ()=>openDayEdit(day, dayEvents);
 
@@ -642,8 +676,9 @@
             const type = getEventType(dayEvents[field]);
             const cls = type!=='default' ? (type + (type==='full-duty'||type==='medium-duty'?' duty-shift':'')) : '';
             const isJB = isJBDuty(dayEvents[field]);
+            const hrs = getEffectiveHours(dayEvents[field]);
             html += `
-              <div class="overview-event-item color-${field} ${cls} ${isJB?'jb-darken':''}">
+              <div class="overview-event-item color-${field} ${cls} ${isJB?'jb-darken':''}" title="${hrs>0?('Godziny: '+hrs):''}">
                 <div class="overview-event-label">${fieldLabels[field]}</div>
                 <div class="overview-event-text">${dayEvents[field]}</div>
               </div>
@@ -656,7 +691,7 @@
       }
 
       dom.loading.style.display = 'none';
-      // Autoprzewijanie do „Dziś” tylko desktop
+      // Autoprzewijanie „Dziś” tylko desktop
       setTimeout(()=>{
         if (!isMobile) {
           const todayCard = container.querySelector('.overview-day-card.ring-2');
@@ -664,7 +699,7 @@
         }
       },100);
 
-      // po wczytaniu przelicz sumy
+      // sumy
       computeMonthlySummary(events);
     };
 
@@ -700,16 +735,14 @@
       }
 
       for(let day=1; day<=daysInMonth; day++){
-        const date = new Date(year, month, day);
-        const dow = date.getDay();
-        const isToday = today.toDateString() === date.toDateString();
+        const dow = new Date(year, month, day).getDay();
+        const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
         const isWeekend = dow===0 || dow===6;
         const dayEvents = events[day] || {};
         const isHoliday = dayEvents.isHoliday || false;
-        const afterDutyMorning = isAfterDutyMorningDay(day, events);
 
         const cell = document.createElement('div');
-        cell.className = `month-day-cell ${isWeekend||isHoliday?'weekend':''} ${isToday?'today':''} ${afterDutyMorning?'after-duty-morning':''}`;
+        cell.className = `month-day-cell ${isWeekend||isHoliday?'weekend':''} ${isToday?'today':''}`;
         cell.dataset.day = day;
         cell.onclick = ()=>openDayEdit(day, dayEvents);
 
@@ -720,7 +753,7 @@
             const type = getEventType(dayEvents[field]);
             const cls = type!=='default' ? type : '';
             const isJB = isJBDuty(dayEvents[field]);
-            html += `<div class="month-event-item color-${field} ${cls} ${isJB?'jb-darken':''}">${dayEvents[field]}</div>`;
+            html += `<div class="month-event-item color-${field} ${cls} ${isJB?'jb-darken':''}" title="${getEffectiveHours(dayEvents[field])>0?('Godziny: '+getEffectiveHours(dayEvents[field])):''}">${dayEvents[field]}</div>`;
             shown++;
           }
         }
@@ -744,7 +777,6 @@
 
       dom.loading.style.display = 'none';
 
-      // przelicz sumy
       computeMonthlySummary(events);
     };
 
@@ -763,22 +795,22 @@
         const value = (dayEvents[field]||'');
         const type = getEventType(value);
 
-        const btns = `
-          <div style="display:flex;gap:.5rem;margin-top:.4rem;">
-            <button data-act="add-hour" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-purple-300 text-purple-700 hover:bg-purple-50">+h</button>
-            <button data-act="add-port" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-pink-300 text-pink-700 hover:bg-pink-50">+port</button>
-          </div>
-        `;
-
         wrap.innerHTML = `
           <label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label>
           <input type="text" class="day-edit-input ${type!=='default'?type:''} ${isJBDuty(value)?'jb-darken':''}" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
-          ${btns}
+          <div style="display:flex;gap:.5rem;margin-top:.4rem;flex-wrap:wrap">
+            <button data-act="set-h" data-h="6"  data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">6h</button>
+            <button data-act="set-h" data-h="10" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">10h</button>
+            <button data-act="set-h" data-h="24" data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50">24h</button>
+            <button data-act="clr-h"             data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-red-300 text-red-700 hover:bg-red-50">− usuń godziny</button>
+            <button data-act="add-port"          data-field="${field}" class="px-2 py-1 text-xs rounded-md border border-pink-300 text-pink-700 hover:bg-pink-50">+port</button>
+          </div>
+          <div class="text-xs text-gray-500 mt-1">Domyślnie: JB/Łask 24h · Ortho/Brzeziny 10h · „rano” 6h. Token #hX nadpisuje.</div>
         `;
         dom.dayEditFields.appendChild(wrap);
       });
 
-      // listeners na inputy
+      // input change
       dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{
         input.addEventListener('change', async ()=>{
           const field = input.dataset.field;
@@ -790,7 +822,7 @@
         });
       });
 
-      // szybkie przyciski tokenów
+      // quick actions
       dom.dayEditFields.querySelectorAll('button[data-act]').forEach(btn=>{
         btn.addEventListener('click', async ()=>{
           const field = btn.getAttribute('data-field');
@@ -798,11 +830,17 @@
           const inp = dom.dayEditFields.querySelector(`.day-edit-input[data-field="${field}"]`);
           if (!inp) return;
           let v = inp.value.trim();
-          if (act==='add-hour'){
-            // domyślnie 12h — łatwo zmienić ręcznie
-            v = `${v} #h12`.trim();
+          if (act==='set-h'){
+            const h = parseInt(btn.getAttribute('data-h'),10);
+            v = setHoursToken(v, h);
+          } else if (act==='clr-h'){
+            v = setHoursToken(v, null);
           } else if (act==='add-port'){
-            v = `${v} #p1`.trim();
+            // jeśli nie ma portów → #p1, jeśli są → +1
+            const cur = getPortsFromText(v);
+            const nv = cur>0 ? (cur+1) : 1;
+            v = v.replace(/(#p\s*\d+)|(\bporty?\s*[:=]\s*\d+)/ig,'').trim();
+            v = `${v} #p${nv}`.trim();
           }
           if (v.length > MAX_CHARS) v = v.slice(0, MAX_CHARS);
           inp.value = v;
@@ -816,7 +854,6 @@
     };
     window.closeDayEdit = () => {
       dom.dayEditModal.style.display = 'none';
-      // odśwież bieżący widok
       if (currentView==='compact') renderCompact(currentDate.getFullYear(), currentDate.getMonth());
       else if (currentView==='month') renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
       else update();
@@ -827,7 +864,6 @@
     const update = () => {
       if (!db) return;
 
-      // widoki
       if (currentView==='compact'){ renderCompact(currentDate.getFullYear(), currentDate.getMonth()); return; }
       if (currentView==='month'){ renderMonthView(currentDate.getFullYear(), currentDate.getMonth()); return; }
 
@@ -1051,6 +1087,11 @@
         }
       },100);
     };
+
+    // --- Summary FAB / Sheet (mobile) ---
+    dom.summaryFab.addEventListener('click', ()=> dom.summarySheet.classList.add('open'));
+    dom.closeSheet.addEventListener('click', ()=> dom.summarySheet.classList.remove('open'));
+    dom.summarySheet.addEventListener('click', (e)=>{ if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); });
 
     // --- Init ---
     const initCalendar = () => {
