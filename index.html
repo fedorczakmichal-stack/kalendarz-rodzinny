@@ -392,7 +392,7 @@
         }
         
         /* Widok overview - kompaktowy */
-        #month-overview-view { 
+        #compact-view { 
             display: none; 
             padding: 1rem; 
             overflow-y: auto;
@@ -473,6 +473,105 @@
         
         .overview-event-text {
             word-wrap: break-word;
+        }
+        
+        /* Widok miesięczny - nowy styl jak Google/Apple Calendar */
+        #month-view {
+            display: none;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .month-header-cell {
+            background-color: #f9fafb;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .month-day-cell {
+            background-color: white;
+            min-height: 100px;
+            padding: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .month-day-cell:hover {
+            background-color: #f9fafb;
+        }
+        
+        .month-day-cell.other-month {
+            background-color: #fcfcfc;
+            opacity: 0.5;
+        }
+        
+        .month-day-cell.weekend {
+            background: linear-gradient(135deg, rgba(219, 39, 119, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+        }
+        
+        .month-day-cell.today {
+            background-color: #ede9fe;
+            border: 2px solid #8b5cf6;
+        }
+        
+        .month-day-number {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        .month-day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .month-event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        
+        .month-event-item {
+            font-size: 0.65rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        @media (max-width: 768px) {
+            .month-day-cell {
+                min-height: 70px;
+                padding: 0.25rem;
+            }
+            
+            .month-day-number {
+                font-size: 0.75rem;
+            }
+            
+            .month-event-item {
+                font-size: 0.6rem;
+                padding: 1px 2px;
+            }
         }
         
         /* Modal dla edycji dnia */
@@ -639,10 +738,14 @@
                         </svg>
                     </button>
                     <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
-                    <button id="view-toggle-btn" class="hidden md:inline-block px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Kompaktowy</button>
-                    <button id="overview-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <button id="compact-btn" class="hidden md:inline-block p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Widok kompaktowy">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <button id="month-view-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Widok miesięczny">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </button>
                 </div>
@@ -673,8 +776,14 @@
                 </div>
             </div>
             
-            <div id="month-overview-view">
+            <!-- Widok kompaktowy -->
+            <div id="compact-view">
                 <div class="overview-container"></div>
+            </div>
+            
+            <!-- Widok miesięczny -->
+            <div id="month-view">
+                <div class="month-grid"></div>
             </div>
             
             <div id="loading" class="text-center p-8 text-gray-500 font-semibold">
@@ -685,10 +794,10 @@
 
     <!-- Menu kontekstowe -->
     <div id="context-menu" class="context-menu">
-        <div id="copy-btn" class="context-menu-item">📋 Kopiuj</div>
-        <div id="paste-btn" class="context-menu-item">📌 Wklej</div>
+        <div id="copy-btn" class="context-menu-item">Kopiuj</div>
+        <div id="paste-btn" class="context-menu-item">Wklej</div>
         <div class="context-menu-separator"></div>
-        <div id="delete-btn" class="context-menu-item text-red-600">🗑️ Usuń</div>
+        <div id="delete-btn" class="context-menu-item text-red-600">Usuń</div>
     </div>
 
     <!-- Panel akcji masowych -->
@@ -750,7 +859,7 @@
         let clipboard = null;
         let contextTarget = null;
         const selected = new Set();
-        let isOverview = false;
+        let currentView = 'standard'; // 'standard', 'compact', 'month'
         let isMobile = window.innerWidth <= 768;
         let currentEditDay = null;
         let currentEvents = {};
@@ -764,8 +873,8 @@
             todayBtn: document.getElementById('today-btn'),
             container: document.getElementById('calendar-container'),
             mobileCalendar: document.getElementById('mobile-calendar'),
-            viewToggle: document.getElementById('view-toggle-btn'),
-            overviewBtn: document.getElementById('overview-btn'),
+            compactBtn: document.getElementById('compact-btn'),
+            monthViewBtn: document.getElementById('month-view-btn'),
             body: document.getElementById('calendar-body'),
             loading: document.getElementById('loading'),
             contextMenu: document.getElementById('context-menu'),
@@ -777,7 +886,8 @@
             bulkDelete: document.getElementById('bulk-delete-btn'),
             clearSelection: document.getElementById('clear-selection-btn'),
             mainView: document.getElementById('main-view'),
-            overviewView: document.getElementById('month-overview-view'),
+            compactView: document.getElementById('compact-view'),
+            monthView: document.getElementById('month-view'),
             dayEditModal: document.getElementById('day-edit-modal'),
             dayEditFields: document.getElementById('day-edit-fields')
         };
@@ -819,15 +929,27 @@
             }
             
             setTimeout(() => {
-                const todayElement = document.querySelector('.today');
-                if (todayElement) {
-                    todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                
-                // Dla widoku mobilnego
-                const todayCard = document.querySelector('.mobile-day-card.ring-2');
-                if (todayCard) {
-                    todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (currentView === 'standard') {
+                    const todayElement = document.querySelector('.today');
+                    if (todayElement) {
+                        todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    
+                    // Dla widoku mobilnego
+                    const todayCard = document.querySelector('.mobile-day-card.ring-2');
+                    if (todayCard) {
+                        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else if (currentView === 'compact') {
+                    const todayCard = document.querySelector('#compact-view .overview-day-card.ring-2');
+                    if (todayCard) {
+                        todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else if (currentView === 'month') {
+                    const todayCell = document.querySelector('.month-day-cell.today');
+                    if (todayCell) {
+                        todayCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }
             }, 100);
         };
@@ -967,16 +1089,16 @@
             dom.mobileCalendar.appendChild(fragment);
         };
 
-        // --- Renderowanie widoku Overview (kompaktowego) ---
-        const renderOverview = async (year, month) => {
+        // --- Renderowanie widoku kompaktowego ---
+        const renderCompact = async (year, month) => {
             dom.loading.style.display = 'flex';
-            const container = dom.overviewView.querySelector('.overview-container');
+            const container = dom.compactView.querySelector('.overview-container');
             container.innerHTML = '';
             dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
             
             const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
             const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
-            currentEvents = events; // Zapisz do użycia w edycji
+            currentEvents = events;
             
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const today = new Date();
@@ -1033,9 +1155,103 @@
             }
             
             dom.loading.style.display = 'none';
+            
+            // Przewiń do dzisiejszego dnia po załadowaniu
+            setTimeout(() => {
+                const todayCard = container.querySelector('.overview-day-card.ring-2');
+                if (todayCard) {
+                    todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
         };
 
-        // --- Funkcje edycji dnia w widoku kompaktowym ---
+        // --- Renderowanie widoku miesięcznego ---
+        const renderMonthView = async (year, month) => {
+            dom.loading.style.display = 'flex';
+            const grid = dom.monthView.querySelector('.month-grid');
+            grid.innerHTML = '';
+            dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
+            
+            // Nagłówki dni tygodnia
+            const headers = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Nd'];
+            headers.forEach(header => {
+                const headerCell = document.createElement('div');
+                headerCell.className = 'month-header-cell';
+                headerCell.textContent = header;
+                grid.appendChild(headerCell);
+            });
+            
+            const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
+            const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
+            currentEvents = events;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startDay = (firstDay.getDay() + 6) % 7; // Poniedziałek = 0
+            const today = new Date();
+            
+            // Puste komórki przed pierwszym dniem
+            for (let i = 0; i < startDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'month-day-cell other-month';
+                grid.appendChild(emptyCell);
+            }
+            
+            // Dni miesiąca
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayOfWeek = date.getDay();
+                const isToday = today.toDateString() === date.toDateString();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const dayEvents = events[day] || {};
+                const isHoliday = dayEvents.isHoliday || false;
+                
+                const dayCell = document.createElement('div');
+                dayCell.className = `month-day-cell ${isWeekend || isHoliday ? 'weekend' : ''} ${isToday ? 'today' : ''}`;
+                dayCell.dataset.day = day;
+                dayCell.onclick = () => openDayEdit(day, dayEvents);
+                
+                let cellHTML = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
+                
+                let eventCount = 0;
+                fields.forEach(field => {
+                    if (dayEvents[field] && eventCount < 3) { // Pokazuj max 3 wydarzenia
+                        const eventType = getEventType(dayEvents[field]);
+                        let typeClass = '';
+                        if (eventType !== 'default') {
+                            typeClass = eventType;
+                        }
+                        cellHTML += `<div class="month-event-item color-${field} ${typeClass}">${dayEvents[field]}</div>`;
+                        eventCount++;
+                    }
+                });
+                
+                const totalEvents = fields.filter(f => dayEvents[f]).length;
+                if (totalEvents > 3) {
+                    cellHTML += `<div class="month-event-item" style="font-size: 0.6rem; color: #6b7280;">+${totalEvents - 3} więcej</div>`;
+                }
+                
+                cellHTML += '</div>';
+                dayCell.innerHTML = cellHTML;
+                grid.appendChild(dayCell);
+            }
+            
+            // Puste komórki po ostatnim dniu (wypełnienie do 35 lub 42 komórek)
+            const totalCells = startDay + daysInMonth;
+            const rows = Math.ceil(totalCells / 7);
+            const targetCells = rows * 7;
+            
+            for (let i = totalCells; i < targetCells; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'month-day-cell other-month';
+                grid.appendChild(emptyCell);
+            }
+            
+            dom.loading.style.display = 'none';
+        };
+
+        // --- Funkcje edycji dnia ---
         window.openDayEdit = (day, dayEvents) => {
             currentEditDay = day;
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -1093,8 +1309,10 @@
 
         window.closeDayEdit = () => {
             dom.dayEditModal.style.display = 'none';
-            if (isOverview) {
-                renderOverview(currentDate.getFullYear(), currentDate.getMonth());
+            if (currentView === 'compact') {
+                renderCompact(currentDate.getFullYear(), currentDate.getMonth());
+            } else if (currentView === 'month') {
+                renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
             }
         };
 
@@ -1108,6 +1326,16 @@
         // --- Update funkcja ---
         const update = () => {
             if (!db) return;
+            
+            if (currentView === 'compact') {
+                renderCompact(currentDate.getFullYear(), currentDate.getMonth());
+                return;
+            } else if (currentView === 'month') {
+                renderMonthView(currentDate.getFullYear(), currentDate.getMonth());
+                return;
+            }
+            
+            // Standardowy widok
             unsubscribe();
             dom.loading.style.display = 'flex';
             dom.body.innerHTML = '';
@@ -1120,7 +1348,7 @@
             unsubscribe = onSnapshot(collection(db, calendarId), snap => {
                 const events = {};
                 snap.forEach(doc => { events[doc.id] = doc.data(); });
-                currentEvents = events; // Zapisz aktualny stan
+                currentEvents = events;
                 
                 if (isMobile) {
                     renderMobile(year, month, events);
@@ -1128,6 +1356,27 @@
                     renderDesktop(year, month, events);
                 }
             });
+        };
+
+        // --- Przełączanie widoków ---
+        const switchView = (newView) => {
+            currentView = newView;
+            
+            // Ukryj wszystkie widoki
+            dom.mainView.style.display = 'none';
+            dom.compactView.style.display = 'none';
+            dom.monthView.style.display = 'none';
+            
+            // Pokaż odpowiedni widok
+            if (newView === 'standard') {
+                dom.mainView.style.display = 'flex';
+            } else if (newView === 'compact') {
+                dom.compactView.style.display = 'block';
+            } else if (newView === 'month') {
+                dom.monthView.style.display = 'block';
+            }
+            
+            update();
         };
 
         // --- Edycja mobilna ---
@@ -1399,48 +1648,35 @@
             }
         };
 
-        // --- Przełącznik Widoku ---
-        const setViewMode = isCompact => {
-            dom.viewToggle.textContent = isCompact ? 'Standardowy' : 'Kompaktowy';
-            localStorage.setItem('view', isCompact ? 'compact' : 'standard');
-        };
-
-        // --- Toggle Overview ---
-        const toggleOverview = () => {
-            isOverview = !isOverview;
-            dom.mainView.style.display = isOverview ? 'none' : 'flex';
-            dom.overviewView.style.display = isOverview ? 'block' : 'none';
-            
-            if (isOverview) {
-                renderOverview(currentDate.getFullYear(), currentDate.getMonth());
-                if (!isMobile) setViewMode(true);
-            } else {
-                update();
-                if (!isMobile) setViewMode(false);
-            }
-        };
-
         // --- Inicjalizacja ---
         const initCalendar = () => {
             const navigate = (delta) => {
-                if (isOverview) {
-                    currentDate.setMonth(currentDate.getMonth() + delta);
-                    renderOverview(currentDate.getFullYear(), currentDate.getMonth());
-                } else {
-                    currentDate.setMonth(currentDate.getMonth() + delta);
-                    update();
-                }
+                currentDate.setMonth(currentDate.getMonth() + delta);
+                update();
             };
             
             dom.prevBtn.addEventListener('click', () => navigate(-1));
             dom.nextBtn.addEventListener('click', () => navigate(1));
-            dom.todayBtn.addEventListener('click', scrollToToday); // Zmienione - teraz przewija do konkretnego dnia
+            dom.todayBtn.addEventListener('click', scrollToToday);
             
+            // Przełączniki widoków
             if (!isMobile) {
-                dom.viewToggle.addEventListener('click', toggleOverview); // Zmienione - teraz przełącza na widok kompaktowy
+                dom.compactBtn.addEventListener('click', () => {
+                    if (currentView === 'compact') {
+                        switchView('standard');
+                    } else {
+                        switchView('compact');
+                    }
+                });
             }
             
-            dom.overviewBtn.addEventListener('click', toggleOverview);
+            dom.monthViewBtn.addEventListener('click', () => {
+                if (currentView === 'month') {
+                    switchView(isMobile ? 'standard' : 'standard');
+                } else {
+                    switchView('month');
+                }
+            });
             
             // Touch events dla lepszej obsługi mobilnej
             let touchStartX = 0;
