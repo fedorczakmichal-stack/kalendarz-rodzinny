@@ -69,6 +69,65 @@
     .summary-dot{width:.5rem;height:.5rem;border-radius:9999px}
     @media (max-width:768px){ .summary-bar{display:none} }
     
+    /* --- MOBILE SUMMARY BUTTON --- */
+    #mobile-summary-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    #mobile-summary-btn:active {
+      transform: scale(0.95);
+    }
+    #mobile-summary-btn svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+    @media (max-width: 768px) {
+      #mobile-summary-btn.show {
+        display: flex;
+      }
+    }
+    
+    /* --- MOBILE SUMMARY MODAL --- */
+    #mobile-summary-modal {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: white;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      z-index: 99;
+      display: none;
+      min-width: 250px;
+    }
+    #mobile-summary-modal.show {
+      display: block;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
     /* --- DESKTOP GRID --- */
     .calendar-grid{display:grid;grid-template-columns:minmax(80px,.5fr) repeat(6,1fr);border-top:1px solid #E5E7EB}
     .calendar-cell{border-bottom:1px solid #E5E7EB;border-left:1px solid #E5E7EB;min-height:60px;position:relative;padding:4px}
@@ -248,7 +307,7 @@
       <span class="summary-chip"><span class="summary-dot" style="background:#a7f3d0"></span> Ortho: <b id="sum-ortho">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fde68a"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#f9a8d4"></span> Łask: <b id="sum-lask">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB (OIT+Zniecz.): <b id="sum-jb">0h</b></span>
+      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB: <b id="sum-jb">0h</b></span>
       <span class="summary-chip"><span class="summary-dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
     </div>
 
@@ -283,6 +342,40 @@
         <div class="loading-spinner"></div>
       </div>
     </main>
+  </div>
+
+  <!-- Mobile Summary Button -->
+  <button id="mobile-summary-btn" class="show">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 12h18m-9-9v18"/>
+    </svg>
+  </button>
+
+  <!-- Mobile Summary Modal -->
+  <div id="mobile-summary-modal">
+    <h3 style="font-size:1rem;font-weight:700;color:#1f2937;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f3f4f6;">Podsumowanie</h3>
+    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span style="color:#6b7280;">Ortho:</span>
+        <span style="font-weight:600;color:#10b981;" id="m-sum-ortho">0h</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span style="color:#6b7280;">Brzeziny:</span>
+        <span style="font-weight:600;color:#f59e0b;" id="m-sum-brzeziny">0h</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span style="color:#6b7280;">Łask:</span>
+        <span style="font-weight:600;color:#ec4899;" id="m-sum-lask">0h</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span style="color:#6b7280;">JB:</span>
+        <span style="font-weight:600;color:#8b5cf6;" id="m-sum-jb">0h</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding-top:0.5rem;border-top:1px solid #e5e7eb;">
+        <span style="color:#6b7280;">Porty:</span>
+        <span style="font-weight:600;color:#ef4444;" id="m-sum-ports">0</span>
+      </div>
+    </div>
   </div>
 
   <div id="context-menu" class="context-menu">
@@ -576,7 +669,6 @@
       dom.mSumLask.textContent = `${laskH}h`;
       dom.mSumJB.textContent = `${jbH}h`;
       dom.mSumPorts.textContent = `${ports}`;
-      dom.summaryTitle.textContent = `Podsumowanie: ${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
     };
 
     const renderDesktop = (year, month, events) => {
@@ -1048,7 +1140,28 @@
         });
 
         dom.mobileCalendar.addEventListener('contextmenu', e => { e.preventDefault(); });
+        
+        dom.mobileCalendar.addEventListener('click', e => {
+            const target = e.target.closest('.mobile-event-content');
+            if (target) handleMobileEdit(target);
+        });
     };
+
+    // Mobile summary button and modal
+    const mobileSummaryBtn = document.getElementById('mobile-summary-btn');
+    const mobileSummaryModal = document.getElementById('mobile-summary-modal');
+    
+    if (mobileSummaryBtn && mobileSummaryModal) {
+        mobileSummaryBtn.addEventListener('click', () => {
+            mobileSummaryModal.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#mobile-summary-btn') && !e.target.closest('#mobile-summary-modal')) {
+                mobileSummaryModal.classList.remove('show');
+            }
+        });
+    }
 
     const initCalendar = () => {
       const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
