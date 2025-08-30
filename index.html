@@ -168,7 +168,7 @@
       .month-event-item{font-size:.6rem;padding:1px 2px}
     }
 
-    /* NOWY, UPROSZCZONY INPUT GODZIN W MODALU */
+    /* UPROSZCZONY INPUT GODZIN W MODALU */
     .hours-input{
       width:80px;
       padding:0.5rem;
@@ -284,11 +284,11 @@
         <div id="mobile-calendar" class="mobile-calendar md:hidden"></div>
       </div>
 
-      <div id="compact-view">
+      <div id="compact-view" class="overflow-auto flex-1">
         <div class="overview-container"></div>
       </div>
 
-      <div id="month-view">
+      <div id="month-view" class="overflow-auto flex-1">
         <div class="month-grid"></div>
       </div>
 
@@ -371,7 +371,7 @@
       mainView: document.getElementById('main-view'),
       compactView: document.getElementById('compact-view'),
       monthView: document.getElementById('month-view'),
-      container: document.getElementById('calendar-container'),
+      calendarWrapper: document.getElementById('calendar-wrapper'),
       mobileCalendar: document.getElementById('mobile-calendar'),
       body: document.getElementById('calendar-body'),
       loading: document.getElementById('loading'),
@@ -411,7 +411,7 @@
 
     // Rozpoznawanie rodzaju pracy
     const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz'];
-    const morningKeywords = ['rano','poranna','7:30','7.30','07:30','07.30','chirurgia'];
+    const morningKeywords = ['rano','poranna', 'wybudzenia', '7:30','7.30','07:30','07.30','chirurgia'];
     const locationLaskKeywords = ['łask'];
     const locationOtherKeywords = ['ortho','brzeziny'];
 
@@ -439,6 +439,33 @@
       const s = t.toLowerCase();
       return morningKeywords.some(k=>s.includes(k));
     };
+    
+    // NOWA LOGIKA DLA DWÓCH DYŻURÓW
+    const detectMultiShift = (text) => {
+        if (!text) return { detected: false };
+        const s = text.toLowerCase();
+        const hasJB = isJBDuty(s);
+        const hasOrtho = isOrtho(s);
+        const hasLask = isLask(s);
+
+        if (hasJB && (hasOrtho || hasLask)) {
+            return {
+                detected: true,
+                part1: 'JB',
+                part2: hasOrtho ? 'Ortho' : 'Łask'
+            };
+        }
+        return { detected: false };
+    };
+    
+    const getDefaultPartHours = (multiShiftResult) => {
+        if (!multiShiftResult.detected) return null;
+        return {
+            part1: 6, // Domyślna wartość dla części JB
+            part2: multiShiftResult.part2 === 'Ortho' ? 10 : 24 // dla Ortho lub Łask
+        };
+    };
+
 
     // System godzin
     const getHoursFromDB = (day, field) => {
@@ -451,8 +478,8 @@
       const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
       const docRef = doc(db, calendarId, String(day));
       const key = `hours_${field}`;
-      if (hours === null) {
-        await updateDoc(docRef, { [key]: deleteField() });
+      if (hours === null || (typeof hours === 'object' && hours.part1 === null && hours.part2 === null)) {
+        await updateDoc(docRef, { [key]: deleteField() }).catch(() => setDoc(docRef, {}));
       } else {
         await setDoc(docRef, { [key]: hours }, { merge: true });
       }
@@ -477,11 +504,8 @@
       return 0;
     };
 
-    const checkContinuation = (day, field, allEvents) => {
-      if (day < 1 || day > 31) return null;
-      const text = allEvents[day] && allEvents[day][field];
-      if (!text) return null;
-      
+    const checkContinuation = (text, day, field, allEvents) => {
+      if (!text || day >= 31) return null;
       const nextDay = day + 1;
       const nextText = allEvents[nextDay] && allEvents[nextDay][field];
       if (nextText && isMorningShift(nextText) && isJBDuty(text)) {
@@ -491,16 +515,31 @@
     };
 
     const getEffectiveHours = (text, day, field, allEvents) => {
-      const saved = getHoursFromDB(day, field);
-      if (saved !== null) return saved;
-      
-      let defaultHours = getDefaultHours(text, day, field, allEvents);
-      const continuation = checkContinuation(day, field, allEvents);
-      
-      if (continuation) {
-        defaultHours += continuation.extraHours;
-      }
-      return defaultHours;
+        const savedHours = getHoursFromDB(day, field);
+
+        if (savedHours !== null) {
+            if (typeof savedHours === 'object') {
+                const multiShift = detectMultiShift(text);
+                const defaultPartHours = multiShift.detected ? getDefaultPartHours(multiShift) : { part1: 0, part2: 0 };
+                const part1 = savedHours.part1 !== null ? savedHours.part1 : defaultPartHours.part1;
+                const part2 = savedHours.part2 !== null ? savedHours.part2 : defaultPartHours.part2;
+                return (part1 || 0) + (part2 || 0);
+            }
+            return savedHours;
+        }
+
+        const multiShift = detectMultiShift(text);
+        if (multiShift.detected) {
+            const defaultParts = getDefaultPartHours(multiShift);
+            return defaultParts.part1 + defaultParts.part2;
+        }
+
+        let defaultHours = getDefaultHours(text, day, field, allEvents);
+        const continuation = checkContinuation(text, day, field, allEvents);
+        if (continuation) {
+            defaultHours += continuation.extraHours;
+        }
+        return defaultHours;
     };
 
     const getPortsFromText = (t) => {
@@ -509,17 +548,14 @@
       return m ? parseInt(m[1], 10) : 0;
     };
 
-    // Responsive flag
     window.addEventListener('resize', () => {
       const wasMobile = isMobile;
       isMobile = window.innerWidth <= 768;
       if (wasMobile !== isMobile) update();
     });
 
-    // Summary compute
     const computeMonthlySummary = async () => {
       let orthoH=0, brzezH=0, jbH=0, ports=0;
-      
       const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
 
       for (let day = 1; day <= daysInMonth; day++) {
@@ -554,10 +590,7 @@
 
     // Renders
     const renderDesktop = (year, month, events) => {
-      dom.loading.style.display = 'none';
       dom.body.innerHTML = '';
-      dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-
       const daysInMonth = new Date(year, month+1, 0).getDate();
       const today = new Date();
       const frag = document.createDocumentFragment();
@@ -603,7 +636,6 @@
           span.className = 'event-text';
           span.textContent = eventText;
           div.appendChild(span);
-
           cell.appendChild(div);
           frag.appendChild(cell);
         });
@@ -612,10 +644,7 @@
     };
 
     const renderMobile = (year, month, events) => {
-      dom.loading.style.display = 'none';
       dom.mobileCalendar.innerHTML = '';
-      dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-
       const daysInMonth = new Date(year, month+1, 0).getDate();
       const today = new Date();
       const frag = document.createDocumentFragment();
@@ -633,15 +662,11 @@
 
         let html = `
           <div class="mobile-day-header">
-            <div>
-              <span class="mobile-day-number">${day}</span>
-              <span class="mobile-day-name ml-2">${getDayFullName(dow===0?6:dow-1)}</span>
-            </div>
+            <div><span class="mobile-day-number">${day}</span><span class="mobile-day-name ml-2">${getDayFullName(dow===0?6:dow-1)}</span></div>
             ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
             ${isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>':''}
           </div>
-          <div class="mobile-events">
-        `;
+          <div class="mobile-events">`;
         
         fields.forEach(field=>{
           const t = dayEvents[field] || '';
@@ -654,8 +679,7 @@
               <div class="mobile-event-content color-${field} ${typeClass}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}">
                 <span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
               </div>
-            </div>
-          `;
+            </div>`;
         });
         
         html += `</div>`;
@@ -665,162 +689,126 @@
       dom.mobileCalendar.appendChild(frag);
     };
 
-    const renderCompact = async (year, month) => {
-      dom.loading.style.display = 'flex';
+    const renderCompact = (year, month, events) => {
       const container = dom.compactView.querySelector('.overview-container');
       container.innerHTML = '';
-      dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-      
-      unsubscribe();
-      const id = `${year}-${month+1}`;
-      unsubscribe = onSnapshot(collection(db, id), async (snap) => {
-        const events = {};
-        snap.forEach(d => { events[d.id] = d.data(); });
-        currentEvents = events;
-        container.innerHTML = '';
+      const daysInMonth = new Date(year, month+1, 0).getDate();
+      const today = new Date();
 
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const today = new Date();
+      for(let day=1; day<=daysInMonth; day++){
+        const date = new Date(year, month, day);
+        const dow = date.getDay();
+        const isToday = today.toDateString() === date.toDateString();
+        const isWeekend = dow===0 || dow===6;
+        const dayEvents = events[day] || {};
+        const isHoliday = dayEvents.isHoliday || false;
 
-        for (let day = 1; day <= daysInMonth; day++) {
-          const date = new Date(year, month, day);
-          const dow = date.getDay();
-          const isToday = today.toDateString() === date.toDateString();
-          const isWeekend = dow === 0 || dow === 6;
-          const dayEvents = events[day] || {};
-          const isHoliday = dayEvents.isHoliday || false;
+        const card = document.createElement('div');
+        card.className = `overview-day-card ${isWeekend||isHoliday?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
+        card.dataset.day = day;
+        card.onclick = ()=>openDayEdit(day, dayEvents);
 
-          const card = document.createElement('div');
-          card.className = `overview-day-card ${isWeekend || isHoliday ? 'weekend' : ''} ${isToday ? 'ring-2 ring-purple-400' : ''}`;
-          card.dataset.day = day;
-          card.onclick = () => openDayEdit(day, dayEvents);
-
-          let html = `
-            <div class="overview-day-header">
-              <div class="overview-day-info">
-                <span class="overview-day-number">${day}</span>
-                <span class="overview-day-name">${getDayFullName(dow === 0 ? 6 : dow - 1)}</span>
-              </div>
-              <div>
-                ${isToday ? '<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>' : ''}
-                ${isHoliday ? '<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>' : ''}
-              </div>
+        let html = `
+          <div class="overview-day-header">
+            <div class="overview-day-info">
+              <span class="overview-day-number">${day}</span>
+              <span class="overview-day-name">${getDayFullName(dow===0?6:dow-1)}</span>
             </div>
-            <div class="overview-events-grid">
-          `;
-
-          fields.forEach(field => {
-            if (dayEvents[field]) {
-              const type = getEventType(dayEvents[field]);
-              html += `
-                <div class="overview-event-item color-${field} ${type !== 'default' ? type : ''}">
-                  <div class="overview-event-label">${fieldLabels[field]}</div>
-                  <div class="overview-event-text">${dayEvents[field]}</div>
-                </div>
-              `;
-            }
-          });
-
-          html += `</div>`;
-          card.innerHTML = html;
-          container.appendChild(card);
-        }
-
-        dom.loading.style.display = 'none';
-        computeMonthlySummary();
-      });
+            <div>
+              ${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}
+              ${isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>':''}
+            </div>
+          </div>
+          <div class="overview-events-grid">`;
+        
+        fields.forEach(field=>{
+          if (dayEvents[field]){
+            const type = getEventType(dayEvents[field]);
+            html += `
+              <div class="overview-event-item color-${field} ${type!=='default'?type:''}">
+                <div class="overview-event-label">${fieldLabels[field]}</div>
+                <div class="overview-event-text">${dayEvents[field]}</div>
+              </div>`;
+          }
+        });
+        html += `</div>`;
+        card.innerHTML = html;
+        container.appendChild(card);
+      }
     };
 
-    const renderMonthView = async (year, month) => {
-      dom.loading.style.display = 'flex';
+    const renderMonthView = (year, month, events) => {
       const grid = dom.monthView.querySelector('.month-grid');
       grid.innerHTML = '';
-      dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-
-      unsubscribe();
-      const id = `${year}-${month+1}`;
-      unsubscribe = onSnapshot(collection(db, id), (snap) => {
-        const events = {};
-        snap.forEach(d => { events[d.id] = d.data(); });
-        currentEvents = events;
-        grid.innerHTML = '';
-      
-        const headers = ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'];
-        headers.forEach(h=>{
-          const el = document.createElement('div');
-          el.className = 'month-header-cell';
-          el.textContent = h;
-          grid.appendChild(el);
-        });
-
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month+1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startDay = (firstDay.getDay() + 6) % 7;
-        const today = new Date();
-
-        for(let i=0;i<startDay;i++){
-          const empty = document.createElement('div');
-          empty.className = 'month-day-cell other-month';
-          grid.appendChild(empty);
-        }
-
-        for(let day=1; day<=daysInMonth; day++){
-          const dow = new Date(year, month, day).getDay();
-          const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
-          const isWeekend = dow===0 || dow===6;
-          const dayEvents = events[day] || {};
-          const isHoliday = dayEvents.isHoliday || false;
-
-          const cell = document.createElement('div');
-          cell.className = `month-day-cell ${isWeekend||isHoliday?'weekend':''} ${isToday?'today':''}`;
-          cell.dataset.day = day;
-          cell.onclick = ()=>openDayEdit(day, dayEvents);
-
-          let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
-          let shown = 0;
-          
-          for (const field of fields){
-            if (dayEvents[field] && shown < 3){
-              const type = getEventType(dayEvents[field]);
-              html += `<div class="month-event-item color-${field} ${type!=='default'?type:''}}">${dayEvents[field]}</div>`;
-              shown++;
-            }
-          }
-          
-          const total = fields.filter(f=>dayEvents[f]).length;
-          if (total > 3){
-            html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`;
-          }
-          
-          html += `</div>`;
-          cell.innerHTML = html;
-          grid.appendChild(cell);
-        }
-
-        const totalCells = startDay + daysInMonth;
-        const rows = Math.ceil(totalCells/7);
-        const target = rows*7;
-        
-        for(let i=totalCells; i<target; i++){
-          const empty = document.createElement('div');
-          empty.className = 'month-day-cell other-month';
-          grid.appendChild(empty);
-        }
-
-        dom.loading.style.display = 'none';
-        computeMonthlySummary();
+      const headers = ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'];
+      headers.forEach(h=>{
+        const el = document.createElement('div');
+        el.className = 'month-header-cell';
+        el.textContent = h;
+        grid.appendChild(el);
       });
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month+1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startDay = (firstDay.getDay() + 6) % 7;
+      const today = new Date();
+
+      for(let i=0;i<startDay;i++){
+        const empty = document.createElement('div');
+        empty.className = 'month-day-cell other-month';
+        grid.appendChild(empty);
+      }
+
+      for(let day=1; day<=daysInMonth; day++){
+        const dow = new Date(year, month, day).getDay();
+        const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
+        const isWeekend = dow===0 || dow===6;
+        const dayEvents = events[day] || {};
+        const isHoliday = dayEvents.isHoliday || false;
+
+        const cell = document.createElement('div');
+        cell.className = `month-day-cell ${isWeekend||isHoliday?'weekend':''} ${isToday?'today':''}`;
+        cell.dataset.day = day;
+        cell.onclick = ()=>openDayEdit(day, dayEvents);
+
+        let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
+        let shown = 0;
+        
+        for (const field of fields){
+          if (dayEvents[field] && shown < 3){
+            const type = getEventType(dayEvents[field]);
+            html += `<div class="month-event-item color-${field} ${type!=='default'?type:''}}">${dayEvents[field]}</div>`;
+            shown++;
+          }
+        }
+        
+        const total = fields.filter(f=>dayEvents[f]).length;
+        if (total > 3){
+          html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`;
+        }
+        
+        html += `</div>`;
+        cell.innerHTML = html;
+        grid.appendChild(cell);
+      }
+
+      const totalCells = startDay + daysInMonth;
+      const rows = Math.ceil(totalCells/7);
+      const target = rows*7;
+      
+      for(let i=totalCells; i<target; i++){
+        const empty = document.createElement('div');
+        empty.className = 'month-day-cell other-month';
+        grid.appendChild(empty);
+      }
     };
 
-    // UPROSZCZONY MODAL
     window.openDayEdit = (day, dayEvents) => {
       currentEditDay = day;
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dow = date.getDay();
-      document.querySelector('.day-edit-title').textContent =
-        `${day} ${getMonthName(currentDate.getMonth())} - ${getDayFullName(dow===0?6:dow-1)}`;
-
+      document.querySelector('.day-edit-title').textContent = `${day} ${getMonthName(currentDate.getMonth())} - ${getDayFullName(dow===0?6:dow-1)}`;
       dom.dayEditFields.innerHTML = '';
       
       fields.forEach(field=>{
@@ -828,24 +816,43 @@
         wrap.className = 'day-edit-field';
         const value = (dayEvents && dayEvents[field] ||'');
         const savedHours = getHoursFromDB(day, field);
-        const effectiveHours = getDefaultHours(value, day, field, currentEvents);
-        
+        const multiShift = detectMultiShift(value);
+
+        let hoursHTML = '';
+        if (multiShift.detected) {
+            const defaultPartHours = getDefaultPartHours(multiShift);
+            const savedPart1 = (typeof savedHours === 'object' && savedHours.part1 !== undefined && savedHours.part1 !== null) ? savedHours.part1 : '';
+            const savedPart2 = (typeof savedHours === 'object' && savedHours.part2 !== undefined && savedHours.part2 !== null) ? savedHours.part2 : '';
+            hoursHTML = `
+                <div style="margin-top:0.5rem; display:flex; flex-direction: column; gap:0.5rem; background-color: #f9fafb; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <label style="font-size:0.8rem;color:#6b7280; flex: 1;">Godziny (${multiShift.part1}):</label>
+                        <input type="number" class="hours-input" data-field="${field}" data-part="part1" value="${savedPart1}" min="0" max="48" placeholder="${defaultPartHours.part1}h">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <label style="font-size:0.8rem;color:#6b7280; flex: 1;">Godziny (${multiShift.part2}):</label>
+                        <input type="number" class="hours-input" data-field="${field}" data-part="part2" value="${savedPart2}" min="0" max="48" placeholder="${defaultPartHours.part2}h">
+                    </div>
+                    <div style="font-size: 0.7rem; color: #9ca3af; text-align: right; margin-top: 0.25rem;">Pozostaw puste, aby użyć wartości auto.</div>
+                </div>`;
+        } else {
+            const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
+            hoursHTML = `
+               <div style="margin-top:0.5rem; display:flex; align-items:center; gap:0.75rem;">
+                <label style="font-size:0.8rem;color:#6b7280;">Godziny (puste = auto):</label>
+                <input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number') ? savedHours : ''}" min="0" max="48" placeholder="${effectiveHours}h">
+              </div>`;
+        }
+
         wrap.innerHTML = `
           <label class="day-edit-label color-${field}" style="font-weight:600;font-size:.875rem;padding:.5rem;border-radius:8px;color:#4b5563">${fieldLabels[field]}</label>
           <input type="text" class="day-edit-input" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
-          
-          <div style="margin-top:0.5rem; display:flex; align-items:center; gap:0.75rem;">
-            <label style="font-size:0.8rem;color:#6b7280;">Godziny (puste = auto):</label>
-            <input type="number" class="hours-input" data-field="${field}" value="${savedHours !== null ? savedHours : ''}" min="0" max="48" placeholder="${effectiveHours}h">
-          </div>
-        `;
-        
+          ${hoursHTML}`;
         dom.dayEditFields.appendChild(wrap);
       });
 
-      // Event listeners
       dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{
-        input.addEventListener('change', async ()=>{
+        input.addEventListener('change', async () => {
           const field = input.dataset.field;
           const val = input.value.trim();
           await (val === '' ? dbDelete(currentEditDay, field) : dbSave(currentEditDay, field, val));
@@ -853,48 +860,71 @@
       });
 
       dom.dayEditFields.querySelectorAll('.hours-input').forEach(input=>{
-        input.addEventListener('change', async ()=>{
-          const field = input.dataset.field;
-          const hours = input.value === '' ? null : (parseInt(input.value) || 0);
-          await setHoursToDB(currentEditDay, field, hours);
+        input.addEventListener('change', async () => {
+            const field = input.dataset.field;
+            const part = input.dataset.part;
+
+            if (part === 'single') {
+                const hours = input.value === '' ? null : (parseInt(input.value, 10) || 0);
+                await setHoursToDB(currentEditDay, field, hours);
+            } else {
+                const part1Input = dom.dayEditFields.querySelector(`.hours-input[data-field="${field}"][data-part="part1"]`);
+                const part2Input = dom.dayEditFields.querySelector(`.hours-input[data-field="${field}"][data-part="part2"]`);
+                const val1 = part1Input.value;
+                const val2 = part2Input.value;
+
+                if (val1 === '' && val2 === '') {
+                    await setHoursToDB(currentEditDay, field, null);
+                } else {
+                    const hoursObj = {
+                        part1: val1 !== '' ? parseInt(val1, 10) : null,
+                        part2: val2 !== '' ? parseInt(val2, 10) : null,
+                    };
+                    await setHoursToDB(currentEditDay, field, hoursObj);
+                }
+            }
         });
       });
-
       dom.dayEditModal.style.display = 'flex';
     };
     
     window.closeDayEdit = () => {
       dom.dayEditModal.style.display = 'none';
-      update();
+      // No full update needed, changes are reflected live
     };
     
-    dom.dayEditModal.addEventListener('click', (e)=>{ 
-      if(e.target===dom.dayEditModal) closeDayEdit(); 
-    });
+    dom.dayEditModal.addEventListener('click', (e)=>{ if(e.target===dom.dayEditModal) closeDayEdit(); });
 
     // Updates
     const update = () => {
       if (!db) return;
-
-      if (currentView==='compact'){ renderCompact(currentDate.getFullYear(), currentDate.getMonth()); return; }
-      if (currentView==='month'){ renderMonthView(currentDate.getFullYear(), currentDate.getMonth()); return; }
-
-      // standard
-      unsubscribe();
       dom.loading.style.display = 'flex';
-      dom.body.innerHTML = '';
-      dom.mobileCalendar.innerHTML = '';
-      const y = currentDate.getFullYear();
-      const m = currentDate.getMonth();
-      const id = `${y}-${m+1}`;
+      dom.monthYear.textContent = `${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
       
-      unsubscribe = onSnapshot(collection(db, id), async snap=>{
-        const events = {}; 
-        snap.forEach(d=>{ events[d.id]=d.data(); });
-        currentEvents = events;
+      unsubscribe();
+      const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
+      
+      unsubscribe = onSnapshot(collection(db, id), snap=>{
+        currentEvents = {}; 
+        snap.forEach(d=>{ currentEvents[d.id]=d.data(); });
         
-        if (isMobile) renderMobile(y, m, events); 
-        else renderDesktop(y, m, events);
+        const scrollable = {
+          standard: isMobile ? dom.mobileCalendar : dom.calendarWrapper,
+          compact: dom.compactView,
+          month: dom.monthView,
+        }[currentView];
+        const scrollPos = scrollable.scrollTop;
+
+        if (currentView === 'standard') {
+            isMobile ? renderMobile(currentDate.getFullYear(), currentDate.getMonth(), currentEvents) : renderDesktop(currentDate.getFullYear(), currentDate.getMonth(), currentEvents);
+        } else if (currentView === 'compact') {
+            renderCompact(currentDate.getFullYear(), currentDate.getMonth(), currentEvents);
+        } else if (currentView === 'month') {
+            renderMonthView(currentDate.getFullYear(), currentDate.getMonth(), currentEvents);
+        }
+        
+        scrollable.scrollTop = scrollPos;
+        dom.loading.style.display = 'none';
         computeMonthlySummary();
       });
     };
@@ -958,9 +988,7 @@
       
       ta.addEventListener('input', upd);
       ta.addEventListener('blur', save);
-      ta.addEventListener('keydown', e=>{
-        if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); }
-      });
+      ta.addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } });
       ta.focus();
     };
 
@@ -1007,7 +1035,6 @@
         if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); }
         else if (e.key==='Escape'){ ta.remove(); cc.remove(); span.style.display=''; if (cur) fieldDiv.draggable = true; }
       });
-
       fieldDiv.appendChild(ta);
       ta.focus();
     };
@@ -1015,31 +1042,16 @@
     // Event listeners
     document.getElementById('calendar-body').addEventListener('click', e=>{
       const dayInfoCell = e.target.closest('.day-info-cell');
-      if (dayInfoCell){ 
-        if (e.target.closest('.editable-field')) return; 
-        toggleHoliday(dayInfoCell.dataset.day); 
-        return; 
-      }
+      if (dayInfoCell){ if (e.target.closest('.editable-field')) return; toggleHoliday(dayInfoCell.dataset.day); return; }
       
       const fieldDiv = e.target.closest('.editable-field');
-      if (!fieldDiv){ 
-        if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); 
-        return; 
-      }
+      if (!fieldDiv){ if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); return; }
       
-      if (e.ctrlKey || e.metaKey){ 
-        e.preventDefault(); 
-        toggleSelection(fieldDiv); 
-      } else { 
-        if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); 
-        handleEdit(fieldDiv); 
-      }
+      if (e.ctrlKey || e.metaKey){ e.preventDefault(); toggleSelection(fieldDiv); } 
+      else { if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); handleEdit(fieldDiv); }
     });
 
-    dom.mobileCalendar.addEventListener('click', e=>{
-      const el = e.target.closest('.mobile-event-content');
-      if (el) handleMobileEdit(el);
-    });
+    dom.mobileCalendar.addEventListener('click', e=>{ const el = e.target.closest('.mobile-event-content'); if (el) handleMobileEdit(el); });
 
     // Context menu
     const showContextMenu = (e,target)=>{
@@ -1049,61 +1061,17 @@
       dom.contextMenu.style.display = 'block';
     };
     
-    dom.body.addEventListener('contextmenu', e=>{
-      e.preventDefault();
-      const field = e.target.closest('.editable-field');
-      if (field) showContextMenu(e, field);
-    });
-    
-    dom.mobileCalendar.addEventListener('contextmenu', e=>{
-      e.preventDefault();
-      const ec = e.target.closest('.mobile-event-content');
-      if (ec) showContextMenu(e, ec);
-    });
-    
-    dom.copyBtn.addEventListener('click', ()=>{ 
-      clipboard = contextTarget.querySelector('.event-text').textContent; 
-      dom.contextMenu.style.display='none'; 
-    });
-    
-    dom.pasteBtn.addEventListener('click', ()=>{ 
-      if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); 
-      dom.contextMenu.style.display='none'; 
-    });
-    
-    dom.deleteBtn.addEventListener('click', ()=>{ 
-      dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); 
-      dom.contextMenu.style.display='none'; 
-    });
-    
-    document.addEventListener('click', e=>{ 
-      if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; 
-    });
+    dom.body.addEventListener('contextmenu', e=>{ e.preventDefault(); const field = e.target.closest('.editable-field'); if (field) showContextMenu(e, field); });
+    dom.mobileCalendar.addEventListener('contextmenu', e=>{ e.preventDefault(); const ec = e.target.closest('.mobile-event-content'); if (ec) showContextMenu(e, ec); });
+    dom.copyBtn.addEventListener('click', ()=>{ clipboard = contextTarget.querySelector('.event-text').textContent; dom.contextMenu.style.display='none'; });
+    dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) dbSave(contextTarget.dataset.day, contextTarget.dataset.field, clipboard); dom.contextMenu.style.display='none'; });
+    dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field); dom.contextMenu.style.display='none'; });
+    document.addEventListener('click', e=>{ if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; });
 
     // Bulk selection
-    const toggleSelection = el => { 
-      const id = el.dataset.cellId; 
-      selected.has(id) ? selected.delete(id) : selected.add(id); 
-      el.classList.toggle('selected'); 
-      updateBulkUI(); 
-    };
-    
-    const updateBulkUI = () => { 
-      const c = selected.size; 
-      if (c>0){ 
-        dom.selectionCount.textContent = `Zaznaczono: ${c}`; 
-        dom.bulkActions.classList.remove('hidden'); 
-      } else {
-        dom.bulkActions.classList.add('hidden'); 
-      }
-    };
-    
-    const clearSelection = () => { 
-      document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); 
-      selected.clear(); 
-      updateBulkUI(); 
-    };
-    
+    const toggleSelection = el => { const id = el.dataset.cellId; selected.has(id) ? selected.delete(id) : selected.add(id); el.classList.toggle('selected'); updateBulkUI(); };
+    const updateBulkUI = () => { const c = selected.size; if (c>0){ dom.selectionCount.textContent = `Zaznaczono: ${c}`; dom.bulkActions.classList.remove('hidden'); } else { dom.bulkActions.classList.add('hidden'); } };
+    const clearSelection = () => { document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); selected.clear(); updateBulkUI(); };
     dom.bulkDelete.addEventListener('click', async ()=>{
       const batch = writeBatch(db);
       const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
@@ -1114,38 +1082,19 @@
       await batch.commit();
       clearSelection();
     });
-    
     dom.clearSelection.addEventListener('click', clearSelection);
 
     // Drag & drop
-    dom.body.addEventListener('dragstart', e=>{
-      const f = e.target.closest('.editable-field');
-      if (f && f.draggable) e.dataTransfer.setData('text/plain', f.querySelector('.event-text').textContent);
-    });
-    
-    dom.body.addEventListener('dragover', e=>{ 
-      e.preventDefault(); 
-      e.target.closest('.editable-field')?.classList.add('drag-over'); 
-    });
-    
+    dom.body.addEventListener('dragstart', e=>{ const f = e.target.closest('.editable-field'); if (f && f.draggable) e.dataTransfer.setData('text/plain', f.querySelector('.event-text').textContent); });
+    dom.body.addEventListener('dragover', e=>{ e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
     dom.body.addEventListener('dragleave', e=> e.target.closest('.editable-field')?.classList.remove('drag-over'));
-    
-    dom.body.addEventListener('drop', e=>{
-      e.preventDefault();
-      const f = e.target.closest('.editable-field');
-      if (f){ 
-        f.classList.remove('drag-over'); 
-        const t = e.dataTransfer.getData('text/plain'); 
-        if (t) dbSave(f.dataset.day, f.dataset.field, t); 
-      }
-    });
+    dom.body.addEventListener('drop', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f){ f.classList.remove('drag-over'); const t = e.dataTransfer.getData('text/plain'); if (t) dbSave(f.dataset.day, f.dataset.field, t); } });
 
     // DB helpers
     const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
     const dbDelete = (day, field) => updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: deleteField() });
     const toggleHoliday = async (day) => {
-      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
-      const ref = doc(db, calendarId, String(day));
+      const ref = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day));
       try{
         const snap = await getDoc(ref);
         const cur = snap.exists() ? (snap.data().isHoliday || false) : false;
@@ -1156,11 +1105,7 @@
     // Navigation
     const scrollToToday = () => {
       const t = new Date();
-      if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ 
-        currentDate = new Date(t); 
-        update(); 
-      }
-      
+      if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ currentDate = new Date(t); update(); }
       setTimeout(()=>{
         if (currentView==='standard'){
           document.querySelector('.today')?.scrollIntoView({behavior:'smooth', block:'center'});
@@ -1176,43 +1121,33 @@
     // Summary FAB / Sheet
     dom.summaryFab.addEventListener('click', ()=> dom.summarySheet.classList.add('open'));
     dom.closeSheet.addEventListener('click', ()=> dom.summarySheet.classList.remove('open'));
-    dom.summarySheet.addEventListener('click', (e)=>{ 
-      if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); 
-    });
+    dom.summarySheet.addEventListener('click', (e)=>{ if(e.target===dom.summarySheet) dom.summarySheet.classList.remove('open'); });
 
     // Init
     const initCalendar = () => {
-      const nav = (d)=>{ 
-        currentDate.setMonth(currentDate.getMonth()+d); 
-        update(); 
-      };
-      
+      const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
       dom.prevBtn.addEventListener('click', ()=>nav(-1));
       dom.nextBtn.addEventListener('click', ()=>nav(1));
       dom.todayBtn.addEventListener('click', scrollToToday);
-
-      [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const v = btn.dataset.view;
-          if (currentView!==v) switchView(v);
-        });
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dom.dayEditModal.style.display === 'flex') {
+            closeDayEdit();
+        }
       });
 
-      // Mobile gestures
+      [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(btn=>{
+        btn.addEventListener('click', ()=>{ const v = btn.dataset.view; if (currentView!==v) switchView(v); });
+      });
+
       let sx=0, ex=0;
       if (isMobile){
         document.addEventListener('touchstart', e=>{ sx = e.changedTouches[0].screenX; });
-        document.addEventListener('touchend', e=>{ 
-          ex = e.changedTouches[0].screenX; 
-          if (ex < sx - 50) nav(1); 
-          if (ex > sx + 50) nav(-1); 
-        });
+        document.addEventListener('touchend', e=>{ ex = e.changedTouches[0].screenX; if (ex < sx - 50) nav(1); if (ex > sx + 50) nav(-1); });
       }
 
-      setActiveViewButton();
-      update();
+      switchView(isMobile ? 'standard' : 'month');
     };
   </script>
 </body>
 </html>
-```
