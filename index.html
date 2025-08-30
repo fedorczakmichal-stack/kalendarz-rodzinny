@@ -30,22 +30,22 @@
         
         .flower-petal {
             position: absolute;
-            width: 12px;
-            height: 16px;
+            width: 10px;
+            height: 14px;
             background: white;
             border-radius: 50% 0;
             opacity: 0.9;
         }
         
-        .flower-petal:nth-child(1) { transform: rotate(0deg) translateY(-10px); }
-        .flower-petal:nth-child(2) { transform: rotate(72deg) translateY(-10px); }
-        .flower-petal:nth-child(3) { transform: rotate(144deg) translateY(-10px); }
-        .flower-petal:nth-child(4) { transform: rotate(216deg) translateY(-10px); }
-        .flower-petal:nth-child(5) { transform: rotate(288deg) translateY(-10px); }
+        .flower-petal:nth-child(1) { transform: rotate(0deg) translateY(-9px); }
+        .flower-petal:nth-child(2) { transform: rotate(72deg) translateY(-9px); }
+        .flower-petal:nth-child(3) { transform: rotate(144deg) translateY(-9px); }
+        .flower-petal:nth-child(4) { transform: rotate(216deg) translateY(-9px); }
+        .flower-petal:nth-child(5) { transform: rotate(288deg) translateY(-9px); }
         
         .flower-center {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: #fbbf24;
             border-radius: 50%;
             z-index: 10;
@@ -88,13 +88,14 @@
             font-weight: 700; 
             color: #1a202c; 
             margin: 0; 
-            line-height: 1.2; 
+            line-height: 1.1; 
         }
         
         .brand-text p { 
             font-size: 0.875rem; 
             color: #64748b; 
-            margin: 0; 
+            margin: 0;
+            margin-top: 2px;
         }
         
         .header-actions { 
@@ -170,6 +171,11 @@
                 margin-bottom: 1rem;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
                 border: 1px solid #e5e7eb;
+            }
+            
+            .mobile-day-card.weekend {
+                background: linear-gradient(135deg, rgba(219, 39, 119, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
+                border: 1px solid rgba(219, 39, 119, 0.2);
             }
             
             .mobile-day-header {
@@ -249,6 +255,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
+        /* Mocniejszy kolor dla weekendów */
         .day-off::before {
             content: '';
             position: absolute;
@@ -256,7 +263,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(251, 207, 232, 0.3) 0%, rgba(233, 213, 255, 0.3) 100%);
+            background: linear-gradient(135deg, rgba(219, 39, 119, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
             z-index: 1;
         }
 
@@ -353,25 +360,25 @@
             margin: 4px 0; 
         }
 
-        /* Ulepszone kolory pastelowe */
+        /* Ulepszone kolory pastelowe z lepszym rozróżnieniem Michał/Michał Praca */
         .color-ania { background-color: #ffe4e6; }
         .color-aniaPraca { background-color: #fed7aa; }
-        .color-michal { background-color: #dbeafe; }
-        .color-michalPraca { background-color: #e0e7ff; }
+        .color-michal { background-color: #cce7ff; } /* Jaśniejszy niebieski */
+        .color-michalPraca { background-color: #ddd6fe; } /* Bardziej fioletowy */
         .color-wspolne { background-color: #d1fae5; }
         .color-inne { background-color: #fef3c7; }
         
         .medium-duty.color-ania { background-color: #fecdd3 !important; }
         .medium-duty.color-aniaPraca { background-color: #fdba74 !important; }
-        .medium-duty.color-michal { background-color: #bfdbfe !important; }
-        .medium-duty.color-michalPraca { background-color: #c7d2fe !important; }
+        .medium-duty.color-michal { background-color: #93c5fd !important; }
+        .medium-duty.color-michalPraca { background-color: #c4b5fd !important; }
         .medium-duty.color-wspolne { background-color: #a7f3d0 !important; }
         .medium-duty.color-inne { background-color: #fde68a !important; }
 
         .full-duty.color-ania { background-color: #fca5a5 !important; }
         .full-duty.color-aniaPraca { background-color: #fb923c !important; }
-        .full-duty.color-michal { background-color: #93c5fd !important; }
-        .full-duty.color-michalPraca { background-color: #a5b4fc !important; }
+        .full-duty.color-michal { background-color: #60a5fa !important; }
+        .full-duty.color-michalPraca { background-color: #a78bfa !important; }
         .full-duty.color-wspolne { background-color: #86efac !important; }
         .full-duty.color-inne { background-color: #fcd34d !important; }
 
@@ -384,43 +391,25 @@
             padding: 1rem;
         }
         
-        /* Widok overview */
+        /* Widok overview - kompaktowy */
         #month-overview-view { 
             display: none; 
             padding: 1rem; 
+            overflow-y: auto;
         }
         
-        .overview-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 4px; 
-            height: 100%; 
-        }
-        
-        @media (max-width: 768px) {
-            .overview-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-        }
-        
-        .overview-day-header { 
-            text-align: center; 
-            font-weight: 600; 
-            font-size: 0.875rem; 
-            color: #6B7280; 
-            padding-bottom: 0.5rem; 
+        .overview-container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .overview-day-card { 
+            background: white;
             border: 1px solid #E5E7EB; 
-            border-radius: 8px; 
-            padding: 6px; 
-            display: flex; 
-            flex-direction: column; 
-            font-size: 0.7rem; 
-            overflow: hidden; 
-            background-color: white; 
+            border-radius: 12px; 
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
             transition: all 0.2s;
         }
         
@@ -429,67 +418,152 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         
-        .overview-day-card-header { 
-            font-weight: 700; 
-            text-align: right; 
-            color: #374151; 
-            margin-bottom: 4px; 
-            font-size: 0.9rem;
+        .overview-day-card.weekend {
+            background: linear-gradient(135deg, rgba(219, 39, 119, 0.08) 0%, rgba(147, 51, 234, 0.08) 100%);
+            border: 1px solid rgba(219, 39, 119, 0.2);
         }
         
-        .overview-events-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 2px; 
+        .overview-day-header { 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .overview-day-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .overview-day-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .overview-day-name {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .overview-events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
         }
         
         .overview-event-item { 
-            padding: 2px 4px; 
-            border-radius: 4px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            font-size: 0.65rem; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
         
-        /* Przyciski akcji */
-        .action-button {
-            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+        .overview-event-label {
             font-weight: 600;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0.7;
         }
         
-        .action-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .overview-event-text {
+            word-wrap: break-word;
         }
         
-        .action-button:active {
-            transform: translateY(0);
+        /* Modal dla edycji dnia */
+        .day-edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
         }
         
-        /* Bulk actions panel */
-        #bulk-actions {
+        .day-edit-content {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 1.5rem;
         }
         
-        /* Mobile-friendly floating action button */
-        @media (max-width: 768px) {
-            #bulk-actions {
-                bottom: 80px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: calc(100% - 2rem);
-                max-width: 350px;
-            }
+        .day-edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .day-edit-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .day-edit-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .day-edit-close:hover {
+            background: #e5e7eb;
+        }
+        
+        .day-edit-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .day-edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .day-edit-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: #4b5563;
+        }
+        
+        .day-edit-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .day-edit-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
         
         /* Loading animation */
@@ -513,6 +587,24 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Bulk actions panel */
+        #bulk-actions {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            #bulk-actions {
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 2rem);
+                max-width: 350px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -530,12 +622,11 @@
                         <div class="flower-center"></div>
                     </div>
                     <div class="brand-text">
-                        <h1>Kalendarz Rodzinny</h1>
-                        <p>Fedorczak 🌸</p>
+                        <h1>Rodzina Fedorczak</h1>
+                        <p>Kalendarz 🌸</p>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button id="import-btn" class="action-button hidden md:inline-block">Importuj</button>
                     <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -548,7 +639,7 @@
                         </svg>
                     </button>
                     <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
-                    <button id="view-toggle-btn" class="hidden md:inline-block px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Zmniejsz</button>
+                    <button id="view-toggle-btn" class="hidden md:inline-block px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Kompaktowy</button>
                     <button id="overview-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -582,8 +673,8 @@
                 </div>
             </div>
             
-            <div id="month-overview-view" class="overflow-auto flex-1">
-                <div class="overview-grid"></div>
+            <div id="month-overview-view">
+                <div class="overview-container"></div>
             </div>
             
             <div id="loading" class="text-center p-8 text-gray-500 font-semibold">
@@ -609,6 +700,23 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
+    </div>
+
+    <!-- Modal edycji dnia -->
+    <div id="day-edit-modal" class="day-edit-modal">
+        <div class="day-edit-content">
+            <div class="day-edit-header">
+                <h3 class="day-edit-title">Edycja dnia</h3>
+                <div class="day-edit-close" onclick="closeDayEdit()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            </div>
+            <div class="day-edit-fields" id="day-edit-fields">
+                <!-- Pola będą generowane dynamicznie -->
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -644,11 +752,12 @@
         const selected = new Set();
         let isOverview = false;
         let isMobile = window.innerWidth <= 768;
+        let currentEditDay = null;
+        let currentEvents = {};
         const MAX_CHARS = 50;
         
         // --- Elementy DOM ---
         const dom = {
-            importBtn: document.getElementById('import-btn'),
             monthYear: document.getElementById('month-year-display'),
             prevBtn: document.getElementById('prev-month'),
             nextBtn: document.getElementById('next-month'),
@@ -668,7 +777,9 @@
             bulkDelete: document.getElementById('bulk-delete-btn'),
             clearSelection: document.getElementById('clear-selection-btn'),
             mainView: document.getElementById('main-view'),
-            overviewView: document.getElementById('month-overview-view')
+            overviewView: document.getElementById('month-overview-view'),
+            dayEditModal: document.getElementById('day-edit-modal'),
+            dayEditFields: document.getElementById('day-edit-fields')
         };
 
         // --- Funkcje Pomocnicze ---
@@ -697,6 +808,28 @@
             if (locationLaskKeywords.some(k => lowerText.includes(k))) return 'location-lask';
             if (locationOtherKeywords.some(k => lowerText.includes(k))) return 'location-other';
             return 'default';
+        };
+
+        // --- Funkcje do przewijania do konkretnego dnia ---
+        const scrollToToday = () => {
+            const today = new Date();
+            if (today.getMonth() !== currentDate.getMonth() || today.getFullYear() !== currentDate.getFullYear()) {
+                currentDate = new Date(today);
+                update();
+            }
+            
+            setTimeout(() => {
+                const todayElement = document.querySelector('.today');
+                if (todayElement) {
+                    todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                
+                // Dla widoku mobilnego
+                const todayCard = document.querySelector('.mobile-day-card.ring-2');
+                if (todayCard) {
+                    todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
         };
 
         // --- Sprawdzanie czy mobile ---
@@ -787,11 +920,9 @@
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
                 const dayEvents = events[day] || {};
                 const isHoliday = dayEvents.isHoliday || false;
-                const isDayOff = isWeekend || isHoliday;
 
                 const dayCard = document.createElement('div');
-                dayCard.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400' : ''}`;
-                if (isDayOff) dayCard.style.background = 'linear-gradient(135deg, rgba(251, 207, 232, 0.1) 0%, rgba(233, 213, 255, 0.1) 100%)';
+                dayCard.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400' : ''} ${isWeekend || isHoliday ? 'weekend' : ''}`;
                 
                 let cardHTML = `
                     <div class="mobile-day-header">
@@ -836,6 +967,144 @@
             dom.mobileCalendar.appendChild(fragment);
         };
 
+        // --- Renderowanie widoku Overview (kompaktowego) ---
+        const renderOverview = async (year, month) => {
+            dom.loading.style.display = 'flex';
+            const container = dom.overviewView.querySelector('.overview-container');
+            container.innerHTML = '';
+            dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
+            
+            const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
+            const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
+            currentEvents = events; // Zapisz do użycia w edycji
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayOfWeek = date.getDay();
+                const isToday = today.toDateString() === date.toDateString();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const dayEvents = events[day] || {};
+                const isHoliday = dayEvents.isHoliday || false;
+                
+                const dayCard = document.createElement('div');
+                dayCard.className = `overview-day-card ${isWeekend || isHoliday ? 'weekend' : ''} ${isToday ? 'ring-2 ring-purple-400' : ''}`;
+                dayCard.dataset.day = day;
+                dayCard.onclick = () => openDayEdit(day, dayEvents);
+                
+                let cardHTML = `
+                    <div class="overview-day-header">
+                        <div class="overview-day-info">
+                            <span class="overview-day-number">${day}</span>
+                            <span class="overview-day-name">${getDayFullName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}</span>
+                        </div>
+                        <div>
+                            ${isToday ? '<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>' : ''}
+                            ${isHoliday ? '<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="overview-events-grid">
+                `;
+                
+                fields.forEach(field => {
+                    if (dayEvents[field]) {
+                        const eventType = getEventType(dayEvents[field]);
+                        let typeClass = '';
+                        if (eventType !== 'default') {
+                            typeClass = eventType;
+                            if (eventType === 'full-duty' || eventType === 'medium-duty') {
+                                typeClass += ' duty-shift';
+                            }
+                        }
+                        cardHTML += `
+                            <div class="overview-event-item color-${field} ${typeClass}">
+                                <div class="overview-event-label">${fieldLabels[field]}</div>
+                                <div class="overview-event-text">${dayEvents[field]}</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                cardHTML += '</div>';
+                dayCard.innerHTML = cardHTML;
+                container.appendChild(dayCard);
+            }
+            
+            dom.loading.style.display = 'none';
+        };
+
+        // --- Funkcje edycji dnia w widoku kompaktowym ---
+        window.openDayEdit = (day, dayEvents) => {
+            currentEditDay = day;
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const dayOfWeek = date.getDay();
+            
+            const title = dom.dayEditModal.querySelector('.day-edit-title');
+            title.textContent = `${day} ${getMonthName(currentDate.getMonth())} - ${getDayFullName(dayOfWeek === 0 ? 6 : dayOfWeek - 1)}`;
+            
+            dom.dayEditFields.innerHTML = '';
+            
+            fields.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'day-edit-field';
+                
+                const eventText = dayEvents[field] || '';
+                const eventType = getEventType(eventText);
+                let typeClass = '';
+                if (eventType !== 'default') {
+                    typeClass = eventType;
+                }
+                
+                fieldDiv.innerHTML = `
+                    <label class="day-edit-label color-${field}">${fieldLabels[field]}</label>
+                    <input type="text" 
+                           class="day-edit-input ${typeClass}" 
+                           data-field="${field}" 
+                           value="${eventText}"
+                           maxlength="${MAX_CHARS}"
+                           placeholder="Kliknij aby dodać">
+                `;
+                
+                dom.dayEditFields.appendChild(fieldDiv);
+            });
+            
+            // Dodaj listenery do inputów
+            dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input => {
+                input.addEventListener('change', async () => {
+                    const field = input.dataset.field;
+                    const value = input.value.trim();
+                    
+                    if (value === '') {
+                        await dbDelete(currentEditDay, field);
+                    } else {
+                        await dbSave(currentEditDay, field, value);
+                    }
+                    
+                    // Aktualizuj kolor inputu
+                    const eventType = getEventType(value);
+                    input.className = `day-edit-input ${eventType !== 'default' ? eventType : ''}`;
+                });
+            });
+            
+            dom.dayEditModal.style.display = 'flex';
+        };
+
+        window.closeDayEdit = () => {
+            dom.dayEditModal.style.display = 'none';
+            if (isOverview) {
+                renderOverview(currentDate.getFullYear(), currentDate.getMonth());
+            }
+        };
+
+        // Zamknij modal po kliknięciu poza nim
+        dom.dayEditModal.addEventListener('click', (e) => {
+            if (e.target === dom.dayEditModal) {
+                closeDayEdit();
+            }
+        });
+
         // --- Update funkcja ---
         const update = () => {
             if (!db) return;
@@ -851,6 +1120,7 @@
             unsubscribe = onSnapshot(collection(db, calendarId), snap => {
                 const events = {};
                 snap.forEach(doc => { events[doc.id] = doc.data(); });
+                currentEvents = events; // Zapisz aktualny stan
                 
                 if (isMobile) {
                     renderMobile(year, month, events);
@@ -1131,80 +1401,23 @@
 
         // --- Przełącznik Widoku ---
         const setViewMode = isCompact => {
-            if (!isMobile) {
-                dom.container.classList.toggle('compact-view', isCompact);
-                dom.viewToggle.textContent = isCompact ? 'Powiększ widok' : 'Zmniejsz widok';
-                localStorage.setItem('view', isCompact ? 'compact' : 'standard');
-            }
+            dom.viewToggle.textContent = isCompact ? 'Standardowy' : 'Kompaktowy';
+            localStorage.setItem('view', isCompact ? 'compact' : 'standard');
         };
 
-        // --- Widok Miesiąca (Overview) ---
-        const renderOverview = async (year, month) => {
-            dom.loading.style.display = 'flex';
-            const grid = dom.overviewView.querySelector('.overview-grid');
-            grid.innerHTML = '';
-            dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-            
-            if (!isMobile) {
-                const headers = ['PN','WT','ŚR','CZ','PT','SB','ND'];
-                headers.forEach(h => { 
-                    const header = document.createElement('div');
-                    header.className = 'overview-day-header';
-                    header.textContent = h;
-                    grid.appendChild(header);
-                });
-            }
-            
-            const { docs } = await getDocs(collection(db, `${year}-${month + 1}`));
-            const events = docs.reduce((acc, doc) => ({...acc, [doc.id]: doc.data()}), {});
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const offset = !isMobile ? (new Date(year, month, 1).getDay() + 6) % 7 : 0;
-            
-            for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month, day);
-                const dayOfWeek = date.getDay();
-                const dayCard = document.createElement('div');
-                dayCard.className = 'overview-day-card';
-                
-                let cardHTML = `
-                    <div class="overview-day-card-header">
-                        ${day} ${isMobile ? getDayName(dayOfWeek === 0 ? 6 : dayOfWeek - 1) : ''}
-                    </div>
-                    <div class="overview-events-container">
-                `;
-                
-                const dayEvents = events[day] || {};
-                fields.forEach(field => {
-                    if (dayEvents[field]) {
-                        const eventType = getEventType(dayEvents[field]);
-                        let typeClass = '';
-                        if (eventType !== 'default') {
-                            typeClass = eventType;
-                            if (eventType === 'full-duty' || eventType === 'medium-duty') {
-                                typeClass += ' duty-shift';
-                            }
-                        }
-                        cardHTML += `<div class="overview-event-item color-${field} ${typeClass}">${dayEvents[field]}</div>`;
-                    }
-                });
-                
-                cardHTML += `</div>`;
-                dayCard.innerHTML = cardHTML;
-                grid.appendChild(dayCard);
-            }
-            
-            dom.loading.style.display = 'none';
-        };
-        
+        // --- Toggle Overview ---
         const toggleOverview = () => {
             isOverview = !isOverview;
             dom.mainView.style.display = isOverview ? 'none' : 'flex';
             dom.overviewView.style.display = isOverview ? 'block' : 'none';
-            if (isOverview) renderOverview(currentDate.getFullYear(), currentDate.getMonth());
-            else update();
+            
+            if (isOverview) {
+                renderOverview(currentDate.getFullYear(), currentDate.getMonth());
+                if (!isMobile) setViewMode(true);
+            } else {
+                update();
+                if (!isMobile) setViewMode(false);
+            }
         };
 
         // --- Inicjalizacja ---
@@ -1221,14 +1434,10 @@
             
             dom.prevBtn.addEventListener('click', () => navigate(-1));
             dom.nextBtn.addEventListener('click', () => navigate(1));
-            dom.todayBtn.addEventListener('click', () => { 
-                currentDate = new Date(); 
-                isOverview ? renderOverview(currentDate.getFullYear(), currentDate.getMonth()) : update(); 
-            });
+            dom.todayBtn.addEventListener('click', scrollToToday); // Zmienione - teraz przewija do konkretnego dnia
             
             if (!isMobile) {
-                dom.viewToggle.addEventListener('click', () => setViewMode(!dom.container.classList.contains('compact-view')));
-                setViewMode(localStorage.getItem('view') !== 'standard');
+                dom.viewToggle.addEventListener('click', toggleOverview); // Zmienione - teraz przełącza na widok kompaktowy
             }
             
             dom.overviewBtn.addEventListener('click', toggleOverview);
