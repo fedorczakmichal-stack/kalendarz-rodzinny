@@ -780,8 +780,16 @@ async function update(){
 }
 
 /* ==== Nawigacja/widoki ==== */
-E.prev.onclick=()=>{ cur.setMonth(cur.getMonth()-1); update(); };
-E.next.onclick=()=>{ cur.setMonth(cur.getMonth()+1); update(); };
+E.prev.onclick=()=>{ 
+  cur.setDate(1);
+  cur.setMonth(cur.getMonth()-1); 
+  update(); 
+};
+E.next.onclick=()=>{ 
+  cur.setDate(1);
+  cur.setMonth(cur.getMonth()+1); 
+  update(); 
+};
 E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
 
 function setActive(){
