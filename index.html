@@ -1,1233 +1,652 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kalendarz Rodziny Fedorczak</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body{
-      font-family:'Inter',sans-serif;
-      background:linear-gradient(135deg,#fef3f8 0%,#f3f4f6 100%);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      touch-action:manipulation;
-    }
-    .touch-drag-ghost {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 1001;
-        pointer-events: none;
-        opacity: 0.7;
-        transform: translate(-50%, -50%);
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,.3);
-    }
-    .drag-over {
-        outline: 2px dashed #8b5cf6;
-        background-color: #ede9fe !important;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Kalendarz Rodziny Fedorczak</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  :root{
+    /* kolory kolumn */
+    --c-ania:#ffe4e6; --c-aniaP:#fed7aa; --c-michal:#cce7ff; --c-michalP:#ddd6fe; --c-wsp:#d1fae5; --c-inne:#fef3c7;
+    /* akcenty (zgodne z kropkami w podsumowaniu) */
+    --k-ortho:#a7f3d0;     /* mięta */
+    --k-brzeziny:#fde68a;  /* żółty */
+    --k-lask:#f9a8d4;      /* róż */
+    --k-jb:#c4b5fd;        /* jasny fiolet */
+    --k-jb24:#a78bfa;      /* ciemniejszy fiolet dla 24h */
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased}
 
-    /* --- LOGO --- */
-    .flower-logo{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4 0%,#c084fc 100%);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
-    .flower-petal{position:absolute;width:10px;height:14px;background:#fff;border-radius:50% 0;opacity:.9}
-    .flower-petal:nth-child(1){transform:rotate(0deg) translateY(-9px)}
-    .flower-petal:nth-child(2){transform:rotate(72deg) translateY(-9px)}
-    .flower-petal:nth-child(3){transform:rotate(144deg) translateY(-9px)}
-    .flower-petal:nth-child(4){transform:rotate(216deg) translateY(-9px)}
-    .flower-petal:nth-child(5){transform:rotate(288deg) translateY(-9px)}
-    .flower-center{width:10px;height:10px;background:#fbbf24;border-radius:50%;z-index:10;position:relative}
+  /* HEADER */
+  .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .view-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
+  .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
 
-    #app-container{display:flex;flex-direction:column;height:100vh;width:100%}
+  /* PODSUMOWANIE (desktop) */
+  .sumbar{display:flex;gap:.5rem;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem}
+  .chip{display:inline-flex;gap:.35rem;align-items:center;border:1px solid #e5e7eb;background:#f9fafb;border-radius:9999px;padding:.3rem .55rem;font-size:.82rem}
+  .dot{width:.55rem;height:.55rem;border-radius:9999px}
+  @media (max-width:768px){ .sumbar{display:none} }
 
-    /* --- HEADER --- */
-    .modern-header{background:#fff;border-bottom:1px solid #e2e8f0;padding:.75rem 1rem;flex-shrink:0;box-shadow:0 1px 3px 0 rgba(0,0,0,.1)}
-    .header-content{max-width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
-    .brand{display:flex;align-items:center;gap:.75rem}
-    .brand-text h1{font-size:1.25rem;font-weight:700;color:#1a202c;margin:0;line-height:1.1}
-    .brand-text p{font-size:.875rem;color:#64748b;margin:0;margin-top:2px}
-    .header-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  /* GRID – stabilna dla IX/X */
+  .grid{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid #e5e7eb}
+  .cell{border-bottom:1px solid #e5e7eb;border-left:1px solid #e5e7eb;min-height:60px;position:relative;padding:4px}
+  .cell:nth-child(7n+1){border-left:none}
+  .cell.header{background:#f9fafb;font-weight:600}
+  .day-cell{cursor:pointer}
+  .day-num{font-weight:800;color:#374151}
+  .day-name{font-size:.7rem;color:#6b7280}
+  .today .day-num,.today .day-name{color:#6d28d9}
+  .off{background:linear-gradient(135deg,rgba(219,39,119,.06),rgba(147,51,234,.06))}
+  .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;transition:transform .12s}
+  .fld:hover{transform:translateY(-1px)}
+  .selected{outline:2px solid #8b5cf6}
 
-    .view-toggle{display:flex;gap:.25rem;background:#fff;padding:.25rem;border:1px solid #e5e7eb;border-radius:.75rem}
-    .view-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent;transition:all .15s;cursor:pointer}
-    .view-btn:hover{background:#f3f4f6}
-    .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
-    .view-btn svg{width:20px;height:20px;color:#475569}
+  /* kolory kolumn */
+  .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)}
+  .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)}
+  .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
 
-    @media (max-width:768px){
-      .modern-header{padding:.5rem}
-      .header-content{justify-content:center}
-      .brand-text h1{font-size:1.1rem}
-      .header-actions{width:100%;justify-content:center;margin-top:.5rem}
-      .header-actions button{padding:.6rem .8rem;font-size:.8rem;min-height:40px;min-width:40px}
-      #month-year-display{font-size:1rem;width:auto;min-width:140px}
-    }
+  /* kafelki typów pracy (spójne z kropkami) */
+  .tile-ortho{background:var(--k-ortho)!important;font-weight:600}
+  .tile-lask{background:var(--k-lask)!important;font-weight:600}
+  .tile-jb{background:var(--k-jb)!important;font-weight:600}
+  .tile-jb24{background:var(--k-jb24)!important;color:#1f2937;font-weight:700}
 
-    /* --- SUMMARY BAR (desktop only) --- */
-    .summary-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem;display:flex;gap:.75rem;flex-wrap:wrap}
-    .summary-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:9999px;padding:.35rem .6rem}
-    .summary-dot{width:.5rem;height:.5rem;border-radius:9999px}
-    @media (max-width:768px){ .summary-bar{display:none} }
-    
-    /* --- MOBILE SUMMARY BUTTON --- */
-    #mobile-summary-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 100;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    #mobile-summary-btn:active {
-      transform: scale(0.95);
-    }
-    #mobile-summary-btn svg {
-      width: 24px;
-      height: 24px;
-      color: white;
-    }
-    @media (max-width: 768px) {
-      #mobile-summary-btn.show {
-        display: flex;
-      }
-    }
-    
-    /* --- MOBILE SUMMARY MODAL --- */
-    #mobile-summary-modal {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      background: white;
-      border-radius: 16px;
-      padding: 1rem;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      z-index: 99;
-      display: none;
-      min-width: 250px;
-    }
-    #mobile-summary-modal.show {
-      display: block;
-      animation: slideUp 0.3s ease-out;
-    }
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-    
-    /* --- DESKTOP GRID --- */
-    .calendar-grid{display:grid;grid-template-columns:minmax(80px,.5fr) repeat(6,1fr);border-top:1px solid #E5E7EB}
-    .calendar-cell{border-bottom:1px solid #E5E7EB;border-left:1px solid #E5E7EB;min-height:60px;position:relative;padding:4px}
-    .calendar-cell:first-child,.calendar-cell:nth-child(7n + 1){border-left:none}
-    .calendar-cell.header{min-height:auto;font-weight:600;background:#F9FAFB}
-    .day-info-cell{cursor:pointer}
-    .day-info{text-align:center;font-weight:600;position:relative;z-index:2}
-    .day-number{font-size:1.25rem;color:#374151}
-    .day-name{font-size:.75rem;color:#6B7280}
-    .today .day-info{background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 100%);color:#fff;border-radius:12px;padding:4px 0;box-shadow:0 2px 4px rgba(0,0,0,.1)}
-    .day-off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(219,39,119,.15) 0%,rgba(147,51,234,.15) 100%);z-index:1}
+  /* MOBILE LIST */
+  .mcal{display:none;padding:1rem}
+  @media (max-width:768px){
+    .grid{display:none}
+    .mcal{display:block}
+    .m-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+    .m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
+    .m-num{font-size:1.5rem;font-weight:800;color:#1f2937}
+    .m-name{font-size:.85rem;color:#6b7280}
+    .m-row{display:flex;gap:.5rem;align-items:stretch;margin:.35rem 0}
+    .m-label{flex:0 0 90px;border-radius:10px;padding:.5rem;font-weight:600;color:#334155}
+    .m-content{flex:1;border-radius:10px;padding:.5rem;cursor:pointer}
+    .m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  }
 
-    .editable-field{font-size:.9rem;line-height:1.4;padding:4px;border-radius:8px;height:100%;cursor:pointer;position:relative;z-index:2;user-select:none;word-wrap:break-word;overflow-wrap:break-word;transition:all .2s}
-    .editable-field.selected{outline:2px solid #8b5cf6;background:rgba(139,92,246,.1)!important}
-    .editable-field:hover{background:rgba(147,197,253,.15);transform:translateY(-1px)}
-    .duty-shift{font-weight:600}
-    .editable-field textarea{width:100%;height:100%;border:none;background:#fff;resize:none;padding:4px;margin:0;outline:none;border-radius:8px;box-shadow:0 0 0 2px #8b5cf6;position:absolute;inset:0;font-size:.9rem}
-    .char-counter{position:absolute;bottom:2px;right:4px;font-size:.65rem;color:#9ca3af;background:rgba(255,255,255,.95);padding:2px 4px;border-radius:4px}
-    .char-counter.warning{color:#f59e0b}
-    .char-counter.error{color:#ef4444;font-weight:600}
+  /* COMPACT */
+  #compact{display:none;padding:1rem}
+  .cv-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:12px;padding:12px;cursor:pointer}
+  .cv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+  .cv-item{padding:8px;border-radius:10px;font-size:.85rem}
 
-    /* --- KOLORY --- */
-    .color-ania{background:#ffe4e6}
-    .color-aniaPraca{background:#fed7aa}
-    .color-michal{background:#cce7ff}
-    .color-michalPraca{background:#ddd6fe}
-    .color-wspolne{background:#d1fae5}
-    .color-inne{background:#fef3c7}
-    .medium-duty.color-ania{background:#fecdd3!important}
-    .medium-duty.color-aniaPraca{background:#fdba74!important}
-    .medium-duty.color-michal{background:#93c5fd!important}
-    .medium-duty.color-michalPraca{background:#c4b5fd!important}
-    .medium-duty.color-wspolne{background:#a7f3d0!important}
-    .medium-duty.color-inne{background:#fde68a!important}
+  /* MONTH */
+  #month{display:none;padding:1rem}
+  .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+  .mh{background:#f9fafb;padding:.6rem;text-align:center;font-weight:700;color:#6b7280}
+  .mc{background:#fff;min-height:96px;padding:.4rem;cursor:pointer}
+  .mc.week{background:linear-gradient(135deg,rgba(219,39,119,.05),rgba(147,51,234,.05))}
+  .mnum{font-weight:700;color:#374151;margin-bottom:.25rem}
+  .mitem{font-size:.68rem;padding:2px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    .full-duty { color: white !important; }
-    .full-duty.color-ania{background:#be123c!important}
-    .full-duty.color-aniaPraca{background:#b45309!important}
-    .full-duty.color-michal{background:#1d4ed8!important}
-    .full-duty.color-michalPraca{background:#6d28d9!important}
-    .full-duty.color-wspolne{background:#15803d!important}
-    .full-duty.color-inne{background:#d97706!important}
+  /* CONTEXT */
+  #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.1);padding:6px;display:none;z-index:1000}
+  .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px}
+  .ctx-it:hover{background:#f3f4f6}
 
-    .location-lask{background:#f9a8d4!important;font-weight:600}
-    .location-other{background:#fdba74!important;font-weight:600}
+  /* MODAL EDYCJI */
+  #edit{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1200;padding:12px}
+  .edit-body{background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:82vh;overflow:auto;padding:16px}
 
-    /* --- MOBILE LIST --- */
-    .mobile-calendar{display:none;padding:1rem}
-    @media (max-width:768px){
-      .calendar-grid{display:none}
-      .mobile-calendar{display:block!important}
-      .mobile-day-card{background:#fff;border-radius:12px;padding:1rem;margin-bottom:1rem;box-shadow:0 2px 4px rgba(0,0,0,.05);border:1px solid #e5e7eb;position:relative}
-      .mobile-day-card.weekend{background:linear-gradient(135deg,rgba(219,39,119,.08) 0%,rgba(147,51,234,.08) 100%);border:1px solid rgba(219,39,119,.2)}
-      .mobile-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
-      .mobile-day-number{font-size:1.5rem;font-weight:700;color:#1f2937}
-      .mobile-day-name{font-size:.875rem;color:#6b7280;font-weight:500}
-      .mobile-events{display:flex;flex-direction:column;gap:.5rem}
-      .mobile-event-row{display:flex;align-items:stretch;gap:.5rem;min-height:44px}
-      .mobile-event-label{flex:0 0 90px;font-size:.75rem;font-weight:600;padding:.5rem;border-radius:8px;display:flex;align-items:center;color:#4b5563}
-      .mobile-event-content{flex:1;padding:.5rem;border-radius:8px;font-size:.875rem;min-height:44px;display:flex;align-items:center;cursor:pointer;transition:all .2s;position:relative}
-      .mobile-event-content:active{transform:scale(.98)}
-      .mobile-event-content .event-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;width:100%}
-    }
-
-    /* --- COMPACT OVERVIEW --- */
-    #compact-view{display:none;padding:1rem;overflow-y:auto}
-    .overview-container{max-width:1200px;margin:0 auto}
-    .overview-day-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:1rem;margin-bottom:1rem;cursor:pointer;transition:.2s;position:relative}
-    .overview-day-card:hover{transform:translateY(-2px);box-shadow:0 4px 6px -1px rgba(0,0,0,.1)}
-    .overview-day-card.weekend{background:linear-gradient(135deg,rgba(219,39,119,.08) 0%,rgba(147,51,234,.08) 100%);border:1px solid rgba(219,39,119,.2)}
-    .overview-day-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
-    .overview-day-info{display:flex;align-items:center;gap:.5rem}
-    .overview-day-number{font-size:1.5rem;font-weight:700;color:#1f2937}
-    .overview-day-name{font-size:.875rem;color:#6b7280;font-weight:500}
-    .overview-events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem}
-    .overview-event-item{padding:6px 10px;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:2px;position:relative}
-    .overview-event-label{font-weight:600;font-size:.7rem;opacity:.7}
-    .overview-event-text{word-wrap:break-word}
-    .compact-delete-btn {
-        position: absolute; top: 2px; right: 2px; display: none;
-        background: rgba(255,255,255,0.7); border-radius: 50%; width: 20px; height: 20px;
-        align-items: center; justify-content: center; cursor: pointer;
-    }
-    .compact-delete-btn svg { width: 12px; height: 12px; color: #ef4444; }
-    .overview-event-item:hover .compact-delete-btn { display: flex; }
-
-
-    /* --- MONTH VIEW --- */
-    #month-view{display:none;padding:1rem;overflow-y:auto}
-    .month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-    .month-header-cell{background:#f9fafb;padding:.75rem .5rem;text-align:center;font-weight:600;font-size:.875rem;color:#6b7280}
-    .month-day-cell{background:#fff;min-height:100px;padding:.5rem;position:relative;cursor:pointer;transition:.2s;overflow:hidden;contain:layout paint}
-    .month-day-cell:hover{background:#f9fafb}
-    .month-day-cell.other-month{background:#fcfcfc;opacity:.5}
-    .month-day-cell.weekend{background:linear-gradient(135deg,rgba(219,39,119,.05) 0%,rgba(147,51,234,.05) 100%)}
-    .month-day-cell.today{background:#ede9fe;border:2px solid #8b5cf6}
-    .month-day-number{font-weight:600;font-size:.875rem;color:#374151;margin-bottom:.25rem}
-    .month-day-events{display:flex;flex-direction:column;gap:2px}
-    .month-event-item{font-size:.65rem;padding:2px 4px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-    @media (max-width:768px){
-      .month-day-cell{min-height:70px;padding:.25rem}
-      .month-day-number{font-size:.75rem}
-      .month-event-item{font-size:.6rem;padding:1px 2px}
-    }
-
-    /* INPUTY W MODALU */
-    .hours-input, .ports-input {
-      width:80px;
-      padding:0.5rem;
-      border:1px solid #e5e7eb;
-      border-radius:0.5rem;
-      font-size:0.875rem;
-      text-align:center;
-    }
-    .delete-field-btn {
-      background: transparent; border: none; cursor: pointer; padding: 0.5rem;
-      color: #9ca3af; transition: color 0.2s;
-    }
-    .delete-field-btn:hover { color: #ef4444; }
-
-    /* --- MODALE, MENU, LOADER --- */
-    #context-menu{position:fixed;background:#fff;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);z-index:1000;min-width:150px;padding:6px;display:none;border:1px solid #e5e7eb}
-    .context-menu-item{padding:10px 14px;font-size:.875rem;color:#374151;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background-color .2s;border-radius:8px}
-    .context-menu-item:hover{background:#f9fafb}
-    .context-menu-separator{height:1px;background:#e5e7eb;margin:4px 0}
-
-    #loading{display:flex;align-items:center;justify-content:center;padding:3rem}
-    .loading-spinner{width:40px;height:40px;border:3px solid:#f3f4f6;border-top:3px solid #8b5cf6;border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-
-    #bulk-actions{background:#fff;border-radius:12px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);border:1px solid #e5e7eb}
-    @media (max-width:768px){
-      #bulk-actions{bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:350px}
-    }
-  </style>
+  /* FAB + SHEET (MOBILE) */
+  #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;
+    background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;border:none;border-radius:9999px;padding:.7rem .95rem;font-weight:800}
+  #fab svg{width:18px;height:18px}
+  @media (max-width:768px){ #fab{display:inline-flex} }
+  #sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;
+    box-shadow:0 -12px 24px rgba(0,0,0,.2);transform:translateY(110%);transition:transform .22s ease-out;z-index:1200}
+  #sheet.open{transform:translateY(0)}
+</style>
 </head>
 <body>
-  <div id="app-container">
-    <header class="modern-header">
-      <div class="header-content">
-        <div class="brand">
-          <div class="flower-logo">
-            <div class="flower-petal"></div><div class="flower-petal"></div><div class="flower-petal"></div><div class="flower-petal"></div><div class="flower-petal"></div>
-            <div class="flower-center"></div>
-          </div>
-          <div class="brand-text">
-            <h1>Rodzina Fedorczak</h1>
-            <p>Kalendarz 🌸</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <button id="prev-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Poprzedni miesiąc">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          </button>
-          <h2 id="month-year-display" class="text-base md:text-lg font-semibold text-gray-700 text-center">Ładowanie...</h2>
-          <button id="next-month" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Następny miesiąc">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          </button>
-          <button id="today-btn" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">Dziś</button>
-          <div class="view-toggle" role="tablist" aria-label="Przełącz widok">
-            <button id="btn-view-standard" class="view-btn active" title="Widok normalny" data-view="standard" role="tab" aria-selected="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 10h18M3 14h18"/></svg>
-            </button>
-            <button id="btn-view-compact" class="view-btn" title="Widok kompaktowy" data-view="compact" role="tab" aria-selected="false">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
-            <button id="btn-view-month" class="view-btn" title="Widok miesięczny" data-view="month" role="tab" aria-selected="false">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
-            </button>
-          </div>
-        </div>
+<header class="hdr">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow">
+        <span class="text-white font-black">🌸</span>
       </div>
-    </header>
-
-    <div id="summary-bar" class="summary-bar">
-      <span class="summary-chip"><span class="summary-dot" style="background:#a7f3d0"></span> Ortho: <b id="sum-ortho">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#fde68a"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#f9a8d4"></span> Łask: <b id="sum-lask">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#c4b5fd"></span> JB: <b id="sum-jb">0h</b></span>
-      <span class="summary-chip"><span class="summary-dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
+      <div>
+        <div class="font-extrabold text-slate-900">Rodzina Fedorczak</div>
+        <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
+      </div>
     </div>
 
-    <main id="app" class="w-full bg-white flex flex-col flex-grow">
-      <div id="main-view" class="overflow-auto flex-1 flex flex-col">
-        <div id="calendar-wrapper" class="overflow-auto flex-1 hidden md:block">
-          <div id="calendar-container" class="bg-white border-t min-w-[900px]">
-            <div class="calendar-grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
-              <div class="calendar-cell header p-3">Dzień</div>
-              <div class="calendar-cell header p-3 color-ania">Ania</div>
-              <div class="calendar-cell header p-3 color-aniaPraca">Ania Praca</div>
-              <div class="calendar-cell header p-3 color-michal">Michał</div>
-              <div class="calendar-cell header p-3 color-michalPraca">Michał Praca</div>
-              <div class="calendar-cell header p-3 color-wspolne">Wspólne</div>
-              <div class="calendar-cell header p-3 color-inne">Dom/Finanse</div>
-            </div>
-            <div id="calendar-body" class="calendar-grid"></div>
-          </div>
-        </div>
-        <div id="mobile-calendar" class="mobile-calendar md:hidden"></div>
-      </div>
-
-      <div id="compact-view" class="overflow-auto flex-1">
-        <div class="overview-container"></div>
-      </div>
-
-      <div id="month-view" class="overflow-auto flex-1">
-        <div class="month-grid"></div>
-      </div>
-
-      <div id="loading" class="text-center p-8 text-gray-500 font-semibold">
-        <div class="loading-spinner"></div>
-      </div>
-    </main>
-  </div>
-
-  <button id="mobile-summary-btn" class="show">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M3 12h18m-9-9v18"/>
-    </svg>
-  </button>
-
-  <div id="mobile-summary-modal">
-    <h3 style="font-size:1rem;font-weight:700;color:#1f2937;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:2px solid #f3f4f6;">Podsumowanie</h3>
-    <div style="display:flex;flex-direction:column;gap:0.5rem;">
-      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span style="color:#6b7280;">Ortho:</span>
-        <span style="font-weight:600;color:#10b981;" id="m-sum-ortho">0h</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span style="color:#6b7280;">Brzeziny:</span>
-        <span style="font-weight:600;color:#f59e0b;" id="m-sum-brzeziny">0h</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span style="color:#6b7280;">Łask:</span>
-        <span style="font-weight:600;color:#ec4899;" id="m-sum-lask">0h</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span style="color:#6b7280;">JB:</span>
-        <span style="font-weight:600;color:#8b5cf6;" id="m-sum-jb">0h</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding-top:0.5rem;border-top:1px solid #e5e7eb;">
-        <span style="color:#6b7280;">Porty:</span>
-        <span style="font-weight:600;color:#ef4444;" id="m-sum-ports">0</span>
+    <div class="flex items-center gap-2">
+      <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
+      <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
+      <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
+      <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
+      <div class="flex gap-1 border border-gray-200 rounded-xl p-1">
+        <button id="v-standard" class="view-btn active" data-v="standard" title="Widok normalny">▦</button>
+        <button id="v-compact"  class="view-btn" data-v="compact"  title="Widok kompaktowy">≡</button>
+        <button id="v-month"    class="view-btn" data-v="month"    title="Widok miesięczny">▤</button>
       </div>
     </div>
   </div>
+</header>
 
-  <div id="context-menu" class="context-menu">
-    <div id="copy-btn" class="context-menu-item">Kopiuj</div>
-    <div id="paste-btn" class="context-menu-item">Wklej</div>
-    <div class="context-menu-separator"></div>
-    <div id="delete-btn" class="context-menu-item text-red-600">Usuń</div>
-  </div>
+<!-- Podsumowanie (desktop) -->
+<div class="sumbar">
+  <span class="chip"><span class="dot" style="background:var(--k-ortho)"></span> Ortho: <b id="sum-ortho">0h</b></span>
+  <span class="chip"><span class="dot" style="background:var(--k-brzeziny)"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
+  <span class="chip"><span class="dot" style="background:var(--k-lask)"></span> Łask: <b id="sum-lask">0h</b></span>
+  <span class="chip"><span class="dot" style="background:var(--k-jb)"></span> JB: <b id="sum-jb">0h</b></span>
+  <span class="chip"><span class="dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
+</div>
 
-  <div id="bulk-actions" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-4 py-3 rounded-lg shadow-2xl z-20 flex items-center gap-4">
-    <span id="selection-count" class="text-sm font-medium text-gray-700"></span>
-    <button id="bulk-delete-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-md text-sm">Usuń</button>
-    <button id="clear-selection-btn" class="text-gray-500 hover:text-gray-700 p-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-  </div>
-
-  <div id="day-edit-modal" class="day-edit-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:1rem;">
-    <div class="day-edit-content" style="background:#fff;border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow:auto;padding:1.5rem;">
-      <div class="day-edit-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #f3f4f6;">
-        <h3 class="day-edit-title" style="font-size:1.5rem;font-weight:700;color:#1f2937">Edycja dnia</h3>
-        <div class="day-edit-close" onclick="closeDayEdit()" style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+<main class="w-full bg-white flex flex-col flex-grow">
+  <div id="standard" class="flex-1 flex flex-col">
+    <!-- desktop -->
+    <div id="desk-wrap" class="overflow-auto hidden md:block flex-1">
+      <div class="bg-white border-t min-w-[900px]">
+        <div class="grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
+          <div class="cell header p-3">Dzień</div>
+          <div class="cell header p-3 c-ania">Ania</div>
+          <div class="cell header p-3 c-aniaP">Ania Praca</div>
+          <div class="cell header p-3 c-michal">Michał</div>
+          <div class="cell header p-3 c-michalP">Michał Praca</div>
+          <div class="cell header p-3 c-wsp">Wspólne</div>
+          <div class="cell header p-3 c-inne">Dom/Finanse</div>
         </div>
+        <div id="desk" class="grid"></div>
       </div>
-      <div class="day-edit-fields" id="day-edit-fields" style="display:flex;flex-direction:column;gap:1.5rem;"></div>
+    </div>
+    <!-- mobile -->
+    <div id="mob" class="mcal md:hidden"></div>
+  </div>
+
+  <div id="compact" style="display:none">
+    <div id="cv-cont"></div>
+  </div>
+
+  <div id="month" style="display:none">
+    <div id="mgrid" class="mgrid"></div>
+  </div>
+
+  <div id="loading" class="text-center p-8 text-gray-500 font-semibold hidden">
+    <div class="w-10 h-10 border-4 border-gray-100 border-t-purple-500 rounded-full animate-spin mx-auto"></div>
+  </div>
+</main>
+
+<!-- FAB (mobile) -->
+<button id="fab" aria-label="Pokaż podsumowanie">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"><path d="M3 12h18M12 3v18"/></svg>
+  Suma
+</button>
+
+<!-- SHEET (mobile) -->
+<div id="sheet">
+  <div class="w-full p-4">
+    <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-2"></div>
+    <div id="sheet-title" class="text-sm text-gray-500 mb-2">Podsumowanie</div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Ortho</div><div id="ms-ortho" class="text-lg font-bold">0h</div></div>
+      <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Brzeziny</div><div id="ms-brzeziny" class="text-lg font-bold">0h</div></div>
+      <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Łask</div><div id="ms-lask" class="text-lg font-bold">0h</div></div>
+      <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">JB</div><div id="ms-jb" class="text-lg font-bold">0h</div></div>
+      <div class="p-3 rounded-lg border border-gray-200 bg-gray-50 col-span-2"><div class="text-xs text-gray-500">Porty</div><div id="ms-ports" class="text-lg font-bold">0</div></div>
+    </div>
+    <div class="mt-3 text-right">
+      <button id="sheet-close" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button>
     </div>
   </div>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, writeBatch, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<!-- Context -->
+<div id="ctx">
+  <div id="ctx-copy"  class="ctx-it">Kopiuj</div>
+  <div id="ctx-cut"   class="ctx-it">Wytnij</div>
+  <div id="ctx-paste" class="ctx-it">Wklej</div>
+  <div class="h-px bg-gray-200 my-1"></div>
+  <div id="ctx-del"   class="ctx-it text-red-600">Usuń</div>
+</div>
 
-    // --- Firebase ---
-    const userFirebaseConfig = {
-      apiKey: "AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
-      authDomain: "kalendarz-rodzinny-68d04.firebaseapp.com",
-      projectId: "kalendarz-rodzinny-68d04",
-      storageBucket: "kalendarz-rodzinny-68d04.appspot.com",
-      messagingSenderId: "1050937545151",
-      appId: "1:1050937545151:web:a85fd1a5f066f4a499910a",
-      measurementId: "G-57YKE2XKQ1"
-    };
+<!-- Modal edycji -->
+<div id="edit">
+  <div class="edit-body">
+    <div class="flex items-center justify-between pb-3 border-b-2 border-gray-100 mb-3">
+      <h3 id="edit-title" class="text-xl font-extrabold text-gray-900">Edycja dnia</h3>
+      <button id="edit-close" class="w-8 h-8 rounded-lg bg-gray-100 grid place-items-center">✕</button>
+    </div>
+    <div id="edit-fields" class="flex flex-col gap-4"></div>
+  </div>
+</div>
 
-    let db;
-    try{
-      const app = initializeApp(userFirebaseConfig);
-      const auth = getAuth(app);
-      db = getFirestore(app);
-      signInAnonymously(auth);
-      onAuthStateChanged(auth, user => user && initCalendar());
-    }catch(e){ console.error("Firebase Error:", e); }
+<script type="module">
+/* ==== Firebase ==== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, writeBatch, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- State ---
-    let currentDate = new Date();
-    let unsubscribe = () => {};
-    let clipboard = null;
-    let contextTarget = null;
-    const selected = new Set();
-    let currentView = 'standard';
-    let isMobile = window.innerWidth <= 768;
-    let currentEditDay = null;
-    let currentEvents = {};
-    const MAX_CHARS = 50;
+const cfg = {
+  apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
+  authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com",
+  projectId:"kalendarz-rodzinny-68d04",
+  storageBucket:"kalendarz-rodzinny-68d04.appspot.com",
+  messagingSenderId:"1050937545151",
+  appId:"1:1050937545151:web:a85fd1a5f066f4a499910a",
+  measurementId:"G-57YKE2XKQ1"
+};
 
-    // --- DOM ---
-    const dom = {
-      monthYear: document.getElementById('month-year-display'),
-      prevBtn: document.getElementById('prev-month'),
-      nextBtn: document.getElementById('next-month'),
-      todayBtn: document.getElementById('today-btn'),
-      mainView: document.getElementById('main-view'),
-      compactView: document.getElementById('compact-view'),
-      monthView: document.getElementById('month-view'),
-      calendarWrapper: document.getElementById('calendar-wrapper'),
-      mobileCalendar: document.getElementById('mobile-calendar'),
-      body: document.getElementById('calendar-body'),
-      loading: document.getElementById('loading'),
-      contextMenu: document.getElementById('context-menu'),
-      copyBtn: document.getElementById('copy-btn'),
-      pasteBtn: document.getElementById('paste-btn'),
-      deleteBtn: document.getElementById('delete-btn'),
-      bulkActions: document.getElementById('bulk-actions'),
-      selectionCount: document.getElementById('selection-count'),
-      bulkDelete: document.getElementById('bulk-delete-btn'),
-      clearSelection: document.getElementById('clear-selection-btn'),
-      dayEditModal: document.getElementById('day-edit-modal'),
-      dayEditFields: document.getElementById('day-edit-fields'),
-      btnStandard: document.getElementById('btn-view-standard'),
-      btnCompact: document.getElementById('btn-view-compact'),
-      btnMonth: document.getElementById('btn-view-month'),
-      sumOrtho: document.getElementById('sum-ortho'),
-      sumBrzeziny: document.getElementById('sum-brzeziny'),
-      sumLask: document.getElementById('sum-lask'),
-      sumJB: document.getElementById('sum-jb'),
-      sumPorts: document.getElementById('sum-ports'),
-      mSumOrtho: document.getElementById('m-sum-ortho'),
-      mSumBrzeziny: document.getElementById('m-sum-brzeziny'),
-      mSumLask: document.getElementById('m-sum-lask'),
-      mSumJB: document.getElementById('m-sum-jb'),
-      mSumPorts: document.getElementById('m-sum-ports'),
-    };
+let db;
+try{
+  const app = initializeApp(cfg);
+  const auth = getAuth(app);
+  db = getFirestore(app);
+  signInAnonymously(auth);
+  onAuthStateChanged(auth, u => u && init());
+}catch(e){ console.error(e); }
 
-    // --- Helpers ---
-    const getMonthName = m => ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'][m];
-    const getDayName = d => ['PN','WT','ŚR','CZ','PT','SB','ND'][d];
-    const getDayFullName = d => ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'][d];
-    const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
-    const fieldLabels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
+/* ==== Stan/DOM ==== */
+let cur = new Date();
+let unsub = () => {};
+let isMobile = matchMedia("(max-width: 768px)").matches;
+const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
+const labels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
+let data = {};
+let clip = null; // tekst
+let view = 'standard';
 
-    const fullDutyKeywords = ['jb oit','jb znieczuleń','jb znieczulenia','jb zniecz'];
-    const morningKeywords = ['rano','poranna', 'wybudzenia', '7:30','7.30','07:30','07.30','chirurgia'];
-    const locationLaskKeywords = ['łask'];
-    const locationOtherKeywords = ['ortho','brzeziny'];
+const el = id => document.getElementById(id);
+const E = {
+  title: el('title'), prev: el('prev'), next: el('next'), today: el('today'),
+  vStandard: el('v-standard'), vCompact: el('v-compact'), vMonth: el('v-month'),
+  desk: el('desk'), mob: el('mob'), cv: el('cv-cont'), mgrid: el('mgrid'),
+  sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'),
+  msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'),
+  sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'),
+  ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
+  edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title')
+};
+window.addEventListener('resize', ()=>{ const was = isMobile; isMobile = matchMedia("(max-width: 768px)").matches; if (was!==isMobile) update(); });
 
-    const getEventType = (text) => {
-      if (!text) return 'default';
-      const s = text.toLowerCase();
-      if (fullDutyKeywords.some(k=>s.includes(k))) return 'full-duty';
-      if (s.startsWith('jb')) return 'medium-duty';
-      if (locationLaskKeywords.some(k=>s.includes(k))) return 'location-lask';
-      if (locationOtherKeywords.some(k=>s.includes(k))) return 'location-other';
-      return 'default';
-    };
-    
-    const isJBDuty = (text) => {
-      if (!text) return false;
-      const s = text.toLowerCase();
-      return s.includes('jb ') || s.startsWith('jb');
-    };
-    
-    const isJbPorts = (text) => {
-      if (!text) return false;
-      const s = text.toLowerCase();
-      return s.includes('jb') && s.includes('port');
-    };
+/* ==== Nazwy dni/m-cy ==== */
+const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
+const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
+const getDayIdx = d => (d + 6) % 7; // Pon=0
 
-    const isOrtho = (t) => t && /ortho/i.test(t);
-    const isBrzeziny = (t) => t && /brzeziny/i.test(t);
-    const isLask = (t) => t && /łask/i.test(t);
-    const isMorningShift = (t) => {
-      if (!t) return false;
-      const s = t.toLowerCase();
-      return morningKeywords.some(k=>s.includes(k));
-    };
-    
-    const detectMultiShift = (text) => {
-        if (!text) return { detected: false };
-        const s = text.toLowerCase();
-        const hasMorning = isMorningShift(s);
-        const hasOrtho = isOrtho(s);
-        const hasLask = isLask(s);
-        if (hasMorning && (hasOrtho || hasLask)) {
-            return { detected: true, part1: 'Poranna', part2: hasOrtho ? 'Ortho' : 'Łask' };
-        }
-        return { detected: false };
-    };
-    
-    const getDefaultPartHours = (multiShiftResult) => {
-        if (!multiShiftResult.detected) return null;
-        return { part1: 6, part2: multiShiftResult.part2 === 'Ortho' ? 10 : 24 };
-    };
+/* ==== Rozpoznawanie typów i kafelków ==== */
+const fullDuty = ['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń']; // 24h
+const isOrtho = t => /ortho/i.test(t||'');
+const isBrzeziny = t => /brzeziny/i.test(t||'');
+const isLask = t => /łask/i.test(t||'');
+const isJB = t => !!(t&&(t.toLowerCase().startsWith('jb')||t.toLowerCase().includes('jb ')));
 
-    const getHoursFromDB = (day, field) => {
-      const dayData = currentEvents[day] || {};
-      const key = `hours_${field}`;
-      return dayData[key] !== undefined ? dayData[key] : null;
-    };
-    
-    const getPortsFromDB = (day, field) => {
-      const dayData = currentEvents[day] || {};
-      const key = `ports_${field}`;
-      return dayData[key] !== undefined ? dayData[key] : null;
-    };
+const getTileClass = t=>{
+  if(!t) return '';
+  const s=t.toLowerCase();
+  if(fullDuty.some(k=>s.includes(k))) return 'tile-jb24';
+  if(isLask(s)) return 'tile-lask';
+  if(isOrtho(s)) return 'tile-ortho';
+  if(s.startsWith('jb')) return 'tile-jb';
+  return '';
+};
 
-    const setHoursToDB = async (day, field, hours) => {
-      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
-      const docRef = doc(db, calendarId, String(day));
-      const key = `hours_${field}`;
-      if (hours === null || (typeof hours === 'object' && hours.part1 === null && hours.part2 === null)) {
-        await updateDoc(docRef, { [key]: deleteField() }).catch(() => setDoc(docRef, {}));
-      } else {
-        await setDoc(docRef, { [key]: hours }, { merge: true });
-      }
-    };
-    
-    const setPortsToDB = async (day, field, count) => {
-      const calendarId = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
-      const docRef = doc(db, calendarId, String(day));
-      const key = `ports_${field}`;
-      const countNum = parseInt(count, 10);
-      if (count === '' || isNaN(countNum) || countNum <= 0) {
-          await updateDoc(docRef, { [key]: deleteField() }).catch(() => setDoc(docRef, {}));
-      } else {
-          await setDoc(docRef, { [key]: countNum }, { merge: true });
-      }
-    };
+/* godziny – wyłącznie w tle */
+const getDefaultHours = (txt)=>{
+  if(!txt) return 0;
+  const s = txt.toLowerCase();
+  if(isOrtho(s)||isBrzeziny(s)) return 10;
+  if(isLask(s)) return 24;
+  if(fullDuty.some(k=>s.includes(k))||s.startsWith('jb')) return 24;
+  if(/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6;
+  return 0;
+};
+const getSavedHours = (day, field)=>{
+  const d = data[day]||{};
+  const v = d[`hours_${field}`];
+  return (typeof v === 'number' && Number.isFinite(v)) ? v : null; // fix [object Object]
+};
+const getPorts = (day, field)=>{
+  const d = data[day]||{};
+  const v = d[`ports_${field}`];
+  return (typeof v === 'number' && Number.isFinite(v)) ? v : 0;
+};
+const effHours = (day, field, txt)=>{
+  const saved = getSavedHours(day, field);
+  if(saved!==null) return saved;
+  return getDefaultHours(txt);
+};
 
-    const getDefaultHours = (text, day, field, allEvents) => {
-      if (!text) return 0;
-      const s = text.toLowerCase();
-      if (day > 1 && isMorningShift(s)) {
-        const prevText = (allEvents[day - 1] && allEvents[day - 1][field]) || '';
-        if (isJBDuty(prevText)) return 6;
-      }
-      if (isOrtho(s) || isBrzeziny(s)) return 10;
-      if (isLask(s)) return 24;
-      if (isJbPorts(s)) return 0;
-      if (fullDutyKeywords.some(k=>s.includes(k)) || s.startsWith('jb')) return 24;
-      if (isMorningShift(s)) return 6;
-      return 0;
-    };
+/* ==== Renderers ==== */
+const renderDesktop = (y,m,ev)=>{
+  E.desk.innerHTML='';
+  const days = new Date(y,m+1,0).getDate();
+  const today = new Date();
+  for(let d=1; d<=days; d++){
+    const date = new Date(y,m,d);
+    const dow = date.getDay();
+    const isToday = today.toDateString()===date.toDateString();
+    const de = ev[d]||{};
+    const off = (dow===0||dow===6)||de.isHoliday;
 
-    const checkContinuation = (text, day, field, allEvents) => {
-      if (!text || day >= 31) return null;
-      const nextText = allEvents[day + 1] && allEvents[day + 1][field];
-      if (nextText && isMorningShift(nextText) && isJBDuty(text)) {
-        return { extraHours: 6 };
-      }
-      return null;
-    };
+    const dayCell = document.createElement('div');
+    dayCell.className = `cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`;
+    dayCell.dataset.day=d;
+    dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;
+    E.desk.appendChild(dayCell);
 
-    const getEffectiveHours = (text, day, field, allEvents) => {
-        const savedHours = getHoursFromDB(day, field);
-        if (savedHours !== null) {
-            if (typeof savedHours === 'object') {
-                const multiShift = detectMultiShift(text);
-                const defaultPartHours = multiShift.detected ? getDefaultPartHours(multiShift) : { part1: 0, part2: 0 };
-                const part1 = savedHours.part1 !== null ? savedHours.part1 : defaultPartHours.part1;
-                const part2 = savedHours.part2 !== null ? savedHours.part2 : defaultPartHours.part2;
-                return (part1 || 0) + (part2 || 0);
-            }
-            return savedHours;
-        }
-        const multiShift = detectMultiShift(text);
-        if (multiShift.detected) {
-            const defaultParts = getDefaultPartHours(multiShift);
-            return defaultParts.part1 + defaultParts.part2;
-        }
-        let defaultHours = getDefaultHours(text, day, field, allEvents);
-        const continuation = checkContinuation(text, day, field, allEvents);
-        if (continuation) {
-            defaultHours += continuation.extraHours;
-        }
-        return defaultHours;
-    };
-
-    const getPortsFromText = (t) => {
-      if (!t) return 0;
-      const m = t.match(/port[y]?\s*[:\-]?\s*(\d+)/i);
-      return m ? parseInt(m[1], 10) : 0;
-    };
-    
-    window.addEventListener('resize', () => {
-      const wasMobile = isMobile;
-      isMobile = window.innerWidth <= 768;
-      if (wasMobile !== isMobile) update();
-    });
-
-    const computeMonthlySummary = async () => {
-      let orthoH=0, brzezH=0, jbH=0, ports=0, laskH=0;
-      const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-      for (let day = 1; day <= daysInMonth; day++) {
-        const ev = currentEvents[day];
-        if (!ev) continue;
-        for (const f of fields){
-          const txt = ev[f];
-          if (!txt) continue;
-          
-          const hours = getEffectiveHours(txt, day, f, currentEvents);
-          const savedPorts = getPortsFromDB(day, f);
-          ports += (savedPorts !== null) ? savedPorts : getPortsFromText(txt);
-          
-          if (isLask(txt)) {
-              laskH += hours;
-          } else if (isJBDuty(txt)) {
-              jbH += hours;
-          }
-          if (isOrtho(txt)) orthoH += hours;
-          if (isBrzeziny(txt)) brzezH += hours;
-        }
-      }
-      dom.sumOrtho.textContent = `${orthoH}h`;
-      dom.sumBrzeziny.textContent = `${brzezH}h`;
-      dom.sumLask.textContent = `${laskH}h`;
-      dom.sumJB.textContent = `${jbH}h`;
-      dom.sumPorts.textContent = `${ports}`;
-      dom.mSumOrtho.textContent = `${orthoH}h`;
-      dom.mSumBrzeziny.textContent = `${brzezH}h`;
-      dom.mSumLask.textContent = `${laskH}h`;
-      dom.mSumJB.textContent = `${jbH}h`;
-      dom.mSumPorts.textContent = `${ports}`;
-    };
-
-    const renderDesktop = (year, month, events) => {
-      dom.body.innerHTML = '';
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const today = new Date();
-      
-      for(let day = 1; day <= daysInMonth; day++) {
-        try {
-          const date = new Date(year, month, day);
-          const dow = date.getDay();
-          const isToday = today.toDateString() === date.toDateString();
-          const dayEvents = events[day] || {};
-          const isDayOff = (dow === 0 || dow === 6) || dayEvents.isHoliday;
-
-          // Create and append day info cell directly
-          const dayInfoCell = document.createElement('div');
-          dayInfoCell.className = `calendar-cell day-info-cell flex items-center justify-center ${isToday ? 'today':''} ${isDayOff ? 'day-off' : ''}`;
-          dayInfoCell.dataset.day = day;
-          dayInfoCell.innerHTML = `<div class="day-info"><div class="day-number">${day}</div><div class="day-name">${getDayName((dow + 6) % 7)}</div></div>`;
-          dom.body.appendChild(dayInfoCell);
-
-          // Create and append each field cell directly
-          fields.forEach(field => {
-            const eventText = dayEvents[field] || '';
-            const cell = document.createElement('div');
-            cell.className = `calendar-cell color-${field} ${isDayOff ? 'day-off' : ''}`;
-            const div = document.createElement('div');
-            div.className = 'editable-field';
-            const type = getEventType(eventText);
-            if (type !== 'default') {
-              div.classList.add(type, (type === 'full-duty' || type === 'medium-duty') ? 'duty-shift' : '');
-            }
-            const id = `${day}-${field}`;
-            div.dataset.day = day;
-            div.dataset.field = field;
-            div.dataset.cellId = id;
-            if (selected.has(id)) div.classList.add('selected');
-            if (eventText) div.draggable = true;
-            const span = document.createElement('span');
-            span.className = 'event-text';
-            span.textContent = eventText;
-            div.appendChild(span);
-            cell.appendChild(div);
-            dom.body.appendChild(cell);
-          });
-        } catch (e) {
-          console.error(`Błąd podczas renderowania dnia ${day}:`, e);
-        }
-      }
-    };
-
-    const renderMobile = (year, month, events) => {
-      dom.mobileCalendar.innerHTML = '';
-      const daysInMonth = new Date(year, month+1, 0).getDate();
-      const today = new Date();
-      const frag = document.createDocumentFragment();
-      for(let day=1; day<=daysInMonth; day++){
-        const date = new Date(year, month, day);
-        const dow = date.getDay();
-        const isToday = today.toDateString() === date.toDateString();
-        const dayEvents = events[day] || {};
-        const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
-        const card = document.createElement('div');
-        card.className = `mobile-day-card ${isToday ? 'ring-2 ring-purple-400':''} ${isDayOff ? 'weekend':''}`;
-        let html = `<div class="mobile-day-header"><div><span class="mobile-day-number">${day}</span><span class="mobile-day-name ml-2">${getDayFullName((dow+6)%7)}</span></div>${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}${dayEvents.isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>':''}</div><div class="mobile-events">`;
-        fields.forEach(field=>{
-          const t = dayEvents[field] || '';
-          const type = getEventType(t);
-          html += `<div class="mobile-event-row"><div class="mobile-event-label color-${field}">${fieldLabels[field]}</div><div class="mobile-event-content color-${field} ${type!=='default' ? type : ''}" data-day="${day}" data-field="${field}" data-cell-id="${day}-${field}" draggable="${!!t}"><span class="event-text">${t || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span></div></div>`;
-        });
-        html += `</div>`;
-        card.innerHTML = html;
-        frag.appendChild(card);
-      }
-      dom.mobileCalendar.appendChild(frag);
-    };
-
-    const renderStaticView = async (viewType) => {
-        dom.loading.style.display = 'flex';
-        unsubscribe();
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        dom.monthYear.textContent = `${getMonthName(month)} ${year}`;
-        
-        const { docs } = await getDocs(collection(db, `${year}-${month+1}`));
-        currentEvents = {};
-        docs.forEach(d => { currentEvents[d.id] = d.data(); });
-
-        if (viewType === 'compact') {
-            const container = dom.compactView.querySelector('.overview-container');
-            container.innerHTML = '';
-            const daysInMonth = new Date(year, month+1, 0).getDate();
-            const today = new Date();
-            let hasAnyEvents = false;
-            for(let day=1; day<=daysInMonth; day++){
-                const date = new Date(year, month, day);
-                const dow = date.getDay();
-                const isToday = today.toDateString() === date.toDateString();
-                const dayEvents = currentEvents[day] || {};
-                const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
-                
-                const hasEventsForDay = fields.some(field => dayEvents[field]);
-                if (!hasEventsForDay) continue;
-                hasAnyEvents = true;
-
-                const card = document.createElement('div');
-                card.className = `overview-day-card ${isDayOff?'weekend':''} ${isToday?'ring-2 ring-purple-400':''}`;
-                card.dataset.day = day;
-                card.onclick = (e) => { if (!e.target.closest('.compact-delete-btn')) openDayEdit(day, dayEvents) };
-                let html = `<div class="overview-day-header"><div class="overview-day-info"><span class="overview-day-number">${day}</span><span class="overview-day-name">${getDayFullName((dow+6)%7)}</span></div><div>${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full">Dziś</span>':''}${dayEvents.isHoliday ?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full ml-2">Święto</span>':''}</div></div><div class="overview-events-grid">`;
-                fields.forEach(field=>{
-                  if (dayEvents[field]){
-                    const type = getEventType(dayEvents[field]);
-                    html += `<div class="overview-event-item color-${field} ${type!=='default'?type:''}">
-                        <div class="overview-event-label">${fieldLabels[field]}</div>
-                        <div class="overview-event-text">${dayEvents[field]}</div>
-                        <button class="compact-delete-btn" data-day="${day}" data-field="${field}" title="Usuń wpis"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                      </div>`;
-                  }
-                });
-                html += `</div>`;
-                card.innerHTML = html;
-                container.appendChild(card);
-            }
-            if (!hasAnyEvents) {
-                container.innerHTML = `<p class="text-center text-gray-500 py-8">Brak zaplanowanych wydarzeń w tym miesiącu.</p>`;
-            }
-        } else if (viewType === 'month') {
-            const grid = dom.monthView.querySelector('.month-grid');
-            grid.innerHTML = '';
-            ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'].forEach(h=>{ const el = document.createElement('div'); el.className = 'month-header-cell'; el.textContent = h; grid.appendChild(el); });
-            const firstDay = new Date(year, month, 1);
-            const daysInMonth = new Date(year, month+1, 0).getDate();
-            const startDay = (firstDay.getDay() + 6) % 7;
-            const today = new Date();
-            for(let i=0;i<startDay;i++){ const e=document.createElement('div'); e.className='month-day-cell other-month'; grid.appendChild(e); }
-            for(let day=1; day<=daysInMonth; day++){
-                const dow = new Date(year, month, day).getDay();
-                const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
-                const dayEvents = currentEvents[day] || {};
-                const isDayOff = (dow===0 || dow===6) || dayEvents.isHoliday;
-                const cell = document.createElement('div');
-                cell.className = `month-day-cell ${isDayOff?'weekend':''} ${isToday?'today':''}`;
-                cell.dataset.day = day; cell.onclick = ()=>openDayEdit(day, dayEvents);
-                let html = `<div class="month-day-number">${day}</div><div class="month-day-events">`;
-                let shown = 0;
-                for (const field of fields){
-                  if (dayEvents[field] && shown < 3){ html += `<div class="month-event-item color-${field} ${getEventType(dayEvents[field])!=='default'?getEventType(dayEvents[field]):''}">${dayEvents[field]}</div>`; shown++; }
-                }
-                const total = fields.filter(f=>dayEvents[f]).length;
-                if (total > 3){ html += `<div class="month-event-item" style="font-size:.6rem;color:#6b7280;">+${total-3} więcej</div>`; }
-                html += `</div>`;
-                cell.innerHTML = html; grid.appendChild(cell);
-            }
-            const totalCells = startDay + daysInMonth;
-            for(let i=totalCells; i<Math.ceil(totalCells/7)*7; i++){ const e=document.createElement('div'); e.className='month-day-cell other-month'; grid.appendChild(e); }
-        }
-        
-        dom.loading.style.display = 'none';
-        computeMonthlySummary();
-    };
-
-    window.openDayEdit = (day, dayEvents) => {
-      currentEditDay = day;
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      document.querySelector('.day-edit-title').textContent = `${day} ${getMonthName(date.getMonth())} - ${getDayFullName((date.getDay()+6)%7)}`;
-      dom.dayEditFields.innerHTML = '';
-      fields.forEach(field=>{
-        const wrap = document.createElement('div');
-        wrap.className = 'day-edit-field';
-        const value = (dayEvents && dayEvents[field] ||'');
-        const savedHours = getHoursFromDB(day, field);
-        const multiShift = detectMultiShift(value);
-        const jbPorts = isJbPorts(value);
-
-        let hoursHTML = '';
-        if (multiShift.detected) {
-            const defaultPartHours = getDefaultPartHours(multiShift);
-            const savedPart1 = (typeof savedHours==='object' && savedHours.part1!==null) ? savedHours.part1 : '';
-            const savedPart2 = (typeof savedHours==='object' && savedHours.part2!==null) ? savedHours.part2 : '';
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.5rem; background-color:#f9fafb; padding:0.75rem; border-radius:0.5rem; border:1px solid #e5e7eb;">
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny (${multiShift.part1}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part1" value="${savedPart1}" placeholder="${defaultPartHours.part1}h"></div>
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny (${multiShift.part2}):</label><input type="number" class="hours-input" data-field="${field}" data-part="part2" value="${savedPart2}" placeholder="${defaultPartHours.part2}h"></div>
-                <div style="font-size:0.7rem; color:#9ca3af; text-align:right; margin-top:0.25rem;">Puste = auto</div></div>`;
-        } else if (jbPorts) {
-            const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
-            const savedPorts = getPortsFromDB(day, field);
-            const portCount = savedPorts !== null ? savedPorts : getPortsFromText(value);
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.5rem; background-color:#f9fafb; padding:0.75rem; border-radius:0.5rem; border:1px solid #e5e7eb;">
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Godziny:</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number')?savedHours:''}" placeholder="${effectiveHours}h"></div>
-                <div style="display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280; flex:1;">Ilość portów:</label><input type="number" class="ports-input" data-field="${field}" value="${portCount || ''}" placeholder="0"></div>
-            </div>`;
-        } else {
-            const effectiveHours = getEffectiveHours(value, day, field, currentEvents);
-            hoursHTML = `<div style="margin-top:0.5rem; display:flex; align-items:center; gap:0.75rem;"><label style="font-size:0.8rem;color:#6b7280;">Godziny (puste=auto):</label><input type="number" class="hours-input" data-field="${field}" data-part="single" value="${(typeof savedHours === 'number')?savedHours:''}" placeholder="${effectiveHours}h"></div>`;
-        }
-        wrap.innerHTML = `<div style="display:flex; align-items:center; gap:0.5rem;">
-          <label class="day-edit-label color-${field}" style="font-weight:600; font-size:.875rem; padding:.5rem; border-radius:8px; color:#4b5563; flex:1;">${fieldLabels[field]}</label>
-          <button class="delete-field-btn" data-field="${field}" title="Usuń wpis"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
-          </div>
-          <input type="text" class="day-edit-input" data-field="${field}" value="${value}" maxlength="${MAX_CHARS}" placeholder="Kliknij aby dodać" style="width:100%;padding:.75rem;border:1px solid #e5e7eb;border-radius:8px;font-size:.875rem;">
-          ${hoursHTML}`;
-        dom.dayEditFields.appendChild(wrap);
-      });
-
-      dom.dayEditFields.querySelectorAll('.day-edit-input').forEach(input=>{ input.addEventListener('change', async () => { const val = input.value.trim(); await (val === '' ? dbDelete(currentEditDay, input.dataset.field, true) : dbSave(currentEditDay, input.dataset.field, val)); }); });
-      dom.dayEditFields.querySelectorAll('.hours-input').forEach(input=>{ input.addEventListener('change', async () => {
-        const field = input.dataset.field, part = input.dataset.part;
-        if (part === 'single') { await setHoursToDB(currentEditDay, field, input.value === '' ? null : (parseInt(input.value, 10) || 0)); }
-        else {
-          const p1Input = dom.dayEditFields.querySelector(`.hours-input[data-field="${field}"][data-part="part1"]`), p2Input = dom.dayEditFields.querySelector(`.hours-input[data-field="${field}"][data-part="part2"]`);
-          const v1 = p1Input.value, v2 = p2Input.value;
-          if (v1===''&&v2===''){ await setHoursToDB(currentEditDay, field, null); }
-          else { await setHoursToDB(currentEditDay, field, { part1: v1!==''?parseInt(v1,10):null, part2: v2!==''?parseInt(v2,10):null }); }
-        }
-      });});
-      dom.dayEditFields.querySelectorAll('.ports-input').forEach(input=>{ input.addEventListener('change', async () => { await setPortsToDB(currentEditDay, input.dataset.field, input.value); }); });
-      dom.dayEditFields.querySelectorAll('.delete-field-btn').forEach(btn=>{ btn.addEventListener('click', async () => {
-          const field = btn.dataset.field;
-          await dbDelete(currentEditDay, field, true);
-          const dayEvents = { ...currentEvents[currentEditDay] };
-          delete dayEvents[field];
-          openDayEdit(currentEditDay, dayEvents);
-      });});
-
-      dom.dayEditModal.style.display = 'flex';
-    };
-    
-    window.closeDayEdit = () => { dom.dayEditModal.style.display = 'none'; };
-    dom.dayEditModal.addEventListener('click', (e)=>{ if(e.target===dom.dayEditModal) closeDayEdit(); });
-
-    const update = async () => {
-      if (!db) return;
-      dom.monthYear.textContent = `${getMonthName(currentDate.getMonth())} ${currentDate.getFullYear()}`;
-      if (currentView !== 'standard') {
-        renderStaticView(currentView);
-        return;
-      }
-      
-      dom.loading.style.display = 'flex';
-      unsubscribe();
-      const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`;
-      
-      const initialSnap = await getDocs(collection(db, id));
-      currentEvents = {}; 
-      initialSnap.forEach(d => { currentEvents[d.id] = d.data(); });
-      
-      const scrollable = isMobile ? window : dom.calendarWrapper;
-      const scrollPos = isMobile ? scrollable.scrollY : scrollable.scrollTop;
-      const year = currentDate.getFullYear(), month = currentDate.getMonth();
-      
-      isMobile ? renderMobile(year, month, currentEvents) : renderDesktop(year, month, currentEvents);
-      
-      isMobile ? scrollable.scrollTo(0, scrollPos) : (scrollable.scrollTop = scrollPos);
-      dom.loading.style.display = 'none';
-      computeMonthlySummary();
-
-      unsubscribe = onSnapshot(collection(db, id), snap=>{
-        snap.docChanges().forEach(change => {
-            if (change.type === 'removed') {
-                delete currentEvents[change.doc.id];
-            } else {
-                currentEvents[change.doc.id] = change.doc.data();
-            }
-        });
-        const currentScroll = isMobile ? window.scrollY : dom.calendarWrapper.scrollTop;
-        isMobile ? renderMobile(year, month, currentEvents) : renderDesktop(year, month, currentEvents);
-        isMobile ? window.scrollTo(0, currentScroll) : (dom.calendarWrapper.scrollTop = currentScroll);
-        computeMonthlySummary();
-      });
-    };
-
-    const setActiveViewButton = () => {
-      [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-      const map = {standard:dom.btnStandard, compact:dom.btnCompact, month:dom.btnMonth};
-      map[currentView].classList.add('active'); map[currentView].setAttribute('aria-selected','true');
-    };
-    
-    const switchView = (view) => {
-      currentView = view;
-      dom.mainView.style.display = 'none'; dom.compactView.style.display = 'none'; dom.monthView.style.display = 'none';
-      if (view==='standard') dom.mainView.style.display = 'flex';
-      else if (view==='compact') dom.compactView.style.display = 'block';
-      else if (view==='month') dom.monthView.style.display = 'block';
-      setActiveViewButton(); update();
-    };
-
-    const handleMobileEdit = (el) => {
-      const cur = el.querySelector('.event-text').textContent;
-      const val = cur.includes('Kliknij aby dodać') ? '' : cur;
-      const ta = document.createElement('textarea');
-      ta.value = val; ta.className = 'w-full p-2 border-2 border-purple-400 rounded-md'; ta.style.minHeight = '60px';
-      el.innerHTML = ''; el.appendChild(ta);
-      const cc = document.createElement('div');
-      cc.className = 'char-counter text-xs mt-1'; el.appendChild(cc);
-      const upd = () => { const len = ta.value.length; cc.textContent = `${len}/${MAX_CHARS}`; cc.classList.toggle('text-yellow-500', len > MAX_CHARS-10); cc.classList.toggle('text-red-500', len > MAX_CHARS); };
-      upd();
-      const save = async () => {
-        const txt = ta.value.slice(0, MAX_CHARS);
-        el.innerHTML = `<span class="event-text">${txt || '<span class="text-gray-400">Kliknij aby dodać</span>'}</span>`;
-        if (txt !== val){ await (!txt ? dbDelete(el.dataset.day, el.dataset.field, true) : dbSave(el.dataset.day, el.dataset.field, txt)); }
-      };
-      ta.addEventListener('input', upd); ta.addEventListener('blur', save);
-      ta.addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } });
-      ta.focus();
-    };
-
-    const handleEdit = (fieldDiv) => {
-      const active = document.querySelector('.editable-field textarea');
-      if (active) active.blur();
-      const span = fieldDiv.querySelector('.event-text');
-      const cur = span.textContent; span.style.display = 'none'; fieldDiv.draggable = false;
-      const ta = document.createElement('textarea');
-      ta.value = cur;
-      const cc = document.createElement('div');
-      cc.className = 'char-counter'; fieldDiv.appendChild(cc);
-      const upd = ()=>{ const len = ta.value.length; cc.textContent = `${len}/${MAX_CHARS}`; cc.classList.toggle('warning', len > MAX_CHARS-10); cc.classList.toggle('error', len > MAX_CHARS); };
-      upd(); ta.addEventListener('input', upd);
-      const save = async ()=>{
-        let txt = ta.value.slice(0, MAX_CHARS);
-        ta.remove(); cc.remove(); span.style.display = ''; if (txt) fieldDiv.draggable = true;
-        if (txt !== cur){ span.textContent = txt; await (!txt ? dbDelete(fieldDiv.dataset.day, fieldDiv.dataset.field, true) : dbSave(fieldDiv.dataset.day, fieldDiv.dataset.field, txt)); }
-      };
-      ta.addEventListener('blur', save);
-      ta.addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } else if (e.key==='Escape'){ ta.remove(); cc.remove(); span.style.display=''; if (cur) fieldDiv.draggable = true; } });
-      fieldDiv.appendChild(ta); ta.focus();
-    };
-
-    document.getElementById('calendar-body').addEventListener('click', e=>{
-      const dayInfoCell = e.target.closest('.day-info-cell');
-      if (dayInfoCell){ if (e.target.closest('.editable-field')) return; toggleHoliday(dayInfoCell.dataset.day); return; }
-      const fieldDiv = e.target.closest('.editable-field');
-      if (!fieldDiv){ if (!e.target.closest('#bulk-actions') && !e.target.closest('#context-menu')) clearSelection(); return; }
-      if (e.ctrlKey || e.metaKey){ e.preventDefault(); toggleSelection(fieldDiv); } 
-      else { if (selected.size>0 && !fieldDiv.classList.contains('selected')) clearSelection(); handleEdit(fieldDiv); }
-    });
-    
-    const showContextMenu = (e, target) => {
-        contextTarget = target;
-        const menu = dom.contextMenu;
-        menu.style.display = 'block';
-        const targetRect = target.getBoundingClientRect();
-        const menuRect = menu.getBoundingClientRect();
-        let top = e.clientY, left = e.clientX;
-        if (top + menuRect.height > window.innerHeight) { top = e.clientY - menuRect.height; }
-        if (left + menuRect.width > window.innerWidth) { left = e.clientX - menuRect.width; }
-        if (top < 0) top = 5; if (left < 0) left = 5;
-        menu.style.top = `${top}px`;
-        menu.style.left = `${left}px`;
-    };
-
-    dom.body.addEventListener('contextmenu', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f) showContextMenu(e, f); });
-    
-    document.addEventListener('click', e=>{ if(!e.target.closest('#context-menu')) dom.contextMenu.style.display='none'; });
-    const toggleSelection = el => { const id = el.dataset.cellId; selected.has(id) ? selected.delete(id) : selected.add(id); el.classList.toggle('selected'); updateBulkUI(); };
-    const updateBulkUI = () => { const c = selected.size; if (c>0){ dom.selectionCount.textContent = `Zaznaczono: ${c}`; dom.bulkActions.classList.remove('hidden'); } else { dom.bulkActions.classList.add('hidden'); } };
-    const clearSelection = () => { document.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected')); selected.clear(); updateBulkUI(); };
-    dom.bulkDelete.addEventListener('click', async ()=>{ const b = writeBatch(db); const id = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`; selected.forEach(s=>{ const [day,field] = s.split('-'); b.update(doc(db, id, day), {[field]:deleteField(),[`hours_${field}`]:deleteField(),[`ports_${field}`]:deleteField()}); }); await b.commit(); clearSelection(); });
-    dom.clearSelection.addEventListener('click', clearSelection);
-    
-    const dbSave = (day, field, val) => setDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), { [field]: val }, { merge:true });
-    const dbDelete = (day, field, withSubfields = false) => {
-        const payload = { [field]: deleteField() };
-        if (withSubfields) {
-            payload[`hours_${field}`] = deleteField();
-            payload[`ports_${field}`] = deleteField();
-        }
-        return updateDoc(doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)), payload);
-    };
-
-    const getFullEventData = async (day, field) => {
-        const docRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day));
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) return null;
-        const data = docSnap.data();
-        return { text: data[field], hours: data[`hours_${field}`], ports: data[`ports_${field}`] };
-    };
-    
-    const pasteFullEventData = (day, field, data) => {
-        const batch = writeBatch(db);
-        const docRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day));
-        const payload = { [field]: data.text };
-        if (data.hours !== undefined) payload[`hours_${field}`] = data.hours;
-        if (data.ports !== undefined) payload[`ports_${field}`] = data.ports;
-        batch.set(docRef, payload, { merge: true });
-        return batch.commit();
-    };
-
-    const moveFullEventData = (source, target) => {
-        const batch = writeBatch(db);
-        const sourceRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(source.day));
-        const targetRef = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(target.day));
-        
-        const sourcePayload = { [source.field]: deleteField(), [`hours_${source.field}`]: deleteField(), [`ports_${source.field}`]: deleteField() };
-        const targetPayload = { [target.field]: source.data.text };
-        if (source.data.hours !== undefined) targetPayload[`hours_${target.field}`] = source.data.hours;
-        if (source.data.ports !== undefined) targetPayload[`ports_${target.field}`] = source.data.ports;
-
-        batch.update(sourceRef, sourcePayload);
-        batch.set(targetRef, targetPayload, { merge: true });
-        return batch.commit();
-    };
-
-    dom.copyBtn.addEventListener('click', async () => { const { day, field } = contextTarget.dataset; clipboard = await getFullEventData(day, field); dom.contextMenu.style.display='none'; });
-    dom.pasteBtn.addEventListener('click', ()=>{ if (clipboard) { const { day, field } = contextTarget.dataset; pasteFullEventData(day, field, clipboard); } dom.contextMenu.style.display='none'; });
-    dom.deleteBtn.addEventListener('click', ()=>{ dbDelete(contextTarget.dataset.day, contextTarget.dataset.field, true); dom.contextMenu.style.display='none'; });
-
-    dom.body.addEventListener('dragstart', async e=>{ const f = e.target.closest('.editable-field'); if (f && f.draggable) { const {day, field} = f.dataset; const data = await getFullEventData(day, field); e.dataTransfer.setData('application/json', JSON.stringify({ ...data, sourceDay: day, sourceField: field })); } });
-    dom.body.addEventListener('dragover', e=>{ e.preventDefault(); e.target.closest('.editable-field')?.classList.add('drag-over'); });
-    dom.body.addEventListener('dragleave', e=> e.target.closest('.editable-field')?.classList.remove('drag-over'));
-    dom.body.addEventListener('drop', e=>{ e.preventDefault(); const f = e.target.closest('.editable-field'); if (f){ f.classList.remove('drag-over'); const data = JSON.parse(e.dataTransfer.getData('application/json')); const target = { day: f.dataset.day, field: f.dataset.field }; const source = { day: data.sourceDay, field: data.sourceField, data: data }; moveFullEventData(source, target); } });
-
-    const toggleHoliday = async (day) => { const ref = doc(db, `${currentDate.getFullYear()}-${currentDate.getMonth()+1}`, String(day)); try{ const snap = await getDoc(ref); const cur = snap.exists() ? (snap.data().isHoliday || false) : false; await setDoc(ref, { isHoliday: !cur }, { merge:true }); }catch(e){ console.error(e); } };
-    const scrollToToday = () => {
-      const t = new Date(); if (t.getMonth()!==currentDate.getMonth() || t.getFullYear()!==currentDate.getFullYear()){ currentDate = new Date(t); update(); }
-      setTimeout(()=>{
-        if (currentView==='standard'){ document.querySelector('.today')?.scrollIntoView({behavior:'smooth', block:'center'}); document.querySelector('.mobile-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'}); }
-        else if (currentView==='compact'){ document.querySelector('#compact-view .overview-day-card.ring-2')?.scrollIntoView({behavior:'smooth', block:'center'}); }
-        else if (currentView==='month'){ document.querySelector('.month-day-cell.today')?.scrollIntoView({behavior:'smooth', block:'center'}); }
-      },100);
-    };
-
-    const initMobileInteractions = () => {
-        let longPressTimer;
-        let touchDragData = null;
-        let ghostEl = null;
-        let lastTouchTarget = null;
-        
-        const clearLongPress = () => {
-            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        };
-
-        const cleanupMobileDrag = () => {
-            clearLongPress();
-            if (ghostEl) {
-                ghostEl.remove();
-                ghostEl = null;
-            }
-            touchDragData = null;
-            lastTouchTarget?.classList.remove('drag-over');
-            lastTouchTarget = null;
-        };
-        
-        dom.mobileCalendar.addEventListener('touchstart', e => {
-            const target = e.target.closest('.mobile-event-content');
-            if (!target) return;
-            longPressTimer = setTimeout(() => {
-                if(touchDragData) { // Prevent context menu if dragging starts
-                    showContextMenu({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY }, target);
-                }
-                longPressTimer = null;
-            }, 500);
-
-            if (target.draggable) {
-                touchDragData = {
-                    day: target.dataset.day,
-                    field: target.dataset.field,
-                    text: target.querySelector('.event-text').textContent
-                };
-            }
-        });
-
-        dom.mobileCalendar.addEventListener('touchmove', async e => {
-            if (!touchDragData) return;
-            
-            clearLongPress();
-            
-            if (!ghostEl) {
-                const sourceData = await getFullEventData(touchDragData.day, touchDragData.field);
-                if (!sourceData || !sourceData.text) {
-                    touchDragData = null;
-                    return;
-                }
-                touchDragData.fullData = sourceData;
-
-                const target = e.target.closest('.mobile-event-content');
-                ghostEl = target.cloneNode(true);
-                ghostEl.classList.add('touch-drag-ghost');
-                document.body.appendChild(ghostEl);
-            }
-
-            if (ghostEl) {
-                e.preventDefault();
-                ghostEl.style.left = `${e.touches[0].clientX}px`;
-                ghostEl.style.top = `${e.touches[0].clientY}px`;
-                
-                ghostEl.style.display = 'none';
-                const dropTarget = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)?.closest('.mobile-event-content');
-                ghostEl.style.display = '';
-
-                if (lastTouchTarget !== dropTarget) {
-                    lastTouchTarget?.classList.remove('drag-over');
-                    if(dropTarget) dropTarget.classList.add('drag-over');
-                    lastTouchTarget = dropTarget;
-                }
-            }
-        });
-
-        dom.mobileCalendar.addEventListener('touchend', e => {
-            if (ghostEl && lastTouchTarget) {
-                const target = lastTouchTarget;
-                const source = { day: touchDragData.day, field: touchDragData.field, data: touchDragData.fullData };
-                const targetData = { day: target.dataset.day, field: target.dataset.field };
-                if (source.day !== targetData.day || source.field !== targetData.field) {
-                    moveFullEventData(source, targetData);
-                }
-            }
-            cleanupMobileDrag();
-        });
-        
-        dom.mobileCalendar.addEventListener('touchcancel', e => {
-            cleanupMobileDrag();
-        });
-
-        dom.mobileCalendar.addEventListener('contextmenu', e => { e.preventDefault(); });
-        
-        dom.mobileCalendar.addEventListener('click', e => {
-            const target = e.target.closest('.mobile-event-content');
-            if (target && !ghostEl) { 
-                handleMobileEdit(target);
-            }
-        });
-    };
-
-    // Mobile summary button and modal
-    const mobileSummaryBtn = document.getElementById('mobile-summary-btn');
-    const mobileSummaryModal = document.getElementById('mobile-summary-modal');
-    
-    if (mobileSummaryBtn && mobileSummaryModal) {
-        mobileSummaryBtn.addEventListener('click', () => {
-            mobileSummaryModal.classList.toggle('show');
-        });
-        
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#mobile-summary-btn') && !e.target.closest('#mobile-summary-modal')) {
-                mobileSummaryModal.classList.remove('show');
-            }
-        });
+    for(const f of fields){
+      const t = de[f]||'';
+      const c = document.createElement('div');
+      c.className = `cell ${off?'off':''} c-${f.replace('wspolne','wsp')}`;
+      const div = document.createElement('div');
+      div.className = `fld ${getTileClass(t)}`;
+      div.dataset.day=d; div.dataset.field=f; div.dataset.id=`${d}-${f}`;
+      const span = document.createElement('span'); span.className='txt'; span.textContent=t;
+      div.appendChild(span); c.appendChild(div); E.desk.appendChild(c);
+      if (!isMobile && t) div.draggable = true; // brak DnD na dotyku
     }
+  }
+};
 
-    const initCalendar = () => {
-      const nav = (d)=>{ currentDate.setMonth(currentDate.getMonth()+d); update(); };
-      dom.prevBtn.addEventListener('click', ()=>nav(-1)); dom.nextBtn.addEventListener('click', ()=>nav(1)); dom.todayBtn.addEventListener('click', scrollToToday);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dom.dayEditModal.style.display === 'flex') { closeDayEdit(); } });
-      [dom.btnStandard, dom.btnCompact, dom.btnMonth].forEach(btn=>{ btn.addEventListener('click', ()=>{ const v = btn.dataset.view; if (currentView!==v) switchView(v); }); });
-      
-      dom.compactView.addEventListener('click', async (e) => {
-          const deleteBtn = e.target.closest('.compact-delete-btn');
-          if (deleteBtn) {
-              const { day, field } = deleteBtn.dataset;
-              if (confirm(`Czy na pewno chcesz usunąć ten wpis?`)) {
-                  await dbDelete(day, field, true);
-                  renderStaticView('compact');
-              }
-          }
-      });
-      
-      initMobileInteractions();
-      switchView(isMobile ? 'standard' : 'month');
-    };
-  </script>
+const renderMobile = (y,m,ev)=>{
+  E.mob.innerHTML='';
+  const days = new Date(y,m+1,0).getDate();
+  const today = new Date();
+  const frag = document.createDocumentFragment();
+  for(let d=1; d<=days; d++){
+    const date = new Date(y,m,d);
+    const dow = date.getDay();
+    const de = ev[d]||{};
+    const off = (dow===0||dow===6)||de.isHoliday;
+    const isToday = today.toDateString()===date.toDateString();
+    const card = document.createElement('div');
+    card.className = `m-card ${off?'ring-0':''} ${isToday?'ring-2 ring-purple-400':''}`;
+    let html = `<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div>${de.isHoliday?'<span class="text-xs bg-purple-200 text-purple-700 px-2 py-1 rounded-full">Święto</span>':''}${isToday?'<span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full ml-2">Dziś</span>':''}</div>`;
+    for(const f of fields){
+      const t = de[f]||'';
+      html += `<div class="m-row"><div class="m-label c-${f.replace('wspolne','wsp')}">${labels[f]}</div>
+      <div class="m-content c-${f.replace('wspolne','wsp')} ${getTileClass(t)}" data-day="${d}" data-field="${f}">
+        <span class="txt">${t||'<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
+      </div></div>`;
+    }
+    card.innerHTML = html;
+    frag.appendChild(card);
+  }
+  E.mob.appendChild(frag);
+};
+
+const renderCompact = async (y,m)=>{
+  E.cv.innerHTML='';
+  const days = new Date(y,m+1,0).getDate();
+  for(let d=1; d<=days; d++){
+    const de = data[d]||{};
+    if(!fields.some(f=>de[f])) continue;
+    const dow = new Date(y,m,d).getDay();
+    const card = document.createElement('div');
+    card.className='cv-card';
+    card.onclick=()=>openEdit(d,de);
+    let html = `<div class="flex items-center justify-between pb-2 border-b-2 border-gray-100 mb-2">
+      <div class="font-extrabold text-lg">${d}</div>
+      <div class="text-sm text-gray-500">${dNamesFull[getDayIdx(dow)]}</div></div><div class="cv-grid">`;
+    for(const f of fields){
+      if(de[f]){
+        html += `<div class="cv-item c-${f.replace('wspolne','wsp')} ${getTileClass(de[f])}">
+          <div class="text-[11px] opacity-70 font-semibold">${labels[f]}</div>
+          <div>${de[f]}</div>
+        </div>`;
+      }
+    }
+    html+='</div>';
+    card.innerHTML=html; E.cv.appendChild(card);
+  }
+};
+
+const renderMonth = async (y,m)=>{
+  E.mgrid.innerHTML='';
+  ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'].forEach(h=>{ const e=document.createElement('div'); e.className='mh'; e.textContent=h; E.mgrid.appendChild(e); });
+  const first = new Date(y,m,1); const start = getDayIdx(first.getDay()); const days = new Date(y,m+1,0).getDate();
+  for(let i=0;i<start;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
+  for(let d=1; d<=days; d++){
+    const dow = new Date(y,m,d).getDay();
+    const de = data[d]||{};
+    const cell = document.createElement('div');
+    cell.className=`mc ${(dow===0||dow===6||de.isHoliday)?'week':''}`;
+    cell.onclick=()=>openEdit(d,de);
+    let html = `<div class="mnum">${d}</div>`;
+    let shown=0;
+    for(const f of fields){
+      if(de[f] && shown<3){ html += `<div class="mitem c-${f.replace('wspolne','wsp')} ${getTileClass(de[f])}">${de[f]}</div>`; shown++; }
+    }
+    if(fields.filter(f=>de[f]).length>3) html+=`<div class="mitem" style="color:#6b7280">+ więcej</div>`;
+    cell.innerHTML=html; E.mgrid.appendChild(cell);
+  }
+  const total = start+days; for(let i=total;i<Math.ceil(total/7)*7;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
+};
+
+/* ==== Sumy ==== */
+const computeSums = ()=>{
+  let ortho=0, brz=0, lask=0, jb=0, ports=0;
+  const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();
+  for(let d=1; d<=days; d++){
+    const row=data[d]; if(!row) continue;
+    for(const f of fields){
+      const t=row[f]; if(!t) continue;
+      const h=effHours(d,f,t);
+      if(isOrtho(t)) ortho+=h;
+      if(isBrzeziny(t)) brz+=h;
+      if(isLask(t)) lask+=h;
+      if(isJB(t)) jb+=h;
+      ports += getPorts(d,f);
+    }
+  }
+  E.sumOrtho.textContent=ortho+'h';
+  E.sumBrz.textContent=brz+'h';
+  E.sumLask.textContent=lask+'h';
+  E.sumJB.textContent=jb+'h';
+  E.sumPorts.textContent=String(ports);
+  E.msOrtho.textContent=ortho+'h';
+  E.msBrz.textContent=brz+'h';
+  E.msLask.textContent=lask+'h';
+  E.msJB.textContent=jb+'h';
+  E.msPorts.textContent=String(ports);
+  E.sheetTitle.textContent=`Podsumowanie: ${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
+};
+
+/* ==== DB ==== */
+const calId = ()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
+const save = (day,field,val)=> setDoc(doc(db, calId(), String(day)), { [field]: val }, { merge:true });
+const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
+const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
+const setPortsDb = (day,field,c)=> setDoc(doc(db, calId(), String(day)), { [`ports_${field}`]: (c===''||c===null)? deleteField() : parseInt(c,10) }, { merge:true });
+
+/* ==== Modal edycji ==== */
+function openEdit(day, dayRow){
+  const date=new Date(cur.getFullYear(),cur.getMonth(),day);
+  E.editTitle.textContent = `${day} ${mNames[cur.getMonth()]} — ${dNamesFull[getDayIdx(date.getDay())]}`;
+  E.editFields.innerHTML='';
+  for(const f of fields){
+    const txt = (dayRow&&dayRow[f])||'';
+    const savedH = getSavedHours(day,f);
+    const defH = getDefaultHours(txt);
+    const ports = getPorts(day,f);
+
+    const wrap=document.createElement('div');
+    wrap.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-1 rounded-md c-${f.replace('wspolne','wsp')} text-slate-700 font-semibold">${labels[f]}</span>
+        <button class="ml-auto text-red-500 hover:text-red-600" data-act="del" data-field="${f}" title="Usuń wpis">Usuń</button>
+      </div>
+      <input type="text" class="w-full mt-2 p-3 border border-gray-200 rounded-lg ${getTileClass(txt)}" data-field="${f}" value="${txt}" placeholder="Kliknij aby dodać">
+      <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
+        <div>
+          <label class="text-xs text-gray-500">Godziny (puste = automatycznie)</label>
+          <input type="range" min="0" max="48" step="1" value="${savedH!==null?savedH:defH}" data-field="${f}" data-hrs="slider" class="w-full">
+        </div>
+        <input type="number" min="0" max="48" step="1" value="${savedH!==null?savedH:''}" placeholder="${defH}" data-field="${f}" data-hrs="num" class="w-20 p-2 border border-gray-200 rounded-md text-center">
+      </div>
+      <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
+        <label class="text-xs text-gray-500">Porty (opcjonalnie)</label>
+        <input type="number" min="0" step="1" value="${ports||''}" placeholder="0" data-field="${f}" data-ports class="w-20 p-2 border border-gray-200 rounded-md text-center">
+      </div>
+    `;
+    E.editFields.appendChild(wrap);
+  }
+
+  // tekst
+  E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>{
+    inp.addEventListener('change', async ()=>{
+      const f=inp.dataset.field; const v=inp.value.trim();
+      if(!v) await del(day,f).catch(()=>{});
+      else await save(day,f,v);
+    });
+  });
+  // godziny
+  E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>{
+    sl.addEventListener('input', ()=>{
+      const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${sl.dataset.field}"]`);
+      const field=sl.dataset.field;
+      const curTxt=(data[day]||{})[field]||'';
+      const def = getDefaultHours(curTxt);
+      num.value = (parseInt(sl.value,10)===def)? '' : sl.value;
+    });
+    sl.addEventListener('change', async ()=>{
+      const f=sl.dataset.field; const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${f}"]`);
+      await setHours(day,f,(num.value==='')? '': num.value);
+    });
+  });
+  E.editFields.querySelectorAll('input[data-hrs="num"]').forEach(num=>{
+    num.addEventListener('change', async ()=>{
+      const f=num.dataset.field; const slider = E.editFields.querySelector(`input[data-hrs="slider"][data-field="${f}"]`);
+      const curTxt=(data[day]||{})[f]||''; const def=getDefaultHours(curTxt);
+      slider.value = (num.value===''? def : num.value);
+      await setHours(day,f,num.value);
+    });
+  });
+  // porty
+  E.editFields.querySelectorAll('input[data-ports]').forEach(p=>{
+    p.addEventListener('change', async ()=>{ await setPortsDb(day,p.dataset.field,p.value); });
+  });
+  // usuń
+  E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const f=b.dataset.field; await del(day,f).catch(()=>{});
+      const row={...(data[day]||{})}; delete row[f]; openEdit(day,row);
+    });
+  });
+
+  E.edit.style.display='flex';
+}
+document.getElementById('edit-close').onclick=()=>E.edit.style.display='none';
+E.edit.addEventListener('click',e=>{ if(e.target===E.edit) E.edit.style.display='none'; });
+
+/* ==== Context menu ==== */
+document.addEventListener('contextmenu', e=>{
+  const fld = e.target.closest('.fld'); if(!fld) return;
+  e.preventDefault();
+  const r=E.ctx; r.style.display='block';
+  const rect=r.getBoundingClientRect();
+  let x=e.clientX, y=e.clientY;
+  if(x+rect.width>innerWidth) x = innerWidth-rect.width-6;
+  if(y+rect.height>innerHeight) y = innerHeight-rect.height-6;
+  r.style.left=x+'px'; r.style.top=y+'px';
+  r.dataset.day=fld.dataset.day; r.dataset.field=fld.dataset.field;
+});
+document.addEventListener('click', e=>{ if(!e.target.closest('#ctx')) E.ctx.style.display='none'; });
+
+E.ctxCopy.onclick=()=>{ const d=E.ctx.dataset; clip = (data[d.day]?.[d.field])||''; E.ctx.style.display='none'; };
+E.ctxCut.onclick=async ()=>{ const d=E.ctx.dataset; clip = (data[d.day]?.[d.field])||''; await del(d.day,d.field); E.ctx.style.display='none'; };
+E.ctxPaste.onclick=async ()=>{ const d=E.ctx.dataset; if(clip!==null){ await save(d.day,d.field,clip); } E.ctx.style.display='none'; };
+E.ctxDel.onclick=async ()=>{ const d=E.ctx.dataset; await del(d.day,d.field); E.ctx.style.display='none'; };
+
+/* ==== Inline edycja ==== */
+document.getElementById('desk').addEventListener('click', e=>{
+  const dayCell = e.target.closest('.day-cell'); if(dayCell){ toggleHoliday(dayCell.dataset.day); return; }
+  const fld = e.target.closest('.fld'); if(!fld) return openInlineEdit(fld);
+});
+document.getElementById('mob').addEventListener('click', e=>{
+  const c = e.target.closest('.m-content'); if(c){ openEdit(c.dataset.day, data[c.dataset.day]||{}); }
+});
+
+function openInlineEdit(fld){
+  const span=fld.querySelector('.txt'); const before=span.textContent;
+  const ta=document.createElement('textarea'); ta.value=before; ta.className='w-full h-full p-2 border-2 border-purple-400 rounded-md';
+  fld.innerHTML=''; fld.appendChild(ta);
+  const saveNow=async()=>{
+    const val=ta.value.trim();
+    fld.innerHTML=`<span class="txt">${val}</span>`;
+    if(val!==before){ if(!val) await del(fld.dataset.day,fld.dataset.field).catch(()=>{}); else await save(fld.dataset.day,fld.dataset.field,val); }
+  };
+  ta.addEventListener('blur',saveNow);
+  ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); ta.blur(); } });
+  ta.focus();
+}
+
+/* ==== Holiday toggle ==== */
+async function toggleHoliday(day){
+  const id=calId(); const ref=doc(db,id,String(day));
+  const snap=await getDoc(ref); const cur=(snap.exists() && snap.data().isHoliday)||false;
+  await setDoc(ref,{isHoliday:!cur},{merge:true});
+}
+
+/* ==== Update/render ==== */
+function setTitle(){ E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; }
+
+async function update(){
+  if(!db) return;
+  setTitle();
+  const id=calId(); const snap=await getDocs(collection(db,id));
+  data={}; snap.forEach(d=>data[d.id]=d.data());
+
+  if(view==='standard'){
+    isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
+  }else if(view==='compact'){
+    await renderCompact(cur.getFullYear(),cur.getMonth());
+  }else{
+    await renderMonth(cur.getFullYear(),cur.getMonth());
+  }
+  computeSums();
+
+  // realtime tylko dla standard
+  unsub(); if(view!=='standard') return;
+  unsub = onSnapshot(collection(db,id), s=>{
+    s.docChanges().forEach(ch=>{
+      if(ch.type==='removed'){ delete data[ch.doc.id]; }
+      else { data[ch.doc.id]=ch.doc.data(); }
+    });
+    if(isMobile) renderMobile(cur.getFullYear(),cur.getMonth(),data);
+    else renderDesktop(cur.getFullYear(),cur.getMonth(),data);
+    computeSums();
+  });
+}
+
+/* ==== Nawigacja/widoki ==== */
+E.prev.onclick=()=>{ cur.setMonth(cur.getMonth()-1); update(); };
+E.next.onclick=()=>{ cur.setMonth(cur.getMonth()+1); update(); };
+E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
+
+function setActive(){
+  for(const b of [E.vStandard,E.vCompact,E.vMonth]) b.classList.remove('active');
+  ({standard:E.vStandard,compact:E.vCompact,month:E.vMonth})[view].classList.add('active');
+}
+[E.vStandard,E.vCompact,E.vMonth].forEach(btn=>{
+  btn.onclick=()=>{ view=btn.dataset.v; setActive();
+    document.getElementById('standard').style.display = (view==='standard')?'flex':'none';
+    document.getElementById('compact').style.display  = (view==='compact')?'block':'none';
+    document.getElementById('month').style.display    = (view==='month')?'block':'none';
+    update();
+  };
+});
+
+/* ==== FAB sheet ==== */
+E.fab.onclick=()=> E.sheet.classList.add('open');
+E.sheetClose.onclick=()=> E.sheet.classList.remove('open');
+E.sheet.addEventListener('click',e=>{ if(e.target===E.sheet) E.sheet.classList.remove('open'); });
+
+/* ==== Start ==== */
+function init(){
+  document.getElementById('standard').style.display='flex';
+  update();
+}
+</script>
 </body>
 </html>
