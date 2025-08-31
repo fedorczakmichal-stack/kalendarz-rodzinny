@@ -124,9 +124,7 @@
 
   /* MODAL EDYCJI */
   #edit{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1200;padding:12px}
-  .edit-body{position:relative;background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:82vh;overflow:auto;padding:24px}
-  #edit-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:#f3f4f6;color:#374151;border-radius:8px;cursor:pointer;display:grid;place-items:center;font-size:16px;line-height:1;transition:background .2s;}
-  #edit-close:hover{background:#e5e7eb;}
+  .edit-body{background:#fff;border-radius:18px;max-width:640px;width:100%;max-height:82vh;overflow:auto;padding:24px;}
 
   /* FAB + SHEET (MOBILE) */
   #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;
@@ -237,9 +235,9 @@
 
 <div id="edit">
   <div class="edit-body">
-    <button id="edit-close">✕</button>
-    <div class="pb-3 border-b-2 border-gray-100 mb-3">
+    <div class="flex items-center gap-4 pb-3 border-b-2 border-gray-100 mb-3">
       <h3 id="edit-title" class="text-xl font-extrabold text-gray-900">Edycja dnia</h3>
+      <button id="edit-close" class="ml-auto flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 grid place-items-center">✕</button>
     </div>
     <div id="edit-fields" class="flex flex-col gap-4"></div>
   </div>
