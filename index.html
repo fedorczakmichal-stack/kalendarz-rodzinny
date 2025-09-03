@@ -3,240 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indywidualna Karta Monitorowania Bólu</title>
+    <title>Indywidualna Karta Bólu</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-        .container { max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: #333; border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 20px; }
-        .patient-info, .allergies { margin-bottom: 20px; }
-        .patient-info div, .allergies div { margin-bottom: 10px; }
-        .day-section { border: 1px solid #eee; padding: 15px; margin-bottom: 20px; }
-        .day-section h3 { margin-top: 0; border-bottom: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .note { font-style: italic; color: #666; margin-top: 15px; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; padding: 20px; }
+        .container { max-width: 950px; margin: auto; border: 1px solid #000; padding: 15px; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { font-size: 14pt; margin: 0; }
+        .header h2 { font-size: 11pt; margin: 0; font-weight: normal; }
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .info-section div { flex-basis: 32%; }
+        .info-section div span { font-weight: bold; }
+        .allergies { margin-bottom: 15px; }
+        .section-title { font-weight: bold; text-align: center; border: 1px solid #000; padding: 5px; background-color: #f0f0f0; margin-bottom: 10px; }
+        .table-section table { width: 100%; border-collapse: collapse; }
+        .table-section th, .table-section td { border: 1px solid #000; padding: 4px; vertical-align: top; }
+        .table-section th { text-align: center; }
+        .med-row td { height: 35px; }
+        .signature-row td { height: 25px; }
+        .notes-section { margin-top: 15px; }
+        .notes-section table { width: 100%; }
+        .notes-section th { font-size: 9pt; }
+        .notes-section td { height: 50px; }
+        .pain-scale { display: flex; justify-content: space-between; margin-top: 20px; text-align: center; }
+        .pain-scale div { flex-grow: 1; position: relative; }
+        .pain-scale div:first-child { text-align: left; }
+        .pain-scale div:last-child { text-align: right; }
+        .pain-scale .scale-number { display: block; margin-top: 5px; }
+        .pain-scale .label { font-size: 9pt; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); }
+        .footer { text-align: center; font-size: 9pt; margin-top: 20px; }
+        .drug-list { border: 1px solid #000; padding: 10px; margin-bottom: 15px; }
+        .drug-list h3 { text-align: center; margin: 0 0 10px 0; font-size: 11pt; }
+        .drug-list ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; }
+        .drug-list li { width: 48%; margin-right: 2%; margin-bottom: 5px; }
+        .drug-list input[type="checkbox"] { margin-right: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>INDYWIDUALNA KARTA MONITOROWANIA BÓLU I POSTĘPOWANIA PRZECIWBÓLOWEGO</h1>
-    <h2>KARTA ZLECEŃ</h2>
-
-    <div class="patient-info">
-        <h3>Dane Pacjenta</h3>
-        <div>Imię i nazwisko pacjenta: ___________________________</div>
-        <div>Nr historii choroby: ___________________________</div>
-        <div>Sala: ___________________________</div>
+    <div class="header">
+        <p style="font-size: 9pt; margin: 0; text-align: right;">OP 6.3 wyd. 6 zał. 1</p>
+        <h1>INDYWIDUALNA KARTA MONITOROWANIA BÓLU I POSTĘPOWANIA PRZECIWBÓLOWEGO</h1>
+        <h2>KARTA ZLECEŃ</h2>
     </div>
 
+    <div class="info-section">
+        <div style="flex-grow: 1;">Imię i nazwisko pacjenta: ___________________________________________</div>
+        <div style="width: 250px;">Nr historii choroby: ____________________</div>
+        <div style="width: 150px;">Sala: ____________________</div>
+    </div>
+    
     <div class="allergies">
-        <h3>Uczulenie na leki przeciwbólowe</h3>
-        <div>
-            TAK <input type="checkbox"> NIE <input type="checkbox">
-            Jeśli TAK, na jaki lek: ___________________________
+        Uczulenie na leki przeciwbólowe: <input type="checkbox"> TAK <input type="checkbox"> NIE &nbsp;&nbsp;&nbsp;&nbsp; Jeśli TAK, na jaki lek: ___________________________
+    </div>
+
+    <div class="drug-list">
+        <h3>Lista leków - Drabina Analgetyczna</h3>
+        <ul>
+            <li><input type="checkbox"> Paracetamol (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Tramadol (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Ibuprofen (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Morfina (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Ketoprofen (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Fentanyl (dawkowanie: ______)</li>
+            <li><input type="checkbox"> Inne: ______________________</li>
+        </ul>
+    </div>
+
+    <div class="table-section">
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width: 10%;">Lek</th>
+                    <th rowspan="2" style="width: 10%;">Dawkowanie</th>
+                    <th rowspan="2" style="width: 10%;">Droga podania</th>
+                    <th colspan="5">DOBA / DATA</th>
+                </tr>
+                <tr>
+                    <th style="width: 14%;">Data:</th>
+                    <th style="width: 14%;">Data:</th>
+                    <th style="width: 14%;">Data:</th>
+                    <th style="width: 14%;">Data:</th>
+                    <th style="width: 14%;">Data:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="med-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="med-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="med-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="med-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="signature-row">
+                    <td colspan="3" style="text-align: right; font-weight: bold; border-right: none;">Lekarz: Podpis, Data</td>
+                    <td colspan="5" style="border-left: none;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="notes-section">
+        <p style="font-weight: bold; text-align: center; margin: 0; border: 1px solid #000; padding: 5px; background-color: #f0f0f0;">NATĘŻENIE BÓLU W SKALI NUMERYCZNEJ (NRS) PRZED / 30 MIN. PO PODANIU LEKU</p>
+        <table style="margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Data/Godzina</th>
+                    <th style="width: 20%;">/&nbsp;&nbsp;&nbsp;&nbsp;/</th>
+                    <th style="width: 20%;">/&nbsp;&nbsp;&nbsp;&nbsp;/</th>
+                    <th style="width: 20%;">/&nbsp;&nbsp;&nbsp;&nbsp;/</th>
+                    <th style="width: 20%;">/&nbsp;&nbsp;&nbsp;&nbsp;/</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pain-scale">
+        <div style="margin-left: 20px;">brak bólu</div>
+        <div>0</div>
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div style="position: relative;">
+            4
+            <span class="label">ból umiarkowany</span>
         </div>
-    </div>
-
-    <hr>
-
-    <div class="day-section">
-        <h3>DZIEŃ 1</h3>
-        <div>Data: ___________________________</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Lek</th>
-                    <th>Droga podania</th>
-                    <th>Dawkowanie</th>
-                    <th>Godz. podania</th>
-                    <th>Podpis lekarza</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="day-section">
-        <h3>DZIEŃ 2</h3>
-        <div>Data: ___________________________</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Lek</th>
-                    <th>Droga podania</th>
-                    <th>Dawkowanie</th>
-                    <th>Godz. podania</th>
-                    <th>Podpis lekarza</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+        <div>5</div>
+        <div>6</div>
+        <div>7</div>
+        <div>8</div>
+        <div>9</div>
+        <div style="margin-right: 20px;">10<br>najsilniejszy wyobrażalny ból</div>
     </div>
     
-    <div class="day-section">
-        <h3>DZIEŃ 3</h3>
-        <div>Data: ___________________________</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Lek</th>
-                    <th>Droga podania</th>
-                    <th>Dawkowanie</th>
-                    <th>Godz. podania</th>
-                    <th>Podpis lekarza</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+    <div style="margin-top: 20px;">
+        <span style="font-weight: bold;">Objawy niepożądane:</span>
+        <input type="checkbox"> Nudności/Wymioty
+        <input type="checkbox"> Świąd skóry
+        <input type="checkbox"> Ból NRS > 4
+        <input type="checkbox"> Zaburzenia świadomości
+        <input type="checkbox"> Duszność
+        <input type="checkbox"> Blokada czuciowa powyżej Th4
+        <input type="checkbox"> Inne
     </div>
 
-    <div class="day-section">
-        <h3>DZIEŃ 4</h3>
-        <div>Data: ___________________________</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Lek</th>
-                    <th>Droga podania</th>
-                    <th>Dawkowanie</th>
-                    <th>Godz. podania</th>
-                    <th>Podpis lekarza</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="footer">
+        <p style="margin: 0;">Cewnik zewnątrzoponowy: <input type="checkbox"> Ropivacaina. Bupivacaina Dawka: ____ Przepływ: ____ ml/h</p>
     </div>
-    
-    <div class="day-section">
-        <h3>DZIEŃ 5</h3>
-        <div>Data: ___________________________</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Lek</th>
-                    <th>Droga podania</th>
-                    <th>Dawkowanie</th>
-                    <th>Godz. podania</th>
-                    <th>Podpis lekarza</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
 </body>
 </html>
+
