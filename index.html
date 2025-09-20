@@ -10,50 +10,22 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
     :root{
-      /* === POPRAWIONE KOLORY KOLUMN === */
-      --c-ania:#f0fff4;      /* ZMIANA: Różowy -> Zielony */
-      --c-aniaP:#fff1f2;     /* ZMIANA: Zielony -> Różowy */
-      --c-michal:#f0f9ff;
-      --c-michalP:#f5f3ff;
-      --c-wsp:#fffbeb;
-      --c-inne:#f1f5f9;
-      
-      /* === KOLORY KAFELKÓW (z zamianą) === */
-      --k-lask:#a7f3d0;      /* Miętowy */
-      --k-brzeziny:#fde68a;  /* Żółty */
-      --k-ortho:#f9a8d4;     /* Różowy */
-      --k-jb:#c4b5fd;        /* Fiolet */
-      --k-jb24:#7c3aed;      /* Ciemny fiolet */
+      --c-ania:#f0fff4;--c-aniaP:#fff1f2;--c-michal:#f0f9ff;--c-michalP:#f5f3ff;--c-wsp:#fffbeb;--c-inne:#f1f5f9;
+      --k-lask:#a7f3d0;--k-brzeziny:#fde68a;--k-ortho:#f9a8d4;--k-jb:#c4b5fd;--k-jb24:#7c3aed;
     }
-
     *{box-sizing:border-box}
     body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased}
-    
-    /* === NOWY STYL DLA PRZYCISKU IMPORTU === */
-    .file-upload-btn {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        background-color: #f3f4f6;
-        color: #374151;
-        border: 1px solid #d1d5db;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background-color .2s;
-    }
-    .file-upload-btn:hover { background-color: #e5e7eb; }
-    .file-upload-btn svg { margin-right: 0.5rem; }
-    #csvFileName { font-size: 0.8rem; color: #6b7280; margin-left: 0.75rem; }
-
-    /* Reszta stylów bez zmian... */
+    .file-upload-btn{display:inline-flex;align-items:center;padding:.5rem 1rem;background-color:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:.5rem;cursor:pointer;font-weight:600;transition:background-color .2s}
+    .file-upload-btn:hover{background-color:#e5e7eb}
+    .file-upload-btn svg{margin-right:.5rem}
+    #csvFileName{font-size:.8rem;color:#6b7280;margin-left:.75rem}
     .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
     .view-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
     .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
     .sumbar{display:flex;gap:.5rem;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem}
     .chip{display:inline-flex;gap:.35rem;align-items:center;border:1px solid #e5e7eb;background:#f9fafb;border-radius:9999px;padding:.3rem .55rem;font-size:.82rem}
     .dot{width:.55rem;height:.55rem;border-radius:9999px}
-    @media (max-width:768px){ .sumbar{display:none} }
+    @media (max-width:768px){.sumbar{display:none}}
     .grid{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid #e5e7eb}
     .cell{border-bottom:1px solid #e5e7eb;border-left:1px solid #e5e7eb;min-height:60px;position:relative;padding:4px}
     .cell:nth-child(7n+1){border-left:none}
@@ -66,71 +38,37 @@
     .off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
     .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;transition:transform .12s;position:relative;z-index:2}
     .fld:hover{transform:translateY(-1px)}
-    .selected{outline:2px solid #8b5cf6}
-    .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)}
-    .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)}
-    .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
-    .tile-ortho{background:var(--k-ortho)!important;font-weight:600}
-    .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600}
-    .tile-lask{background:var(--k-lask)!important;font-weight:600}
-    .tile-jb{background:var(--k-jb)!important;font-weight:600}
-    .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
+    .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)} .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)} .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
+    .tile-ortho{background:var(--k-ortho)!important;font-weight:600} .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600} .tile-lask{background:var(--k-lask)!important;font-weight:600} .tile-jb{background:var(--k-jb)!important;font-weight:600} .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
     .mcal{display:none;padding:.75rem}
     @media (max-width:768px){
-      .grid{display:none}
-      .mcal{display:block}
+      .grid{display:none} .mcal{display:block}
       .m-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:.85rem;margin-bottom:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.05)}
       .m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
-      .m-num{font-size:1.25rem;font-weight:800;color:#1f2937}
-      .m-name{font-size:.8rem;color:#6b7280}
-      .tag{font-size:.7rem;border-radius:999px;padding:.15rem .45rem}
-      .m-row{display:flex;gap:.5rem;align-items:stretch;margin:.3rem 0}
-      .m-label{flex:0 0 86px;border-radius:10px;padding:.45rem .5rem;font-weight:600;color:#334155}
-      .m-content{flex:1;border-radius:10px;padding:.45rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:36px;display:flex;align-items:center}
+      .m-num{font-size:1.25rem;font-weight:800;color:#1f2937} .m-name{font-size:.8rem;color:#6b7280} .tag{font-size:.7rem;border-radius:999px;padding:.15rem .45rem}
+      .m-row{display:flex;gap:.5rem;align-items:stretch;margin:.3rem 0} .m-label{flex:0 0 86px;border-radius:10px;padding:.45rem .5rem;font-weight:600;color:#334155} .m-content{flex:1;border-radius:10px;padding:.45rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:36px;display:flex;align-items:center}
       .m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.92rem}
     }
-    #compact{display:none;padding:1rem}
-    .cv-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:12px;padding:12px;cursor:pointer;transition:all .2s}
-    .cv-card:hover{transform:translateY(-2px);box-shadow:0 4px 6px rgba(0,0,0,.1)}
-    .cv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
-    .cv-item{padding:8px;border-radius:10px;font-size:.85rem}
-    #month{display:none;padding:1rem}
-    .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-    .mh{background:#f9fafb;padding:.6rem;text-align:center;font-weight:700;color:#6b7280}
-    .mc{background:#fff;min-height:96px;padding:.4rem;cursor:pointer;position:relative}
-    .mc.week::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
-    .mnum{font-weight:700;color:#374151;margin-bottom:.25rem;position:relative;z-index:2}
-    .mitem{font-size:.68rem;padding:2px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:2}
     #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.1);padding:6px;display:none;z-index:1000}
-    .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px}
-    .ctx-it:hover{background:#f3f4f6}
+    .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px} .ctx-it:hover{background:#f3f4f6}
     #edit{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px}
-    .edit-body{
-      background:#fff;border-radius:18px;width:min(720px,100%);max-height:86vh;overflow:auto;
-      padding:0;display:flex;flex-direction:column;
-    }
-    .edit-head{
-      position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #f3f4f6;
-      display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;border-top-left-radius:18px;border-top-right-radius:18px;
-    }
+    .edit-body{background:#fff;border-radius:18px;width:min(720px,100%);max-height:86vh;overflow:hidden;padding:0;display:flex;flex-direction:column}
+    .edit-head{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;border-top-left-radius:18px;border-top-right-radius:18px}
     .edit-title{font-weight:800;color:#0f172a;font-size:1.1rem}
     .edit-close{margin-left:auto;flex-shrink:0;width:36px;height:36px;border-radius:10px;border:1px solid #e5e7eb;background:#f8fafc}
     .edit-close:hover{background:#eef2ff;border-color:#c7d2fe}
-    .edit-content{padding:1rem 1rem 1.25rem}
-    @supports (padding: env(safe-area-inset-bottom)){
-      @media (max-width:768px){
+    .edit-content{padding:1rem 1rem 1.25rem; overflow-y: auto;}
+    .edit-foot{padding: .75rem 1rem; border-top: 1px solid #f3f4f6; background: #f8fafc; display:flex; justify-content:flex-end; gap: .5rem; border-bottom-left-radius:18px;border-bottom-right-radius:18px;}
+    @media (max-width:768px){
         #edit{align-items:flex-end}
         .edit-body{width:100%;max-height:90vh;border-bottom-left-radius:0;border-bottom-right-radius:0}
         .edit-head{padding-top:calc(1rem + env(safe-area-inset-top))}
-        .edit-content{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
-      }
+        .edit-foot{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
     }
-    #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;
-      background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;border:none;border-radius:9999px;padding:.7rem .95rem;font-weight:800}
+    #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;border:none;border-radius:9999px;padding:.7rem .95rem;font-weight:800}
     #fab svg{width:18px;height:18px}
-    @media (max-width:768px){ #fab{display:inline-flex} }
-    #sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;
-      box-shadow:0 -12px 24px rgba(0,0,0,.2);transform:translateY(110%);transition:transform .22s ease-out;z-index:1200}
+    @media (max-width:768px){#fab{display:inline-flex}}
+    #sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -12px 24px rgba(0,0,0,.2);transform:translateY(110%);transition:transform .22s ease-out;z-index:1200}
     #sheet.open{transform:translateY(0)}
   </style>
 </head>
@@ -138,63 +76,46 @@
   <header class="hdr">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow">
-          <span class="text-white font-black">🌸</span>
-        </div>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow"><span class="text-white font-black">🌸</span></div>
         <div>
           <div class="font-extrabold text-slate-900">Rodzina Fedorczak</div>
           <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
         </div>
       </div>
-
       <div class="flex items-center gap-2 flex-wrap">
         <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
         <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
         <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
         <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
-        <div class="flex gap-1 border border-gray-200 rounded-xl p-1">
-          <button id="v-standard" class="view-btn active" data-v="standard" title="Widok normalny">▦</button>
-          <button id="v-compact"  class="view-btn" data-v="compact"  title="Widok kompaktowy">≡</button>
-          <button id="v-month"    class="view-btn" data-v="month"    title="Widok miesięczny">▤</button>
-        </div>
-        
         <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
             <input type="file" id="csvFileInput" accept=".csv" class="hidden">
-            <label for="csvFileInput" class="file-upload-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
-                Importuj do tego miesiąca
-            </label>
+            <label for="csvFileInput" class="file-upload-btn"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>Wybierz plik...</label>
             <span id="csvFileName"></span>
-            
-            <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść</button>
-            <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj</button>
+            <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
+            <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść miesiąc</button>
+            <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj .ics</button>
         </div>
-
       </div>
     </div>
   </header>
-
   <div class="sumbar">
     <span class="chip"><span class="dot" style="background:var(--k-ortho)"></span> Ortho: <b id="sum-ortho">0h</b></span>
     <span class="chip"><span class="dot" style="background:var(--k-brzeziny)"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
     <span class="chip"><span class="dot" style="background:var(--k-lask)"></span> Łask: <b id="sum-lask">0h</b></span>
     <span class="chip"><span class="dot" style="background:var(--k-jb)"></span> JB: <b id="sum-jb">0h</b></span>
+    <span class="chip"><span class="dot" style="background:#8b5cf6"></span> Łącznie godzin: <b id="sum-total-hours">0h</b></span>
     <span class="chip"><span class="dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
+    <span class="chip"><span class="dot" style="background:#fcd34d"></span> Jednodniówki: <b id="sum-jednodniowki">0</b></span>
+    <span class="chip"><span class="dot" style="background:#818cf8"></span> Kwalifikacje: <b id="sum-kwalifikacje">0</b></span>
+    <span class="chip"><span class="dot" style="background:#f87171"></span> Komercja: <b id="sum-komercja">0</b></span>
     <span class="chip"><span class="dot" style="background:#6ee7b7"></span> 💰 Zarobki: <b id="sum-earnings">0 zł</b></span>
   </div>
-
   <main class="w-full bg-white flex flex-col flex-grow">
     <div id="standard" class="flex-1 flex flex-col">
       <div id="desk-wrap" class="overflow-auto hidden md:block flex-1">
         <div class="bg-white border-t min-w-[900px]">
           <div class="grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
-            <div class="cell header p-3">Dzień</div>
-            <div class="cell header p-3 c-ania">Ania</div>
-            <div class="cell header p-3 c-aniaP">Ania Praca</div>
-            <div class="cell header p-3 c-michal">Michał</div>
-            <div class="cell header p-3 c-michalP">Michał Praca</div>
-            <div class="cell header p-3 c-wsp">Wspólne</div>
-            <div class="cell header p-3 c-inne">Dom/Finanse</div>
+            <div class="cell header p-3">Dzień</div><div class="cell header p-3 c-ania">Ania</div><div class="cell header p-3 c-aniaP">Ania Praca</div><div class="cell header p-3 c-michal">Michał</div><div class="cell header p-3 c-michalP">Michał Praca</div><div class="cell header p-3 c-wsp">Niania</div><div class="cell header p-3 c-inne">Inne</div>
           </div>
           <div id="desk" class="grid"></div>
         </div>
@@ -202,404 +123,453 @@
       <div id="mob" class="mcal md:hidden"></div>
     </div>
   </main>
-
-  <div id="compact" style="display:none"><div id="cv-cont" class="p-1"></div></div>
-  <div id="month" style="display:none"><div id="mgrid" class="mgrid"></div></div>
   <button id="fab" aria-label="Pokaż podsumowanie"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3v18"/></svg>Suma</button>
-  <div id="sheet"><div class="w-full p-4"><div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-2"></div><div id="sheet-title" class="text-sm text-gray-500 mb-2">Podsumowanie</div><div class="grid grid-cols-2 gap-2"><div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Ortho</div><div id="ms-ortho" class="text-lg font-bold">0h</div></div><div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Brzeziny</div><div id="ms-brzeziny" class="text-lg font-bold">0h</div></div><div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Łask</div><div id="ms-lask" class="text-lg font-bold">0h</div></div><div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">JB</div><div id="ms-jb" class="text-lg font-bold">0h</div></div><div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Porty</div><div id="ms-ports" class="text-lg font-bold">0</div></div><div class="p-3 rounded-lg border border-gray-200 bg-emerald-50 col-span-2"><div class="text-xs text-gray-500">💰 Zarobki</div><div id="ms-earnings" class="text-lg font-bold">0 zł</div></div></div><div class="mt-3 text-right"><button id="sheet-close" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button></div></div></div>
+  <div id="sheet">
+    <div class="w-full p-4">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-2"></div>
+      <div id="sheet-title" class="text-sm text-gray-500 mb-2">Podsumowanie</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Ortho</div><div id="ms-ortho" class="text-lg font-bold">0h</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Brzeziny</div><div id="ms-brzeziny" class="text-lg font-bold">0h</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Łask</div><div id="ms-lask" class="text-lg font-bold">0h</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">JB</div><div id="ms-jb" class="text-lg font-bold">0h</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-purple-50 col-span-2"><div class="text-xs text-gray-500">∑ Łącznie godzin</div><div id="ms-total-hours" class="text-lg font-bold">0h</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Porty</div><div id="ms-ports" class="text-lg font-bold">0</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Jednodniówki</div><div id="ms-jednodniowki" class="text-lg font-bold">0</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Kwalifikacje</div><div id="ms-kwalifikacje" class="text-lg font-bold">0</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Komercja</div><div id="ms-komercja" class="text-lg font-bold">0</div></div>
+        <div class="p-3 rounded-lg border border-gray-200 bg-emerald-50 col-span-2"><div class="text-xs text-gray-500">💰 Zarobki</div><div id="ms-earnings" class="text-lg font-bold">0 zł</div></div>
+      </div>
+      <div class="mt-3 text-right"><button id="sheet-close" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button></div>
+    </div>
+  </div>
   <div id="ctx"><div id="ctx-copy" class="ctx-it">Kopiuj</div><div id="ctx-cut" class="ctx-it">Wytnij</div><div id="ctx-paste" class="ctx-it">Wklej</div><div class="h-px bg-gray-200 my-1"></div><div id="ctx-del" class="ctx-it text-red-600">Usuń</div></div>
-  <div id="edit"><div class="edit-body"><div class="edit-head"><h3 id="edit-title" class="edit-title">Edycja dnia</h3><button id="edit-close" class="edit-close">✕</button></div><div id="edit-fields" class="edit-content"></div></div></div>
+  <div id="edit">
+    <div class="edit-body">
+      <div class="edit-head"><h3 id="edit-title" class="edit-title">Edycja</h3><button id="edit-close" class="edit-close">✕</button></div>
+      <div id="edit-content" class="edit-content"></div>
+      <div class="edit-foot"><button id="edit-save" class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Zapisz i zamknij</button></div>
+    </div>
+  </div>
 
   <script type="module">
-    /* ===== Firebase ===== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDocs, getDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const cfg = {
-      apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
-      authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com",
-      projectId:"kalendarz-rodzinny-68d04",
-      storageBucket:"kalendarz-rodzinny-68d04.appspot.com",
-      messagingSenderId:"1050937545151",
-      appId:"1:1050937545151:web:a85fd1a5f066f4a499910a",
-      measurementId:"G-57YKE2XKQ1"
-    };
+    const cfg = { apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ", authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com", projectId:"kalendarz-rodzinny-68d04", storageBucket:"kalendarz-rodzinny-68d04.appspot.com", messagingSenderId:"1050937545151", appId:"1:1050937545151:web:a85fd1a5f066f4a499910a", measurementId:"G-57YKE2XKQ1"};
+    let db; try{ const app=initializeApp(cfg); const auth=getAuth(app); db=getFirestore(app); signInAnonymously(auth); onAuthStateChanged(auth, u=>u && init()); } catch(e){ console.error(e); }
 
-    let db;
-    try{
-      const app = initializeApp(cfg);
-      const auth = getAuth(app);
-      db = getFirestore(app);
-      signInAnonymously(auth);
-      onAuthStateChanged(auth, u => u && init());
-    }catch(e){ console.error(e); }
-
-    /* ===== Stan ===== */
-    let cur = new Date();
-    let unsub = () => {};
-    let isMobile = matchMedia("(max-width: 768px)").matches;
-    const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
-    const labels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
-    let data = {};
-    let clip = null;
-
-    const el = id => document.getElementById(id);
-    const E = {
-      title: el('title'), prev: el('prev'), next: el('next'), today: el('today'),
-      vStandard: el('v-standard'), vCompact: el('v-compact'), vMonth: el('v-month'),
-      desk: el('desk'), mob: el('mob'),
-      sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'), sumEarnings: el('sum-earnings'),
-      msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'), msEarnings: el('ms-earnings'),
-      sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'),
-      ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
-      edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title'),
-      importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), csvFileName: el('csvFileName'),
-      clearMonthBtn: el('clearMonthBtn'), exportIcsBtn: el('exportIcsBtn')
-    };
-
-    window.addEventListener('resize', ()=>{ const was = isMobile; isMobile = matchMedia("(max-width: 768px)").matches; if (was!==isMobile) update(); });
-
-    /* ===== Nazwy i Stawki ===== */
-    const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
-    const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
-    const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
-    const getDayIdx = d => (d + 6) % 7;
-    const hourlyRates = { brzeziny: 400, ortho: 400, jb: 220, lask: 190 };
-    const portRates = { install: 731, remove: 386 };
-
-    /* ===== Typy i kafelki ===== */
-    const jb24 = ['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń'];
-    const isOrtho = t => /ortho/i.test(t||'');
-    const isBrzeziny = t => /brzeziny/i.test(t||'');
-    const isLask = t => /łask/i.test(t||'');
-    const isJB = t => !!(t&&(t.toLowerCase().startsWith('jb')||t.toLowerCase().includes('jb ')));
-
-    const getFieldClass = (field) => ({ aniaPraca:'c-aniaP', michalPraca:'c-michalP', wspolne:'c-wsp' }[field] || `c-${field}`);
-
-    const getTileClass = t=>{
-      if(!t) return '';
-      const s=t.toLowerCase();
-      if(jb24.some(k=>s.includes(k))) return 'tile-jb24';
-      if(isLask(s)) return 'tile-lask';
-      if(isOrtho(s)) return 'tile-ortho';
-      if(isBrzeziny(s)) return 'tile-brzeziny';
-      if(s.startsWith('jb')) return 'tile-jb';
-      return '';
-    };
-
-    /* ===== Godziny i Porty (gettery) ===== */
-    const getDefaultHours = (txt)=>{
-      if(!txt) return 0;
-      const s = txt.toLowerCase();
-      if(isOrtho(s)||isBrzeziny(s)) return 10;
-      if(isLask(s)) return 24;
-      if(jb24.some(k=>s.includes(k))) return 24;
-      if(/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6;
-      if(isJB(s)) return 6;
-      return 0;
-    };
-    const getSavedHours = (day, field)=> (data[day] && typeof data[day][`hours_${field}`] === 'number') ? data[day][`hours_${field}`] : null;
-    const getPorts = (day, field, type) => (data[day] && typeof data[day][`ports_${type}_${field}`] === 'number') ? data[day][`ports_${type}_${field}`] : 0;
-    const effHours = (day, field, txt)=>{
-      const saved = getSavedHours(day, field);
-      return saved !== null ? saved : getDefaultHours(txt);
-    };
-
-    /* ===== Renderowanie ===== */
-    const renderDesktop = (y,m,ev)=>{
-      E.desk.innerHTML='';
-      const days = new Date(y,m+1,0).getDate();
-      for(let d=1; d<=days; d++){
-        const date = new Date(y,m,d);
-        const de = ev[d]||{};
-        const dayCell = document.createElement('div');
-        dayCell.className = `cell day-cell ${((date.getDay()===0||date.getDay()===6)||de.isHoliday)?'off':''} ${(new Date().toDateString()===date.toDateString())?'today':''} flex items-center justify-center`;
-        dayCell.dataset.day=d;
-        dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(date.getDay())]}</div></div>`;
-        E.desk.appendChild(dayCell);
-        for(const f of fields){
-          const t = de[f]||'';
-          const c = document.createElement('div');
-          c.className = `cell ${((date.getDay()===0||date.getDay()===6)||de.isHoliday)?'off':''} ${getFieldClass(f)}`;
-          const div = document.createElement('div');
-          div.className = `fld ${getTileClass(t)}`;
-          div.dataset.day=d; div.dataset.field=f;
-          div.innerHTML = `<span class="txt">${t}</span>`;
-          c.appendChild(div); E.desk.appendChild(c);
-        }
-      }
-    };
-    const renderMobile = (y,m,ev)=>{/* ... skrócone dla zwięzłości ... */};
+    let cur = new Date(); let unsub=()=>{}; let isMobile=matchMedia("(max-width: 768px)").matches;
+    const fields=['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
+    const labels={ania:'Ania',aniaPraca:'Ania Praca',michal:'Michał',michalPraca:'Michał Praca',wspolne:'Niania',inne:'Inne'};
+    let data={}; let clip=null;
+    const el=id=>document.getElementById(id);
+    const E={title:el('title'),prev:el('prev'),next:el('next'),today:el('today'),desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'),sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'),sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'),sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'),msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'),msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'),msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'),sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),editTitle:el('edit-title'),editSave:el('edit-save'),importBtn:el('importBtn'),csvFileInput:el('csvFileInput'),csvFileName:el('csvFileName'),clearMonthBtn:el('clearMonthBtn'),exportIcsBtn:el('exportIcsBtn')};
     
-    /* ===== Sumy i Zarobki ===== */
-    const computeSumsAndEarnings = ()=>{
-      let ortho=0, brz=0, lask=0, jb=0, portsInstall=0, portsRemove=0, earnings = 0;
-      const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();
-      for(let d=1; d<=days; d++){
-        const row=data[d]; if(!row) continue;
-        for(const f of fields){
-          const t=row[f];
-          if (t) {
-              const h=effHours(d,f,t);
-              if(isOrtho(t)) { ortho+=h; earnings += h * hourlyRates.ortho; }
-              if(isBrzeziny(t)) { brz+=h; earnings += h * hourlyRates.brzeziny; }
-              if(isLask(t)) { lask+=h; earnings += h * hourlyRates.lask; }
-              if(isJB(t)) { jb+=h; earnings += h * hourlyRates.jb; }
-          }
-          if(f==='michalPraca') {
-              const pInstall = getPorts(d, f, 'install');
-              const pRemove = getPorts(d, f, 'remove');
-              portsInstall += pInstall;
-              portsRemove += pRemove;
-              earnings += (pInstall * portRates.install) + (pRemove * portRates.remove);
-          }
-        }
-      }
-      const totalPorts = portsInstall + portsRemove;
-      E.sumOrtho.textContent=ortho+'h'; E.sumBrz.textContent=brz+'h'; E.sumLask.textContent=lask+'h'; E.sumJB.textContent=jb+'h'; E.sumPorts.textContent=String(totalPorts);
-      E.sumEarnings.textContent = `${earnings.toLocaleString('pl-PL')} zł`;
-      E.msOrtho.textContent=ortho+'h'; E.msBrz.textContent=brz+'h'; E.msLask.textContent=lask+'h'; E.msJB.textContent=jb+'h'; E.msPorts.textContent=String(totalPorts);
-      E.msEarnings.textContent = `${earnings.toLocaleString('pl-PL')} zł`;
-      E.sheetTitle.textContent=`Podsumowanie: ${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
-    };
-
-    /* ===== DB helpers ===== */
-    const calId = ()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
-    const save = (day,field,val)=> setDoc(doc(db, calId(), String(day)), { [field]: val }, { merge:true });
-    const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
-    const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
-    const setPortsDb = (day,field,count,type)=> setDoc(doc(db, calId(), String(day)), { [`ports_${type}_${field}`]: (count===''||count===null)? deleteField() : parseInt(count,10) }, { merge:true });
-
-    /* ===== Modal edycji ===== */
-    function openEdit(day, dayRow, singleField = null){
-      const date=new Date(cur.getFullYear(),cur.getMonth(),day);
-      const title = singleField ? `${labels[singleField]} — ${day} ${mNames[cur.getMonth()]}` : `${day} ${mNames[cur.getMonth()]} — ${dNamesFull[getDayIdx(date.getDay())]}`;
-      E.editTitle.textContent = title;
-      E.editFields.innerHTML='';
-
-      const fieldsToRender = singleField ? [singleField] : fields;
-      for(const f of fieldsToRender){
-        const txt = (dayRow&&dayRow[f])||'';
-        const savedH = getSavedHours(day,f);
-        const defH = getDefaultHours(txt);
-        const portsInstall = getPorts(day,f,'install');
-        const portsRemove = getPorts(day,f,'remove');
-
-        const wrap=document.createElement('div');
-        wrap.className = "mb-4 pb-4 border-b last:border-b-0";
-        wrap.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-1 rounded-md ${getFieldClass(f)} text-slate-700 font-semibold">${labels[f]}</span>
-            <button class="ml-auto text-red-500 hover:text-red-600" data-act="del" data-field="${f}" title="Usuń wpis">Usuń</button>
-          </div>
-          <input type="text" class="w-full mt-2 p-3 border border-gray-200 rounded-lg ${getTileClass(txt)}" data-field="${f}" value="${txt}" placeholder="Kliknij aby dodać">
-          <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
-            <div>
-              <label class="text-xs text-gray-500">Godziny (puste = auto)</label>
-              <input type="range" min="0" max="48" step="1" value="${savedH!==null?savedH:defH}" data-field="${f}" data-hrs="slider" class="w-full">
-            </div>
-            <input type="number" min="0" max="48" step="1" value="${savedH!==null?savedH:''}" placeholder="${defH}" data-field="${f}" data-hrs="num" class="w-20 p-2 border border-gray-200 rounded-md text-center">
-          </div>
-          ${f==='michalPraca' ? `
-          <div class="mt-2 grid grid-cols-2 gap-3">
-            <div>
-                <label class="text-xs text-gray-500">Porty (założenie)</label>
-                <input type="number" min="0" step="1" value="${portsInstall||''}" placeholder="0" data-field="${f}" data-ports="install" class="w-full p-2 border border-gray-200 rounded-md text-center">
-            </div>
-            <div>
-                <label class="text-xs text-gray-500">Porty (usunięcie)</label>
-                <input type="number" min="0" step="1" value="${portsRemove||''}" placeholder="0" data-field="${f}" data-ports="remove" class="w-full p-2 border border-gray-200 rounded-md text-center">
-            </div>
-          </div>`:''}
-        `;
-        E.editFields.appendChild(wrap);
-      }
-      
-      // Listenery
-      E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>inp.addEventListener('change', async e => save(day,e.target.dataset.field,e.target.value.trim())));
-      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>sl.addEventListener('input', e => {
-          const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${e.target.dataset.field}"]`);
-          num.value = (parseInt(e.target.value,10)===getDefaultHours((data[day]||{})[e.target.dataset.field]||''))? '' : e.target.value;
-      }));
-      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>sl.addEventListener('change', async e => setHours(day, e.target.dataset.field, E.editFields.querySelector(`input[data-hrs="num"][data-field="${e.target.dataset.field}"]`).value)));
-      E.editFields.querySelectorAll('input[data-hrs="num"]').forEach(num=>num.addEventListener('change', async e => {
-          const f=e.target.dataset.field;
-          E.editFields.querySelector(`input[data-hrs="slider"][data-field="${f}"]`).value = (e.target.value===''? getDefaultHours((data[day]||{})[f]||'') : e.target.value);
-          await setHours(day,f,e.target.value);
-      }));
-      E.editFields.querySelectorAll('input[data-ports]').forEach(p=>p.addEventListener('change', async e => setPortsDb(day,e.target.dataset.field,e.target.value, e.target.dataset.ports)));
-      E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>b.addEventListener('click', async e => {
-          const f = e.target.dataset.field; await del(day,f);
-          const row={...(data[day]||{})}; delete row[f]; openEdit(day,row, singleField);
-      }));
-
-      E.edit.style.display='flex';
-    }
-    E.editClose.onclick=()=>E.edit.style.display='none';
-    E.edit.addEventListener('click',e=>{ if(e.target===E.edit) E.edit.style.display='none'; });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.edit.style.display === 'flex') E.edit.style.display = 'none'; });
-
-    /* ===== Context Menu i Kliknięcia ===== */
-    document.addEventListener('contextmenu', e=>{/*...*/});
-    document.addEventListener('click', e=>{ if(!e.target.closest('#ctx')) E.ctx.style.display='none'; });
-    E.ctxCopy.onclick=()=>{/*...*/}; E.ctxCut.onclick=()=>{/*...*/}; E.ctxPaste.onclick=()=>{/*...*/}; E.ctxDel.onclick=()=>{/*...*/};
-    E.desk.addEventListener('click', e=>{
-      const dayCell = e.target.closest('.day-cell'); 
-      if(dayCell){ toggleHoliday(dayCell.dataset.day); return; }
-      const fld = e.target.closest('.fld'); 
-      if(fld) openEdit(fld.dataset.day, data[fld.dataset.day]||{}, fld.dataset.field);
-    });
-    E.mob.addEventListener('click', e=>{/*...*/});
-    async function toggleHoliday(day){/*...*/};
-
-    /* ===== Update/render ===== */
-    function setTitle(){ E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; }
-    async function update(){
-      if(!db) return;
-      setTitle();
-      const id=calId(); const snap=await getDocs(collection(db,id));
-      data={}; snap.forEach(d=>data[d.id]=d.data());
-      isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
-      computeSumsAndEarnings();
-      unsub();
-      unsub = onSnapshot(collection(db,id), s=>{
-        s.docChanges().forEach(ch=>{
-          if(ch.type==='removed'){ delete data[ch.doc.id]; }
-          else { data[ch.doc.id]=ch.doc.data(); }
-        });
-        isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
-        computeSumsAndEarnings();
-      });
-    }
+    window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
     
-    /* ===== Nawigacja ===== */
-    E.prev.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()-1); update(); };
-    E.next.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()+1); update(); };
-    E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
+    const mNames=['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+    const dNamesFull=['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela']; const dShort=['PN','WT','ŚR','CZ','PT','SB','ND'];
+    const getDayIdx=d=>(d+6)%7;
+    const hourlyRates={brzeziny:400,ortho:400,jb:220,lask:190};
+    const portRates={install:731,remove:386};
+    const endoRates={one_day:200,qual:80};
+    const komercjaRate = 500;
+    const ZASTEPCA_ORDYNATORA_BONUS = 4000;
 
-    /* ===== Zarządzanie Danymi (Import, Czyszczenie, Eksport) ===== */
-    async function importData(lines) {
-        const year = cur.getFullYear();
-        const month = cur.getMonth() + 1;
-        const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
-        if (!confirm(`Czy na pewno chcesz zaimportować dane do ${mNames[month-1]} ${year}?`)) return;
-        
-        const daysInMonth = new Date(year, month, 0).getDate();
-        for (let i = 0; i < lines.length && i < daysInMonth; i++) {
-            const day = i + 1;
-            const columns = lines[i];
-            const dataToSave = {}; let hasData = false;
-            for (let j = 0; j < columnMapping.length; j++) {
-                if (j < columns.length && columns[j]) {
-                    dataToSave[columnMapping[j]] = String(columns[j]).trim().replace(/"/g, '');
-                    hasData = true;
+    const jb24=['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń'];
+    const isOrtho=t=>/ortho/i.test(t||''); const isBrzeziny=t=>/brzeziny/i.test(t||''); const isLask=t=>/łask/i.test(t||''); const isJB=t=>!!(t&&(t.toLowerCase().startsWith('jb')||t.toLowerCase().includes('jb ')));
+
+    const getFieldClass=(field)=>({aniaPraca:'c-aniaP',michalPraca:'c-michalP',wspolne:'c-wsp'}[field]||`c-${field}`);
+    const getTileClass=t=>{ if(!t)return''; const s=t.toLowerCase(); if(jb24.some(k=>s.includes(k)))return'tile-jb24'; if(isLask(s))return'tile-lask'; if(isOrtho(s))return'tile-ortho'; if(isBrzeziny(s))return'tile-brzeziny'; if(s.startsWith('jb'))return'tile-jb'; return''; };
+    
+    const getDefaultHours = (txt) => {
+        if (!txt) return 0; const s = txt.toLowerCase();
+        if (isOrtho(s) || isBrzeziny(s)) return 10; if (isLask(s)) return 24; if (jb24.some(k => s.includes(k))) return 24; if (/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6; if (isJB(s)) return 6; return 0;
+    };
+    const getEntryProp = (day, field, prop, fallback) => (data[day]?.[field]?.[prop]) ?? fallback;
+    const getEntryText = (day, field) => { const entry = data[day]?.[field]; return typeof entry === 'object' ? entry.text || '' : entry || ''; };
+
+    const renderDesktop=(y,m,ev)=>{E.desk.innerHTML=''; const days=new Date(y,m+1,0).getDate(); const today=new Date(); for(let d=1; d<=days; d++){ const date=new Date(y,m,d); const dow=date.getDay(); const isToday=today.toDateString()===date.toDateString(); const de=ev[d]||{}; const off=(dow===0||dow===6)||de.isHoliday; const dayCell=document.createElement('div'); dayCell.className=`cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`; dayCell.dataset.day=d; dayCell.innerHTML=`<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`; E.desk.appendChild(dayCell); for(const f of fields){ const t=getEntryText(d,f); const c=document.createElement('div'); c.className=`cell ${off?'off':''} ${getFieldClass(f)}`; const div=document.createElement('div'); div.className=`fld ${getTileClass(t)}`; div.dataset.day=d; div.dataset.field=f; const span=document.createElement('span'); span.className='txt'; span.textContent=t; div.appendChild(span); c.appendChild(div); E.desk.appendChild(c); }}};
+    const renderMobile=(y,m,ev)=>{E.mob.innerHTML=''; const days=new Date(y,m+1,0).getDate(); const today=new Date(); const frag=document.createDocumentFragment(); for(let d=1; d<=days; d++){ const date=new Date(y,m,d); const dow=date.getDay(); const de=ev[d]||{}; const off=(dow===0||dow===6)||de.isHoliday; const isToday=today.toDateString()===date.toDateString(); const card=document.createElement('div'); card.className=`m-card ${off?'ring-0':''} ${isToday?'ring-2 ring-purple-400':''}`; let html=`<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div><div class="flex gap-1">${de.isHoliday?'<span class="tag bg-purple-200 text-purple-700">Święto</span>':''}${isToday?'<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>':''}</div></div>`; for(const f of fields){ const t=getEntryText(d, f); html+=`<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div><div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}"><span class="txt">${t||'<span class="text-gray-400">Kliknij aby dodać</span>'}</span></div></div>`; } card.innerHTML=html; frag.appendChild(card); } E.mob.appendChild(frag);};
+
+    const computeSumsAndEarnings = () => {
+        let sums = { ortho: 0, brz: 0, lask: 0, jb: 0, portsInstall: 0, portsRemove: 0, earnings: 0, jednodniowki: 0, kwalifikacje: 0, komercja: 0 };
+        const days = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
+        const calculateEarningsForText = (text, hours) => {
+            if (!text || !hours) return 0;
+            if (isOrtho(text)) return hours * hourlyRates.ortho;
+            if (isBrzeziny(text)) return hours * hourlyRates.brzeziny;
+            if (isLask(text)) return hours * hourlyRates.lask;
+            if (isJB(text)) return hours * hourlyRates.jb;
+            return 0;
+        };
+        const sumHoursForText = (text, hours, target) => {
+            if (!text || !hours) return;
+            if (isOrtho(text)) target.ortho += hours; else if (isBrzeziny(text)) target.brz += hours; else if (isLask(text)) target.lask += hours; else if (isJB(text)) target.jb += hours;
+        };
+
+        for (let d = 1; d <= days; d++) {
+            const dayData = data[d]; if (!dayData) continue;
+            for (const f of fields) {
+                const entry = dayData[f]; if (!entry) continue;
+                if (typeof entry === 'object') {
+                    const textParts = (entry.text || '').split('/').map(t => t.trim());
+                    const h1 = entry.h1 || 0, h2 = entry.h2 || 0;
+                    sumHoursForText(textParts[0], h1, sums);
+                    sums.earnings += calculateEarningsForText(textParts[0], h1);
+                    if (textParts.length > 1) {
+                        sumHoursForText(textParts[1], h2, sums);
+                        sums.earnings += calculateEarningsForText(textParts[1], h2);
+                    }
+                } else { // Legacy string entry
+                    const hours = getDefaultHours(entry);
+                    sumHoursForText(entry, hours, sums);
+                    sums.earnings += calculateEarningsForText(entry, hours);
+                }
+                if (f === 'michalPraca') {
+                    sums.portsInstall += getEntryProp(d, f, 'ports_i', 0);
+                    sums.portsRemove += getEntryProp(d, f, 'ports_r', 0);
+                    sums.jednodniowki += getEntryProp(d, f, 'endo_od', 0);
+                    sums.kwalifikacje += getEntryProp(d, f, 'endo_q', 0);
+                    sums.komercja += getEntryProp(d, f, 'komercja', 0);
                 }
             }
-            if (hasData) await setDoc(doc(db, `${year}-${month}`, String(day)), dataToSave, { merge: true });
         }
-        alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane.`);
-        update();
-    }
-    E.csvFileInput.addEventListener('change', () => {
-        const file = E.csvFileInput.files[0];
-        if (file) {
-            E.csvFileName.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
-        } else {
-            E.csvFileName.textContent = '';
-        }
-    });
-    E.importBtn.addEventListener('click', () => {
-        const file = E.csvFileInput.files[0];
-        if (!file) { alert("Najpierw wybierz plik CSV, klikając 'Importuj do tego miesiąca'."); return; }
-        Papa.parse(file, { encoding: "UTF-8", complete: res => importData(res.data) });
-    });
+        sums.earnings += (sums.portsInstall * portRates.install) + (sums.portsRemove * portRates.remove);
+        sums.earnings += sums.jednodniowki * endoRates.one_day;
+        sums.earnings += sums.kwalifikacje * endoRates.qual;
+        sums.earnings += sums.komercja * komercjaRate;
+        sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
+
+        const totalPorts = sums.portsInstall + sums.portsRemove;
+        const totalHours = sums.ortho + sums.brz + sums.lask + sums.jb;
+
+        E.sumOrtho.textContent=`${sums.ortho}h`; E.sumBrz.textContent=`${sums.brz}h`; E.sumLask.textContent=`${sums.lask}h`; E.sumJB.textContent=`${sums.jb}h`; E.sumTotalHours.textContent=`${totalHours}h`;
+        E.sumPorts.textContent=String(totalPorts);
+        E.sumJednodniowki.textContent=String(sums.jednodniowki);
+        E.sumKwalifikacje.textContent=String(sums.kwalifikacje);
+        E.sumKomercja.textContent=String(sums.komercja);
+        E.sumEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;
+
+        E.msOrtho.textContent=`${sums.ortho}h`; E.msBrz.textContent=`${sums.brz}h`; E.msLask.textContent=`${sums.lask}h`; E.msJB.textContent=`${sums.jb}h`; E.msTotalHours.textContent=`${totalHours}h`;
+        E.msPorts.textContent=String(totalPorts);
+        E.msJednodniowki.textContent=String(sums.jednodniowki);
+        E.msKwalifikacje.textContent=String(sums.kwalifikacje);
+        E.msKomercja.textContent=String(sums.komercja);
+        E.msEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;
+        E.sheetTitle.textContent=`Podsumowanie: ${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
+    };
+
+    const calId=()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
+    const save=async(day,field,val)=>setDoc(doc(db,calId(),String(day)),{[field]:val},{merge:true});
+    const del=async(day,field)=>updateDoc(doc(db,calId(),String(day)),{[field]:deleteField()});
     
-    async function clearMonthData() {
-        if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${mNames[cur.getMonth()]} ${cur.getFullYear()}?`)) return;
-        const querySnapshot = await getDocs(collection(db, calId()));
-        await Promise.all(querySnapshot.docs.map(d => deleteDoc(d.ref)));
-        alert(`Dane z ${mNames[cur.getMonth()]} ${cur.getFullYear()} zostały usunięte.`);
-        update();
-    }
-    E.clearMonthBtn.addEventListener('click', clearMonthData);
-
-    // === NOWA, INTELIGENTNA FUNKCJA EKSPORTU DO .ICS ===
-    function parseTimeFromText(text) {
-        const match = text.match(/(?:od|o|@)\s*(\d{1,2})[:.]?(\d{2})?/i);
-        if (match) {
-            return {
-                hour: parseInt(match[1], 10),
-                minute: match[2] ? parseInt(match[2], 10) : 0
-            };
+    function openEdit(day, field, overrideText = null) {
+        const entry = data[day]?.[field] || {};
+        const initialText = typeof entry === 'object' ? entry.text || '' : entry || '';
+        const entryText = overrideText ?? initialText;
+        
+        const textParts = entryText.split('/').map(t => t.trim());
+        const date = new Date(cur.getFullYear(), cur.getMonth(), day);
+        E.editTitle.textContent = `${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;
+        
+        let formHTML = `<div class="mb-4"><label class="font-semibold text-gray-700">Treść wpisu</label><input type="text" id="editText" class="w-full mt-1 p-3 border border-gray-200 rounded-lg" value="${entryText.replace(/"/g, '&quot;')}" placeholder="np. JB wybudzień / ortho od 15:00"></div>`;
+        
+        const createHoursHTML = (partNum, text, hours) => {
+            const defaultH = getDefaultHours(text);
+            const currentH = hours ?? defaultH;
+            return `<div class="mb-4 p-3 border rounded-lg bg-gray-50">
+                        <label class="font-bold text-gray-800">${text || `Część ${partNum}`}</label>
+                        <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
+                            <div><input type="range" min="0" max="48" step="0.5" value="${currentH}" data-part="${partNum}" data-role="slider" class="w-full"></div>
+                            <input type="number" min="0" max="48" step="0.5" value="${currentH}" placeholder="${defaultH}" data-part="${partNum}" data-role="num" class="w-24 p-2 border border-gray-200 rounded-md text-center">
+                        </div>
+                    </div>`;
+        };
+        formHTML += createHoursHTML(1, textParts[0], getEntryProp(day, field, 'h1', null));
+        if (textParts.length > 1) {
+            formHTML += createHoursHTML(2, textParts[1], getEntryProp(day, field, 'h2', null));
         }
-        return null; // Domyślny start o 8:00
+        if (field === 'michalPraca') {
+            formHTML += `<div class="my-4 p-3 border rounded-lg bg-indigo-50"><label class="font-bold text-indigo-800">Porty</label><div class="mt-2 grid grid-cols-2 gap-3"><div><label class="text-xs text-gray-500">Założenie</label><input type="number" min="0" value="${getEntryProp(day, field, 'ports_i', '')}" id="editPortsI" placeholder="0" class="w-full p-2 border rounded-md text-center"></div><div><label class="text-xs text-gray-500">Usunięcie</label><input type="number" min="0" value="${getEntryProp(day, field, 'ports_r', '')}" id="editPortsR" placeholder="0" class="w-full p-2 border rounded-md text-center"></div></div></div>`;
+            formHTML += `<div class="my-4 p-3 border rounded-lg bg-teal-50"><label class="font-bold text-teal-800">Inne procedury</label><div class="mt-2 grid grid-cols-3 gap-3">
+                <div><label class="text-xs text-gray-500">Jednodniówki</label><input type="number" min="0" value="${getEntryProp(day, field, 'endo_od', '')}" id="editEndoOD" placeholder="0" class="w-full p-2 border rounded-md text-center"></div>
+                <div><label class="text-xs text-gray-500">Kwalifikacje</label><input type="number" min="0" value="${getEntryProp(day, field, 'endo_q', '')}" id="editEndoQ" placeholder="0" class="w-full p-2 border rounded-md text-center"></div>
+                <div><label class="text-xs text-gray-500">Komercja</label><input type="number" min="0" value="${getEntryProp(day, field, 'komercja', '')}" id="editKomercja" placeholder="0" class="w-full p-2 border rounded-md text-center"></div>
+            </div></div>`;
+        }
+        E.editContent.innerHTML = formHTML;
+
+        const editTextEl = el('editText');
+        editTextEl.focus();
+        editTextEl.selectionStart = editTextEl.selectionEnd = editTextEl.value.length;
+
+        const handleSliderSync = (e) => {
+            if (e.target.dataset.role === 'slider') {
+                const numInput = E.editContent.querySelector(`input[data-role="num"][data-part="${e.target.dataset.part}"]`);
+                if (numInput) numInput.value = e.target.value;
+            } else if (e.target.dataset.role === 'num') {
+                const slider = E.editContent.querySelector(`input[data-role="slider"][data-part="${e.target.dataset.part}"]`);
+                const currentTextPart = textParts[parseInt(e.target.dataset.part, 10) - 1] || '';
+                if (slider) slider.value = e.target.value || getDefaultHours(currentTextPart);
+            }
+        };
+        E.editContent.addEventListener('input', handleSliderSync);
+
+        editTextEl.addEventListener('input', (e) => {
+            const newText = e.target.value;
+            const needsRerender = (initialText.includes('/') !== newText.includes('/'));
+            if (needsRerender) {
+                openEdit(day, field, newText);
+            }
+        });
+
+        E.editSave.onclick = async () => {
+            const newText = el('editText').value.trim();
+            if (!newText && !el('editPortsI')?.value && !el('editPortsR')?.value && !el('editEndoOD')?.value && !el('editEndoQ')?.value && !el('editKomercja')?.value) {
+                await del(day, field);
+            } else {
+                const finalData = { text: newText };
+                const getNumVal = (selector, isFloat = false) => {
+                    const i = el(selector) || E.editContent.querySelector(selector);
+                    if (!i || i.value === '') return deleteField();
+                    return isFloat ? parseFloat(i.value.replace(',', '.')) : parseInt(i.value, 10);
+                };
+                
+                const initialParts = initialText.split('/').map(t => t.trim());
+                const newParts = newText.split('/').map(t => t.trim());
+
+                const processHours = (partNum, initialPartText, newPartText) => {
+                    const formVal = getNumVal(`input[data-part="${partNum}"][data-role="num"]`, true);
+                    if (typeof formVal === 'object') { // Input is empty
+                        return getDefaultHours(newPartText) || deleteField();
+                    }
+                    const oldDefault = getDefaultHours(initialPartText);
+                    if (formVal === oldDefault && initialPartText !== newPartText) {
+                        return getDefaultHours(newPartText) || deleteField();
+                    }
+                    return formVal;
+                };
+
+                finalData.h1 = processHours(1, initialParts[0], newParts[0]);
+                if (newText.includes('/')) {
+                    finalData.h2 = processHours(2, initialParts[1] || '', newParts[1] || '');
+                }
+
+                if (field === 'michalPraca') {
+                    finalData.ports_i = getNumVal('#editPortsI');
+                    finalData.ports_r = getNumVal('#editPortsR');
+                    finalData.endo_od = getNumVal('#editEndoOD');
+                    finalData.endo_q = getNumVal('#editEndoQ');
+                    finalData.komercja = getNumVal('#editKomercja');
+                }
+                await save(day, field, finalData);
+            }
+            E.edit.style.display = 'none';
+        };
+        E.edit.style.display='flex';
     }
 
-    function formatToICSDate(date) {
-        return date.toISOString().replace(/[-:.]/g, '').substring(0, 15) + 'Z';
+    E.editClose.onclick=()=>E.edit.style.display='none';
+    E.edit.addEventListener('click',e=>{if(e.target===E.edit) E.edit.style.display='none';});
+    document.addEventListener('keydown', e=>{if(e.key==='Escape') E.edit.style.display='none';});
+
+    document.addEventListener('contextmenu', e=>{ const fld=e.target.closest('.fld'); if(!fld)return; e.preventDefault(); E.ctx.style.display='block'; E.ctx.style.left=e.clientX+'px'; E.ctx.style.top=e.clientY+'px'; E.ctx.dataset.day=fld.dataset.day; E.ctx.dataset.field=fld.dataset.field; });
+    document.addEventListener('click', e=>{if(!e.target.closest('#ctx')) E.ctx.style.display='none';});
+    E.ctxCopy.onclick=()=>{const d=E.ctx.dataset; clip=data[d.day]?.[d.field]; E.ctx.style.display='none';};
+    E.ctxCut.onclick=async()=>{const d=E.ctx.dataset; clip=data[d.day]?.[d.field]; await del(d.day,d.field); E.ctx.style.display='none';};
+    E.ctxPaste.onclick=async()=>{const d=E.ctx.dataset; if(clip) await save(d.day,d.field,clip); E.ctx.style.display='none';};
+    E.ctxDel.onclick=async()=>{const d=E.ctx.dataset; await del(d.day,d.field); E.ctx.style.display='none';};
+    
+    const launchEdit = (e) => {
+        const target = e.target.closest('[data-day][data-field]');
+        if (target) openEdit(target.dataset.day, target.dataset.field);
+    };
+    E.desk.addEventListener('click', launchEdit);
+    E.mob.addEventListener('click', launchEdit);
+    E.desk.addEventListener('click', e => { const dayCell = e.target.closest('.day-cell'); if (dayCell) toggleHoliday(dayCell.dataset.day); });
+    async function toggleHoliday(day){ const ref=doc(db,calId(),String(day)); const snap=await getDoc(ref); const cur=(snap.exists()&&snap.data().isHoliday)||false; await setDoc(ref,{isHoliday:!cur},{merge:true}); }
+
+    function setTitle(){ E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; }
+    async function update(){
+        if(!db) return; setTitle(); const id=calId(); const snap=await getDocs(collection(db,id)); data={}; snap.forEach(d=>data[d.id]=d.data());
+        isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data); computeSumsAndEarnings();
+        unsub(); unsub=onSnapshot(collection(db,id),s=>{ s.docChanges().forEach(ch=>{if(ch.type==='removed'){delete data[ch.doc.id];}else{data[ch.doc.id]=ch.doc.data();}}); isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data); computeSumsAndEarnings(); });
     }
+    
+    E.prev.onclick=()=>{cur.setDate(1); cur.setMonth(cur.getMonth()-1); update();};
+    E.next.onclick=()=>{cur.setDate(1); cur.setMonth(cur.getMonth()+1); update();};
+    E.today.onclick=()=>{const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update();};
+    
+    E.importBtn.onclick=()=>{ const file=E.csvFileInput.files[0]; if(!file){alert("Wybierz plik CSV."); return;} Papa.parse(file, { encoding:"UTF-8", header: true, skipEmptyLines: true, complete: importData });};
+    E.csvFileInput.onchange=()=>{E.csvFileName.textContent=E.csvFileInput.files[0]?E.csvFileInput.files[0].name:'';};
+    
+    async function importData(parseResult) {
+        const { data: lines, meta } = parseResult;
+        if (!lines || lines.length === 0) {
+            alert("Plik CSV jest pusty lub nie udało się go odczytać. Upewnij się, że jest zapisany w formacie CSV UTF-8.");
+            return;
+        }
+
+        // Debug: pokaż wszystkie kolumny
+        console.log("Znalezione kolumny w CSV:", meta.fields);
+
+        const monthName = mNames[cur.getMonth()];
+        if (!confirm(`Czy na pewno chcesz zaimportować dane do kalendarza na ${monthName} ${cur.getFullYear()}? Istniejące wpisy mogą zostać nadpisane.\n\nZnalezione kolumny: ${meta.fields.join(', ')}`)) {
+            return;
+        }
+
+        const batch = writeBatch(db);
+        
+        // Mapowanie kolumn CSV na pola kalendarza
+        const columnToField = {
+            // Aktualne mapowanie z etykiet
+            'ania': 'ania',
+            'ania praca': 'aniaPraca', 
+            'michał': 'michal',
+            'michał praca': 'michalPraca',
+            'niania': 'wspolne',
+            'inne': 'inne',
+            // Mapowanie dla nowego formatu CSV
+            'ania inne': 'ania',
+            'michal inne': 'michal',
+            // Warianty bez polskich znaków
+            'michal': 'michal',
+            'michal praca': 'michalPraca',
+            // Dodatkowe warianty zapisu
+            'michał inne': 'michal',
+            'dzień': null // kolumna z dniem - ignorujemy przy mapowaniu pól
+        };
+        
+        // Znajdź kolumnę z dniem - może być "Data", "Dzień" lub pierwsza kolumna
+        let dayColumnName = meta.fields.find(field => 
+            ['data', 'dzień', 'day', 'date'].includes(field.toLowerCase().trim())
+        ) || meta.fields[0];
+        
+        console.log("Użyta kolumna z dniem:", dayColumnName);
+        
+        let importCount = 0;
+        let fieldMapping = {};
+
+        for (const line of lines) {
+            const day = parseInt(line[dayColumnName], 10);
+            if (isNaN(day) || day < 1 || day > 31) {
+                console.warn(`Pominięto wiersz z nieprawidłowym dniem:`, line);
+                continue;
+            }
+
+            for (const header of meta.fields) {
+                if (header === dayColumnName) continue; // Pomiń kolumnę z dniem
+                
+                const text = (line[header] || '').trim();
+                if (!text) continue;
+
+                const headerLower = header.trim().toLowerCase();
+                const field = columnToField[headerLower];
+                
+                if (field) {
+                    // Zapamiętaj mapowanie dla debugowania
+                    if (!fieldMapping[header]) {
+                        fieldMapping[header] = field;
+                        console.log(`Mapowanie: "${header}" -> "${field}"`);
+                    }
+                    
+                    const dataToSave = { text };
+                    const hours = getDefaultHours(text);
+                    if (hours > 0) { dataToSave.h1 = hours; }
+
+                    const docRef = doc(db, calId(), String(day));
+                    batch.set(docRef, { [field]: dataToSave }, { merge: true });
+                    importCount++;
+                } else {
+                    // Sprawdź czy to kolumna z numerami (np. "Rok", "2025", "Miesiąc", "11")
+                    if (!['rok', '2025', 'miesiąc', '11'].includes(headerLower)) {
+                        console.warn(`Nierozpoznana kolumna w pliku CSV: '${header}' (małe litery: '${headerLower}')`);
+                    }
+                }
+            }
+        }
+
+        console.log("Podsumowanie mapowania kolumn:", fieldMapping);
+        console.log(`Liczba wpisów do zaimportowania: ${importCount}`);
+
+        try {
+            await batch.commit();
+            alert(`Pomyślnie zaimportowano ${importCount} wpisów.\n\nMapowanie kolumn:\n${Object.entries(fieldMapping).map(([csv, field]) => `${csv} -> ${labels[field] || field}`).join('\n')}`);
+            update();
+        } catch (error) {
+            console.error("Błąd podczas importowania danych:", error);
+            alert("Wystąpił błąd podczas importu. Zobacz konsolę deweloperską, aby uzyskać więcej informacji.");
+        }
+    }
+    
+    E.clearMonthBtn.onclick=async()=>{ const monthName=mNames[cur.getMonth()]; if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${monthName} ${cur.getFullYear()}?`))return; const q=await getDocs(collection(db,calId())); const batch=writeBatch(db); q.docs.forEach(d=>batch.delete(d.ref)); await batch.commit(); alert('Dane usunięte.'); update();};
 
     function exportToICS() {
-        const year = cur.getFullYear();
-        const month = cur.getMonth();
-        let icsString = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FedorczakFamilyCalendar//PL'].join('\r\n') + '\r\n';
+        const year = cur.getFullYear(), month = cur.getMonth();
+        const formatICSDate = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}${String(d.getSeconds()).padStart(2,'0')}`;
+        const parseStartTime = text => {
+            if (!text) return { hour: 8, minute: 0 };
+            const match = text.match(/\bod\s+(\d{1,2})[:.]?(\d{2})?/i);
+            return match ? { hour: parseInt(match[1],10), minute: match[2]?parseInt(match[2],10):0 } : { hour: 8, minute: 0 };
+        };
+        let icsString = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//FedorczakFamilyCalendar//PL'].join('\r\n')+'\r\n';
 
         for (const day in data) {
             const dayData = data[day];
-            for (const field of fields) {
-                if (!dayData[field]) continue;
+            for (const field of ['michalPraca', 'michal']) {
+                const entry = dayData[field]; if (!entry) continue;
+                const entryText = typeof entry === 'object' ? entry.text : entry;
+                const textParts = (entryText || '').split('/').map(t => t.trim());
+                let lastEndDate = null;
 
-                const eventText = dayData[field];
-                const duration = effHours(day, field, eventText);
-                let startTime, endTime;
-                let isAllDay = true;
-                
-                // Stosuj logikę godzinową tylko do wydarzeń z czasem trwania i w kolumnach 'praca'
-                if (duration > 0 && (field.includes('Praca'))) {
-                    const parsedTime = parseTimeFromText(eventText);
-                    const startHour = parsedTime ? parsedTime.hour : 8;
-                    const startMinute = parsedTime ? parsedTime.minute : 0;
+                textParts.forEach((part, index) => {
+                    if (!part) return;
+                    let hours = 0;
+                    if (typeof entry === 'object') {
+                        hours = index === 0 ? (entry.h1 || 0) : (entry.h2 || 0);
+                    } else {
+                        hours = getDefaultHours(part);
+                    }
+                    if (hours <= 0) return;
 
-                    startTime = new Date(Date.UTC(year, month, parseInt(day), startHour, startMinute));
-                    endTime = new Date(startTime.getTime() + duration * 60 * 60 * 1000);
-                    isAllDay = false;
-                }
+                    const timeInfo = parseStartTime(part);
+                    let startDate;
+                    if (part.match(/\bod\s+\d/i)) {
+                        startDate = new Date(year, month, parseInt(day), timeInfo.hour, timeInfo.minute);
+                    } else {
+                        startDate = lastEndDate || new Date(year, month, parseInt(day), 8, 0); // Default to 8 AM if no prev event
+                    }
+                    
+                    const endDate = new Date(startDate.getTime() + hours * 3600000);
+                    lastEndDate = endDate;
 
-                icsString += 'BEGIN:VEVENT\r\n';
-                icsString += `UID:${calId()}-${day}-${field}@fedorczak.family\r\n`;
-                icsString += `DTSTAMP:${formatToICSDate(new Date())}\r\n`;
-                
-                if (isAllDay) {
-                    const dateString = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
-                    icsString += `DTSTART;VALUE=DATE:${dateString}\r\n`;
-                } else {
-                    icsString += `DTSTART:${formatToICSDate(startTime)}\r\n`;
-                    icsString += `DTEND:${formatToICSDate(endTime)}\r\n`;
-                }
-                
-                icsString += `SUMMARY:${labels[field]}: ${eventText}\r\n`;
-                icsString += 'END:VEVENT\r\n';
+                    icsString += [
+                        'BEGIN:VEVENT', `UID:${calId()}-${day}-${field}-${index}@fedorczak.family`,
+                        `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g,'')}Z`,
+                        `DTSTART:${formatICSDate(startDate)}`, `DTEND:${formatICSDate(endDate)}`,
+                        `SUMMARY:${labels[field]}: ${part}`, 'END:VEVENT'
+                    ].join('\r\n')+'\r\n';
+                });
             }
         }
-        icsString += 'END:VCALENDAR';
-        
-        const blob = new Blob([icsString], { type: 'text/calendar;charset=utf-8' });
+        icsString += 'END:VCALENDAR\r\n';
+        const blob = new Blob([icsString],{type:'text/calendar;charset=utf-8'});
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `kalendarz_${year}_${month+1}.ics`;
+        link.download = `kalendarz_michal_${year}_${String(month+1).padStart(2,'0')}.ics`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
     E.exportIcsBtn.addEventListener('click', exportToICS);
 
-    /* ===== Start Aplikacji ===== */
-    function init(){ 
-        document.getElementById('standard').style.display='flex'; 
-        update(); 
-    }
+    E.fab.onclick = () => E.sheet.classList.add('open');
+    E.sheetClose.onclick = () => E.sheet.classList.remove('open');
 
+    function init(){ update(); }
   </script>
 </body>
 </html>
