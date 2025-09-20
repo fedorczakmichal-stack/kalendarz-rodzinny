@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
         <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
         <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
         <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
@@ -157,11 +157,18 @@
           <button id="v-compact"  class="view-btn" data-v="compact"  title="Widok kompaktowy">≡</button>
           <button id="v-month"    class="view-btn" data-v="month"    title="Widok miesięczny">▤</button>
         </div>
+        
+        <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
+            <input type="file" id="csvFileInput" accept=".csv" class="text-sm">
+            <input type="number" id="importYear" placeholder="Rok" class="w-20 p-2 border border-gray-300 rounded-md text-sm">
+            <input type="number" id="importMonth" placeholder="Miesiąc" class="w-24 p-2 border border-gray-300 rounded-md text-sm">
+            <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
+        </div>
+
       </div>
     </div>
   </header>
 
-  <!-- SUM (desktop) -->
   <div class="sumbar">
     <span class="chip"><span class="dot" style="background:var(--k-ortho)"></span> Ortho: <b id="sum-ortho">0h</b></span>
     <span class="chip"><span class="dot" style="background:var(--k-brzeziny)"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
@@ -172,7 +179,6 @@
 
   <main class="w-full bg-white flex flex-col flex-grow">
     <div id="standard" class="flex-1 flex flex-col">
-      <!-- desktop -->
       <div id="desk-wrap" class="overflow-auto hidden md:block flex-1">
         <div class="bg-white border-t min-w-[900px]">
           <div class="grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
@@ -187,28 +193,23 @@
           <div id="desk" class="grid"></div>
         </div>
       </div>
-      <!-- mobile -->
       <div id="mob" class="mcal md:hidden"></div>
     </div>
 
-    <!-- compact -->
     <div id="compact" style="display:none">
       <div id="cv-cont" class="p-1"></div>
     </div>
 
-    <!-- month -->
     <div id="month" style="display:none">
       <div id="mgrid" class="mgrid"></div>
     </div>
   </main>
 
-  <!-- FAB (mobile) -->
   <button id="fab" aria-label="Pokaż podsumowanie">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3v18"/></svg>
     Suma
   </button>
 
-  <!-- SHEET (mobile) -->
   <div id="sheet">
     <div class="w-full p-4">
       <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-2"></div>
@@ -226,7 +227,6 @@
     </div>
   </div>
 
-  <!-- CONTEXT -->
   <div id="ctx">
     <div id="ctx-copy"  class="ctx-it">Kopiuj</div>
     <div id="ctx-cut"   class="ctx-it">Wytnij</div>
@@ -235,7 +235,6 @@
     <div id="ctx-del"   class="ctx-it text-red-600">Usuń</div>
   </div>
 
-  <!-- MODAL -->
   <div id="edit">
     <div class="edit-body">
       <div class="edit-head">
@@ -290,7 +289,8 @@
       msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'),
       sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'),
       ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
-      edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title')
+      edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title'),
+      importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), importYear: el('importYear'), importMonth: el('importMonth')
     };
 
     window.addEventListener('resize', ()=>{ const was = isMobile; isMobile = matchMedia("(max-width: 768px)").matches; if (was!==isMobile) update(); });
@@ -481,7 +481,6 @@
           if(isBrzeziny(t)) brz+=h;
           if(isLask(t)) lask+=h;
           if(isJB(t)) jb+=h;
-          // przykładowo liczymy porty w kolumnie „Michał Praca”
           if(f==='michalPraca') ports += getPorts(d,f);
         }
       }
@@ -500,7 +499,7 @@
 
     /* ===== DB helpers ===== */
     const calId = ()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
-    const save = (day,field,val)=> setDoc(doc(db, calId(), String(day)), { [field]: val }, { merge:true });
+    const save = (day,field,val, customCalId = null)=> setDoc(doc(db, customCalId || calId(), String(day)), { [field]: val }, { merge:true });
     const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
     const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
     const setPortsDb = (day,field,c)=> setDoc(doc(db, calId(), String(day)), { [`ports_${field}`]: (c===''||c===null)? deleteField() : parseInt(c,10) }, { merge:true });
@@ -544,7 +543,6 @@
         E.editFields.appendChild(wrap);
       }
 
-      // tekst
       E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>{
         inp.addEventListener('change', async ()=>{
           const f=inp.dataset.field; const v=inp.value.trim();
@@ -552,7 +550,6 @@
           else await save(day,f,v);
         });
       });
-      // godziny
       E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>{
         sl.addEventListener('input', ()=>{
           const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${sl.dataset.field}"]`);
@@ -574,11 +571,9 @@
           await setHours(day,f,num.value);
         });
       });
-      // porty
       E.editFields.querySelectorAll('input[data-ports]').forEach(p=>{
         p.addEventListener('change', async ()=>{ await setPortsDb(day,p.dataset.field,p.value); });
       });
-      // usuń
       E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>{
         b.addEventListener('click', async ()=>{
           const f=b.dataset.field; await del(day,f).catch(()=>{});
@@ -647,7 +642,6 @@
       }
       computeSums();
 
-      // realtime tylko dla standard
       unsub(); if(view!=='standard') return;
       unsub = onSnapshot(collection(db,id), s=>{
         s.docChanges().forEach(ch=>{
@@ -684,8 +678,87 @@
     E.sheetClose.onclick=()=> E.sheet.classList.remove('open');
     E.sheet.addEventListener('click',e=>{ if(e.target===E.sheet) E.sheet.classList.remove('open'); });
 
+    /* ===== NOWA FUNKCJA IMPORTU ===== */
+    async function importData(csvData, year, month) {
+        const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
+        const collectionId = `${year}-${month}`;
+        const lines = csvData.trim().split('\n');
+
+        if (!confirm(`Czy na pewno chcesz zaimportować dane dla ${mNames[month-1]} ${year}? Spowoduje to nadpisanie istniejących danych.`)) {
+            console.log("Import anulowany.");
+            return;
+        }
+
+        console.log(`Rozpoczynam import do kolekcji: ${collectionId}`);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        for (let i = 0; i < lines.length && i < daysInMonth; i++) {
+            const day = i + 1;
+            const columns = lines[i].split(',');
+            const dataToSave = {};
+            let hasData = false;
+
+            for (let j = 0; j < columnMapping.length; j++) {
+                if (j < columns.length) {
+                    const fieldName = columnMapping[j];
+                    const value = columns[j] ? columns[j].trim().replace(/"/g, '') : '';
+                    if (value) {
+                        dataToSave[fieldName] = value;
+                        hasData = true;
+                    }
+                }
+            }
+
+            if (hasData) {
+                try {
+                    const customCalId = `${year}-${month}`;
+                    await setDoc(doc(db, customCalId, String(day)), dataToSave, { merge: true });
+                    console.log(`Dzień ${day}: Zapisano dane:`, dataToSave);
+                } catch (error) {
+                    console.error(`Błąd zapisu dla dnia ${day}:`, error);
+                }
+            }
+        }
+
+        console.log("Import zakończony!");
+        alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane. Odświeżam widok.`);
+        cur = new Date(year, month - 1, 1);
+        update();
+    }
+
+    E.importBtn.addEventListener('click', () => {
+        const file = E.csvFileInput.files[0];
+        const year = parseInt(E.importYear.value, 10);
+        const month = parseInt(E.importMonth.value, 10);
+
+        if (!file) {
+            alert("Proszę wybrać plik CSV.");
+            return;
+        }
+        if (!year || !month || month < 1 || month > 12) {
+            alert("Proszę podać poprawny rok i miesiąc (1-12).");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const csvData = event.target.result;
+            importData(csvData, year, month);
+        };
+        reader.readAsText(file);
+    });
+    /* =============================== */
+
+
     /* ===== Start ===== */
-    function init(){ document.getElementById('standard').style.display='flex'; update(); }
+    function init(){ 
+        const now = new Date();
+        E.importYear.value = now.getFullYear();
+        E.importMonth.value = now.getMonth() + 1;
+        document.getElementById('standard').style.display='flex'; 
+        update(); 
+    }
+
   </script>
 </body>
 </html>
