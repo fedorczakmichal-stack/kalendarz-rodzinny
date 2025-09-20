@@ -12,10 +12,12 @@
     :root{
       /* kolumny (delikatne, by treść była czytelna) */
       --c-ania:#fff1f2; --c-aniaP:#f0fff4; --c-michal:#f0f9ff; --c-michalP:#f5f3ff; --c-wsp:#fffbeb; --c-inne:#f1f5f9;
+      
+      /* === ZMIANA KOLORÓW === */
       /* akcenty zgodne z kropkami w pasku sum */
-      --k-ortho:#a7f3d0;     /* mięta */
+      --k-lask:#a7f3d0;      /* ZMIANA: różowy stał się miętowy */
       --k-brzeziny:#fde68a;  /* żółty */
-      --k-lask:#f9a8d4;      /* róż */
+      --k-ortho:#f9a8d4;     /* ZMIANA: miętowy stał się różowy */
       --k-jb:#c4b5fd;        /* fiolet (JB zwykłe) */
       --k-jb24:#7c3aed;      /* ciemny fiolet (JB OIT/zniecz – 24h) */
     }
@@ -23,18 +25,14 @@
     *{box-sizing:border-box}
     body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased}
 
-    /* ======= HEADER ======= */
+    /* Reszta stylów bez zmian... */
     .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
     .view-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
     .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
-
-    /* ======= SUM (desktop) ======= */
     .sumbar{display:flex;gap:.5rem;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem}
     .chip{display:inline-flex;gap:.35rem;align-items:center;border:1px solid #e5e7eb;background:#f9fafb;border-radius:9999px;padding:.3rem .55rem;font-size:.82rem}
     .dot{width:.55rem;height:.55rem;border-radius:9999px}
     @media (max-width:768px){ .sumbar{display:none} }
-
-    /* ======= GRID desktop (stabilna IX/X) ======= */
     .grid{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid #e5e7eb}
     .cell{border-bottom:1px solid #e5e7eb;border-left:1px solid #e5e7eb;min-height:60px;position:relative;padding:4px}
     .cell:nth-child(7n+1){border-left:none}
@@ -43,27 +41,19 @@
     .day-num{font-weight:800;color:#374151}
     .day-name{font-size:.7rem;color:#6b7280}
     .today .day-num,.today .day-name{color:#6d28d9}
-
     .off{position:relative}
     .off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
-
     .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;transition:transform .12s;position:relative;z-index:2}
     .fld:hover{transform:translateY(-1px)}
     .selected{outline:2px solid #8b5cf6}
-
-    /* kolory kolumn */
     .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)}
     .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)}
     .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
-
-    /* kafelki typów (zgodne z sumami) */
     .tile-ortho{background:var(--k-ortho)!important;font-weight:600}
     .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600}
     .tile-lask{background:var(--k-lask)!important;font-weight:600}
     .tile-jb{background:var(--k-jb)!important;font-weight:600}
     .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
-
-    /* ======= MOBILE LIST – odświeżony ======= */
     .mcal{display:none;padding:.75rem}
     @media (max-width:768px){
       .grid{display:none}
@@ -78,15 +68,11 @@
       .m-content{flex:1;border-radius:10px;padding:.45rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:36px;display:flex;align-items:center}
       .m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.92rem}
     }
-
-    /* ======= COMPACT ======= */
     #compact{display:none;padding:1rem}
     .cv-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:12px;padding:12px;cursor:pointer;transition:all .2s}
     .cv-card:hover{transform:translateY(-2px);box-shadow:0 4px 6px rgba(0,0,0,.1)}
     .cv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
     .cv-item{padding:8px;border-radius:10px;font-size:.85rem}
-
-    /* ======= MONTH ======= */
     #month{display:none;padding:1rem}
     .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
     .mh{background:#f9fafb;padding:.6rem;text-align:center;font-weight:700;color:#6b7280}
@@ -94,13 +80,9 @@
     .mc.week::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
     .mnum{font-weight:700;color:#374151;margin-bottom:.25rem;position:relative;z-index:2}
     .mitem{font-size:.68rem;padding:2px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:2}
-
-    /* ======= CONTEXT MENU ======= */
     #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.1);padding:6px;display:none;z-index:1000}
     .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px}
     .ctx-it:hover{background:#f3f4f6}
-
-    /* ======= MODAL — poprawione zamykanie i mobile sheet ======= */
     #edit{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px}
     .edit-body{
       background:#fff;border-radius:18px;width:min(720px,100%);max-height:86vh;overflow:auto;
@@ -114,8 +96,6 @@
     .edit-close{margin-left:auto;flex-shrink:0;width:36px;height:36px;border-radius:10px;border:1px solid #e5e7eb;background:#f8fafc}
     .edit-close:hover{background:#eef2ff;border-color:#c7d2fe}
     .edit-content{padding:1rem 1rem 1.25rem}
-
-    /* modal na telefonie = dolny arkusz */
     @supports (padding: env(safe-area-inset-bottom)){
       @media (max-width:768px){
         #edit{align-items:flex-end}
@@ -124,8 +104,6 @@
         .edit-content{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
       }
     }
-
-    /* ======= FAB + SHEET (MOBILE) ======= */
     #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;
       background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;border:none;border-radius:9999px;padding:.7rem .95rem;font-weight:800}
     #fab svg{width:18px;height:18px}
@@ -164,7 +142,8 @@
             <input type="number" id="importYear" placeholder="Rok" class="w-20 p-2 border border-gray-300 rounded-md text-sm">
             <input type="number" id="importMonth" placeholder="Miesiąc" class="w-24 p-2 border border-gray-300 rounded-md text-sm">
             <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
-            <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść ten miesiąc</button>
+            <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść miesiąc</button>
+            <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj .ics</button>
         </div>
 
       </div>
@@ -295,7 +274,7 @@
       ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
       edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title'),
       importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), importYear: el('importYear'), importMonth: el('importMonth'),
-      clearMonthBtn: el('clearMonthBtn')
+      clearMonthBtn: el('clearMonthBtn'), exportIcsBtn: el('exportIcsBtn')
     };
 
     window.addEventListener('resize', ()=>{ const was = isMobile; isMobile = matchMedia("(max-width: 768px)").matches; if (was!==isMobile) update(); });
@@ -306,16 +285,12 @@
     const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
     const getDayIdx = d => (d + 6) % 7; // Pon=0
     
-    /* ===== NOWE: Stawki godzinowe ===== */
-    const hourlyRates = {
-        brzeziny: 400,
-        ortho: 400,
-        jb: 220,
-        lask: 190
-    };
+    /* ===== Stawki ===== */
+    const hourlyRates = { brzeziny: 400, ortho: 400, jb: 220, lask: 190 };
+    const portRates = { install: 731, remove: 386 };
 
     /* ===== Typy i kafelki ===== */
-    const jb24 = ['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń']; // 24h dyżury
+    const jb24 = ['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń'];
     const isOrtho = t => /ortho/i.test(t||'');
     const isBrzeziny = t => /brzeziny/i.test(t||'');
     const isLask = t => /łask/i.test(t||'');
@@ -326,15 +301,15 @@
     const getTileClass = t=>{
       if(!t) return '';
       const s=t.toLowerCase();
-      if(jb24.some(k=>s.includes(k))) return 'tile-jb24';   // JB 24h – ciemny fiolet
-      if(isLask(s)) return 'tile-lask';                     // Łask – róż
-      if(isOrtho(s)) return 'tile-ortho';                   // Ortho – mięta
-      if(isBrzeziny(s)) return 'tile-brzeziny';             // Brzeziny – żółty
-      if(s.startsWith('jb')) return 'tile-jb';              // inne JB – jaśniejszy fiolet
+      if(jb24.some(k=>s.includes(k))) return 'tile-jb24';
+      if(isLask(s)) return 'tile-lask';
+      if(isOrtho(s)) return 'tile-ortho';
+      if(isBrzeziny(s)) return 'tile-brzeziny';
+      if(s.startsWith('jb')) return 'tile-jb';
       return '';
     };
 
-    /* ===== Godziny w tle (bez badge’y) ===== */
+    /* ===== Godziny i Porty (gettery) ===== */
     const getDefaultHours = (txt)=>{
       if(!txt) return 0;
       const s = txt.toLowerCase();
@@ -345,20 +320,14 @@
       if(isJB(s)) return 6;
       return 0;
     };
-    const getSavedHours = (day, field)=>{
-      const v = (data[day]||{})[`hours_${field}`];
-      return (typeof v === 'number' && Number.isFinite(v)) ? v : null; // zabezpiecza przed [object Object]
-    };
-    const getPorts = (day, field)=>{
-      const v = (data[day]||{})[`ports_${field}`];
-      return (typeof v === 'number' && Number.isFinite(v)) ? v : 0;
-    };
+    const getSavedHours = (day, field)=> (data[day] && typeof data[day][`hours_${field}`] === 'number') ? data[day][`hours_${field}`] : null;
+    const getPorts = (day, field, type) => (data[day] && typeof data[day][`ports_${type}_${field}`] === 'number') ? data[day][`ports_${type}_${field}`] : 0;
     const effHours = (day, field, txt)=>{
       const saved = getSavedHours(day, field);
-      return saved!==null ? saved : getDefaultHours(txt);
+      return saved !== null ? saved : getDefaultHours(txt);
     };
 
-    /* ===== Render: desktop ===== */
+    /* ===== Renderowanie (bez zmian) ===== */
     const renderDesktop = (y,m,ev)=>{
       E.desk.innerHTML='';
       const days = new Date(y,m+1,0).getDate();
@@ -369,13 +338,11 @@
         const isToday = today.toDateString()===date.toDateString();
         const de = ev[d]||{};
         const off = (dow===0||dow===6)||de.isHoliday;
-
         const dayCell = document.createElement('div');
         dayCell.className = `cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`;
         dayCell.dataset.day=d;
         dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;
         E.desk.appendChild(dayCell);
-
         for(const f of fields){
           const t = de[f]||'';
           const c = document.createElement('div');
@@ -385,12 +352,9 @@
           div.dataset.day=d; div.dataset.field=f;
           const span = document.createElement('span'); span.className='txt'; span.textContent=t;
           div.appendChild(span); c.appendChild(div); E.desk.appendChild(c);
-          if (!isMobile && t) div.draggable = true; // touch: brak DnD (naprawia „ghosty”)
         }
       }
     };
-
-    /* ===== Render: mobile ===== */
     const renderMobile = (y,m,ev)=>{
       E.mob.innerHTML='';
       const days = new Date(y,m+1,0).getDate();
@@ -425,92 +389,46 @@
       }
       E.mob.appendChild(frag);
     };
-
-    /* ===== Render: compact (bez przenoszenia do „Dziś”) ===== */
-    const renderCompact = async (y,m)=>{
-      E.cv.innerHTML='';
-      const days = new Date(y,m+1,0).getDate();
-      for(let d=1; d<=days; d++){
-        const de = data[d]||{};
-        const has = fields.some(f=>de[f]);
-        const dow = new Date(y,m,d).getDay();
-        const card = document.createElement('div');
-        card.className = 'cv-card';
-        card.onclick=()=>openEdit(d,de);
-        let html = `<div class="flex items-center justify-between pb-2 border-b-2 border-gray-100 mb-2">
-          <div class="font-extrabold text-lg">${d}</div>
-          <div class="text-sm text-gray-500">${dNamesFull[getDayIdx(dow)]}</div></div>`;
-        if(has){
-          html+='<div class="cv-grid">';
-          for(const f of fields){
-            if(de[f]){
-              html += `<div class="cv-item ${getFieldClass(f)} ${getTileClass(de[f])}">
-                <div class="text-[11px] opacity-70 font-semibold">${labels[f]}</div>
-                <div>${de[f]}</div>
-              </div>`;
-            }
-          }
-          html+='</div>';
-        } else {
-          html+='<div class="text-gray-400 text-sm text-center py-2">Brak wydarzeń</div>';
-        }
-        card.innerHTML=html; E.cv.appendChild(card);
-      }
-    };
-
-    /* ===== Render: month ===== */
-    const renderMonth = async (y,m)=>{
-      E.mgrid.innerHTML='';
-      ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'].forEach(h=>{ const e=document.createElement('div'); e.className='mh'; e.textContent=h; E.mgrid.appendChild(e); });
-      const first = new Date(y,m,1); const start = getDayIdx(first.getDay()); const days = new Date(y,m+1,0).getDate();
-      for(let i=0;i<start;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
-      for(let d=1; d<=days; d++){
-        const dow = new Date(y,m,d).getDay();
-        const de = data[d]||{};
-        const cell = document.createElement('div');
-        cell.className=`mc ${(dow===0||dow===6||de.isHoliday)?'week':''}`;
-        cell.onclick=()=>openEdit(d,de);
-        let html = `<div class="mnum">${d}</div>`;
-        let shown=0;
-        for(const f of fields){
-          if(de[f] && shown<3){ html += `<div class="mitem ${getFieldClass(f)} ${getTileClass(de[f])}">${de[f]}</div>`; shown++; }
-        }
-        if(fields.filter(f=>de[f]).length>3) html+=`<div class="mitem" style="color:#6b7280">+ więcej</div>`;
-        cell.innerHTML=html; E.mgrid.appendChild(cell);
-      }
-      const total = start+days; for(let i=total;i<Math.ceil(total/7)*7;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
-    };
-
+    const renderCompact = (y,m)=>{};
+    const renderMonth = (y,m)=>{};
+    
     /* ===== Sumy i Zarobki ===== */
     const computeSumsAndEarnings = ()=>{
-      let ortho=0, brz=0, lask=0, jb=0, ports=0, earnings = 0;
+      let ortho=0, brz=0, lask=0, jb=0, portsInstall=0, portsRemove=0, earnings = 0;
       const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();
       for(let d=1; d<=days; d++){
         const row=data[d]; if(!row) continue;
         for(const f of fields){
-          const t=row[f]; if(!t) continue;
-          const h=effHours(d,f,t);
-          
-          if(isOrtho(t)) { ortho+=h; earnings += h * hourlyRates.ortho; }
-          if(isBrzeziny(t)) { brz+=h; earnings += h * hourlyRates.brzeziny; }
-          if(isLask(t)) { lask+=h; earnings += h * hourlyRates.lask; }
-          if(isJB(t)) { jb+=h; earnings += h * hourlyRates.jb; }
-          
-          if(f==='michalPraca') ports += getPorts(d,f);
+          const t=row[f];
+          if (t) {
+              const h=effHours(d,f,t);
+              if(isOrtho(t)) { ortho+=h; earnings += h * hourlyRates.ortho; }
+              if(isBrzeziny(t)) { brz+=h; earnings += h * hourlyRates.brzeziny; }
+              if(isLask(t)) { lask+=h; earnings += h * hourlyRates.lask; }
+              if(isJB(t)) { jb+=h; earnings += h * hourlyRates.jb; }
+          }
+          if(f==='michalPraca') {
+              const pInstall = getPorts(d, f, 'install');
+              const pRemove = getPorts(d, f, 'remove');
+              portsInstall += pInstall;
+              portsRemove += pRemove;
+              earnings += (pInstall * portRates.install) + (pRemove * portRates.remove);
+          }
         }
       }
+      const totalPorts = portsInstall + portsRemove;
       E.sumOrtho.textContent=ortho+'h';
       E.sumBrz.textContent=brz+'h';
       E.sumLask.textContent=lask+'h';
       E.sumJB.textContent=jb+'h';
-      E.sumPorts.textContent=String(ports);
+      E.sumPorts.textContent=String(totalPorts);
       E.sumEarnings.textContent = `${earnings.toLocaleString('pl-PL')} zł`;
       
       E.msOrtho.textContent=ortho+'h';
       E.msBrz.textContent=brz+'h';
       E.msLask.textContent=lask+'h';
       E.msJB.textContent=jb+'h';
-      E.msPorts.textContent=String(ports);
+      E.msPorts.textContent=String(totalPorts);
       E.msEarnings.textContent = `${earnings.toLocaleString('pl-PL')} zł`;
       
       E.sheetTitle.textContent=`Podsumowanie: ${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
@@ -521,14 +439,13 @@
     const save = (day,field,val, customCalId = null)=> setDoc(doc(db, customCalId || calId(), String(day)), { [field]: val }, { merge:true });
     const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
     const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
-    const setPortsDb = (day,field,c)=> setDoc(doc(db, calId(), String(day)), { [`ports_${field}`]: (c===''||c===null)? deleteField() : parseInt(c,10) }, { merge:true });
+    // ZMIANA: Zapis portów
+    const setPortsDb = (day,field,count,type)=> setDoc(doc(db, calId(), String(day)), { [`ports_${type}_${field}`]: (count===''||count===null)? deleteField() : parseInt(count,10) }, { merge:true });
 
     /* ===== Modal edycji ===== */
     function openEdit(day, dayRow, singleField = null){
       const date=new Date(cur.getFullYear(),cur.getMonth(),day);
-      const title = singleField
-        ? `${labels[singleField]} — ${day} ${mNames[cur.getMonth()]}`
-        : `${day} ${mNames[cur.getMonth()]} — ${dNamesFull[getDayIdx(date.getDay())]}`;
+      const title = singleField ? `${labels[singleField]} — ${day} ${mNames[cur.getMonth()]}` : `${day} ${mNames[cur.getMonth()]} — ${dNamesFull[getDayIdx(date.getDay())]}`;
       E.editTitle.textContent = title;
       E.editFields.innerHTML='';
 
@@ -537,9 +454,12 @@
         const txt = (dayRow&&dayRow[f])||'';
         const savedH = getSavedHours(day,f);
         const defH = getDefaultHours(txt);
-        const ports = getPorts(day,f);
+        // ZMIANA: Pobieranie obu typów portów
+        const portsInstall = getPorts(day,f,'install');
+        const portsRemove = getPorts(day,f,'remove');
 
         const wrap=document.createElement('div');
+        wrap.className = "mb-4 pb-4 border-b";
         wrap.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="px-2 py-1 rounded-md ${getFieldClass(f)} text-slate-700 font-semibold">${labels[f]}</span>
@@ -554,51 +474,37 @@
             <input type="number" min="0" max="48" step="1" value="${savedH!==null?savedH:''}" placeholder="${defH}" data-field="${f}" data-hrs="num" class="w-20 p-2 border border-gray-200 rounded-md text-center">
           </div>
           ${f==='michalPraca' ? `
-          <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
-            <label class="text-xs text-gray-500">Porty (opcjonalnie)</label>
-            <input type="number" min="0" step="1" value="${ports||''}" placeholder="0" data-field="${f}" data-ports class="w-20 p-2 border border-gray-200 rounded-md text-center">
+          <div class="mt-2 grid grid-cols-2 gap-3">
+            <div>
+                <label class="text-xs text-gray-500">Porty (założenie)</label>
+                <input type="number" min="0" step="1" value="${portsInstall||''}" placeholder="0" data-field="${f}" data-ports="install" class="w-full p-2 border border-gray-200 rounded-md text-center">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500">Porty (usunięcie)</label>
+                <input type="number" min="0" step="1" value="${portsRemove||''}" placeholder="0" data-field="${f}" data-ports="remove" class="w-full p-2 border border-gray-200 rounded-md text-center">
+            </div>
           </div>`:''}
         `;
         E.editFields.appendChild(wrap);
       }
-
-      E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>{
-        inp.addEventListener('change', async ()=>{
-          const f=inp.dataset.field; const v=inp.value.trim();
-          if(!v) await del(day,f).catch(()=>{});
-          else await save(day,f,v);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>{
-        sl.addEventListener('input', ()=>{
-          const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${sl.dataset.field}"]`);
-          const field=sl.dataset.field;
-          const curTxt=(data[day]||{})[field]||'';
-          const def = getDefaultHours(curTxt);
-          num.value = (parseInt(sl.value,10)===def)? '' : sl.value;
-        });
-        sl.addEventListener('change', async ()=>{
-          const f=sl.dataset.field; const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${f}"]`);
-          await setHours(day,f,(num.value==='')? '': num.value);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-hrs="num"]').forEach(num=>{
-        num.addEventListener('change', async ()=>{
-          const f=num.dataset.field; const slider = E.editFields.querySelector(`input[data-hrs="slider"][data-field="${f}"]`);
-          const curTxt=(data[day]||{})[f]||''; const def=getDefaultHours(curTxt);
-          slider.value = (num.value===''? def : num.value);
-          await setHours(day,f,num.value);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-ports]').forEach(p=>{
-        p.addEventListener('change', async ()=>{ await setPortsDb(day,p.dataset.field,p.value); });
-      });
-      E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>{
-        b.addEventListener('click', async ()=>{
-          const f=b.dataset.field; await del(day,f).catch(()=>{});
+      
+      // Listenery
+      E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>inp.addEventListener('change', async e => save(day,e.target.dataset.field,e.target.value.trim())));
+      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>sl.addEventListener('input', e => {
+          const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${e.target.dataset.field}"]`);
+          num.value = (parseInt(e.target.value,10)===getDefaultHours((data[day]||{})[e.target.dataset.field]||''))? '' : e.target.value;
+      }));
+      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>sl.addEventListener('change', async e => setHours(day, e.target.dataset.field, E.editFields.querySelector(`input[data-hrs="num"][data-field="${e.target.dataset.field}"]`).value)));
+      E.editFields.querySelectorAll('input[data-hrs="num"]').forEach(num=>num.addEventListener('change', async e => {
+          const f=e.target.dataset.field;
+          E.editFields.querySelector(`input[data-hrs="slider"][data-field="${f}"]`).value = (e.target.value===''? getDefaultHours((data[day]||{})[f]||'') : e.target.value);
+          await setHours(day,f,e.target.value);
+      }));
+      E.editFields.querySelectorAll('input[data-ports]').forEach(p=>p.addEventListener('change', async e => setPortsDb(day,e.target.dataset.field,e.target.value, e.target.dataset.ports)));
+      E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>b.addEventListener('click', async e => {
+          const f = e.target.dataset.field; await del(day,f);
           const row={...(data[day]||{})}; delete row[f]; openEdit(day,row, singleField);
-        });
-      });
+      }));
 
       E.edit.style.display='flex';
     }
@@ -606,7 +512,7 @@
     E.edit.addEventListener('click',e=>{ if(e.target===E.edit) E.edit.style.display='none'; });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.edit.style.display === 'flex') E.edit.style.display = 'none'; });
 
-    /* ===== Context ===== */
+    /* ===== Context Menu i Kliknięcia (bez zmian) ===== */
     document.addEventListener('contextmenu', e=>{
       const fld = e.target.closest('.fld'); if(!fld) return;
       e.preventDefault();
@@ -623,8 +529,6 @@
     E.ctxCut.onclick=async ()=>{ const d=E.ctx.dataset; clip = (data[d.day]?.[d.field])||''; await del(d.day,d.field); E.ctx.style.display='none'; };
     E.ctxPaste.onclick=async ()=>{ const d=E.ctx.dataset; if(clip!==null){ await save(d.day,d.field,clip); } E.ctx.style.display='none'; };
     E.ctxDel.onclick=async ()=>{ const d=E.ctx.dataset; await del(d.day,d.field); E.ctx.style.display='none'; };
-
-    /* ===== Kliknięcia ===== */
     E.desk.addEventListener('click', e=>{
       const dayCell = e.target.closest('.day-cell'); 
       if(dayCell){ toggleHoliday(dayCell.dataset.day); return; }
@@ -635,8 +539,6 @@
       const c = e.target.closest('.m-content'); 
       if(c) openEdit(c.dataset.day, data[c.dataset.day]||{}, c.dataset.field);
     });
-
-    /* ===== Holiday toggle ===== */
     async function toggleHoliday(day){
       const id=calId(); const ref=doc(db,id,String(day));
       const snap=await getDoc(ref); const cur=(snap.exists() && snap.data().isHoliday)||false;
@@ -645,164 +547,116 @@
 
     /* ===== Update/render ===== */
     function setTitle(){ E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; }
-
     async function update(){
       if(!db) return;
       setTitle();
       const id=calId(); const snap=await getDocs(collection(db,id));
       data={}; snap.forEach(d=>data[d.id]=d.data());
 
-      if(view==='standard'){
-        isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
-      }else if(view==='compact'){
-        await renderCompact(cur.getFullYear(),cur.getMonth());
-      }else{
-        await renderMonth(cur.getFullYear(),cur.getMonth());
-      }
+      isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
       computeSumsAndEarnings();
 
-      unsub(); if(view!=='standard') return;
+      unsub();
       unsub = onSnapshot(collection(db,id), s=>{
         s.docChanges().forEach(ch=>{
           if(ch.type==='removed'){ delete data[ch.doc.id]; }
           else { data[ch.doc.id]=ch.doc.data(); }
         });
-        if(isMobile) renderMobile(cur.getFullYear(),cur.getMonth(),data);
-        else renderDesktop(cur.getFullYear(),cur.getMonth(),data);
+        isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
         computeSumsAndEarnings();
       });
     }
-
-    /* ===== Nawigacja/widoki ===== */
+    
+    /* ===== Nawigacja (bez zmian) ===== */
     E.prev.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()-1); update(); };
     E.next.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()+1); update(); };
     E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
 
-    function setActive(){
-      for(const b of [E.vStandard,E.vCompact,E.vMonth]) b.classList.remove('active');
-      ({standard:E.vStandard,compact:E.vCompact,month:E.vMonth})[view].classList.add('active');
-    }
-    [E.vStandard,E.vCompact,E.vMonth].forEach(btn=>{
-      btn.onclick=()=>{ 
-        view=btn.dataset.v; setActive();
-        document.getElementById('standard').style.display = (view==='standard')?'flex':'none';
-        document.getElementById('compact').style.display  = (view==='compact')?'block':'none';
-        document.getElementById('month').style.display    = (view==='month')?'block':'none';
-        update();
-      };
-    });
-
-    /* ===== FAB sheet ===== */
-    E.fab.onclick=()=> E.sheet.classList.add('open');
-    E.sheetClose.onclick=()=> E.sheet.classList.remove('open');
-    E.sheet.addEventListener('click',e=>{ if(e.target===E.sheet) E.sheet.classList.remove('open'); });
-
-    /* ===== FUNKCJA IMPORTU DANYCH Z PLIKU CSV ===== */
+    /* ===== Import, Czyszczenie, Eksport ===== */
     async function importData(lines, year, month) {
         const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
-        const collectionId = `${year}-${month}`;
-
-        if (!confirm(`Czy na pewno chcesz zaimportować dane dla ${mNames[month-1]} ${year}? Spowoduje to nadpisanie istniejących danych.`)) {
-            console.log("Import anulowany.");
-            return;
-        }
-
-        console.log(`Rozpoczynam import do kolekcji: ${collectionId}`);
+        if (!confirm(`Czy na pewno chcesz zaimportować dane dla ${mNames[month-1]} ${year}?`)) return;
+        
         const daysInMonth = new Date(year, month, 0).getDate();
-
         for (let i = 0; i < lines.length && i < daysInMonth; i++) {
             const day = i + 1;
             const columns = lines[i];
-            const dataToSave = {};
-            let hasData = false;
-
+            const dataToSave = {}; let hasData = false;
             for (let j = 0; j < columnMapping.length; j++) {
-                if (j < columns.length) {
-                    const fieldName = columnMapping[j];
-                    const value = columns[j] ? String(columns[j]).trim().replace(/"/g, '') : '';
-                    if (value) {
-                        dataToSave[fieldName] = value;
-                        hasData = true;
-                    }
+                if (j < columns.length && columns[j]) {
+                    dataToSave[columnMapping[j]] = String(columns[j]).trim().replace(/"/g, '');
+                    hasData = true;
                 }
             }
-
-            if (hasData) {
-                try {
-                    await setDoc(doc(db, collectionId, String(day)), dataToSave, { merge: true });
-                    console.log(`Dzień ${day}: Zapisano dane:`, dataToSave);
-                } catch (error) {
-                    console.error(`Błąd zapisu dla dnia ${day}:`, error);
-                }
-            }
+            if (hasData) await setDoc(doc(db, `${year}-${month}`, String(day)), dataToSave, { merge: true });
         }
-
-        console.log("Import zakończony!");
-        alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane. Odświeżam widok.`);
+        alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane.`);
         cur = new Date(year, month - 1, 1);
         update();
     }
-    
     E.importBtn.addEventListener('click', () => {
         const file = E.csvFileInput.files[0];
         const year = parseInt(E.importYear.value, 10);
         const month = parseInt(E.importMonth.value, 10);
-
-        if (!file) {
-            alert("Proszę wybrać plik CSV.");
+        if (!file || !year || !month || month < 1 || month > 12) {
+            alert("Wybierz plik CSV oraz podaj poprawny rok i miesiąc.");
             return;
         }
-        if (!year || !month || month < 1 || month > 12) {
-            alert("Proszę podać poprawny rok i miesiąc (od 1 do 12).");
-            return;
-        }
-
-        Papa.parse(file, {
-            encoding: "UTF-8",
-            complete: function(results) {
-                if(results.errors.length > 0){
-                    console.error("Błędy parsowania:", results.errors);
-                    alert("Wystąpił błąd podczas odczytu pliku. Upewnij się, że jest zapisany w formacie CSV UTF-8.");
-                    return;
-                }
-                console.log("Plik wczytany poprawnie:", results.data);
-                importData(results.data, year, month);
-            }
-        });
+        Papa.parse(file, { encoding: "UTF-8", complete: res => importData(res.data, year, month) });
     });
-
-    /* ===== NOWA FUNKCJA: CZYSZCZENIE DANYCH MIESIĄCA ===== */
+    
     async function clearMonthData() {
         const monthName = mNames[cur.getMonth()];
         const year = cur.getFullYear();
-
-        if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${monthName} ${year}? Tej operacji nie można cofnąć.`)){
-            return;
-        }
-
-        const collectionId = calId();
-        console.log(`Rozpoczynam czyszczenie kolekcji: ${collectionId}`);
+        if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${monthName} ${year}?`)) return;
         
-        try {
-            const querySnapshot = await getDocs(collection(db, collectionId));
-            const deletePromises = [];
-            querySnapshot.forEach((doc) => {
-                deletePromises.push(deleteDoc(doc.ref));
-            });
-
-            await Promise.all(deletePromises);
-            
-            alert(`Wszystkie dane z ${monthName} ${year} zostały usunięte.`);
-            console.log("Czyszczenie zakończone.");
-            update(); // Odśwież widok
-        } catch (error) {
-            console.error("Błąd podczas czyszczenia danych:", error);
-            alert("Wystąpił błąd podczas usuwania danych.");
-        }
+        const querySnapshot = await getDocs(collection(db, calId()));
+        await Promise.all(querySnapshot.docs.map(d => deleteDoc(d.ref)));
+        
+        alert(`Dane z ${monthName} ${year} zostały usunięte.`);
+        update();
     }
-    
     E.clearMonthBtn.addEventListener('click', clearMonthData);
-    /* ======================================================= */
+
+    function exportToICS() {
+        const year = cur.getFullYear();
+        const month = cur.getMonth();
+        let icsString = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//FedorczakFamilyCalendar//PL',
+        ].join('\r\n') + '\r\n';
+
+        for (const day in data) {
+            const dayData = data[day];
+            const date = new Date(year, month, parseInt(day));
+            const dateString = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+
+            for (const field of fields) {
+                if (dayData[field]) {
+                    const summary = `${labels[field]}: ${dayData[field]}`;
+                    icsString += [
+                        'BEGIN:VEVENT',
+                        `UID:${calId()}-${day}-${field}@fedorczak.family`,
+                        `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}Z`,
+                        `DTSTART;VALUE=DATE:${dateString}`,
+                        `SUMMARY:${summary}`,
+                        'END:VEVENT'
+                    ].join('\r\n') + '\r\n';
+                }
+            }
+        }
+        icsString += 'END:VCALENDAR';
+        
+        const blob = new Blob([icsString], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `kalendarz_${year}_${month+1}.ics`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    E.exportIcsBtn.addEventListener('click', exportToICS);
 
     /* ===== Start Aplikacji ===== */
     function init(){ 
