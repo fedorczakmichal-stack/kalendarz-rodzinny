@@ -1,773 +1,988 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Kalendarz Rodziny Fedorczak</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizator Rodzinny</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    :root{
-      /* kolumny (delikatne, by treść była czytelna) */
-      --c-ania:#fff1f2; --c-aniaP:#f0fff4; --c-michal:#f0f9ff; --c-michalP:#f5f3ff; --c-wsp:#fffbeb; --c-inne:#f1f5f9;
-      /* akcenty zgodne z kropkami w pasku sum */
-      --k-ortho:#a7f3d0;     /* mięta */
-      --k-brzeziny:#fde68a;  /* żółty */
-      --k-lask:#f9a8d4;      /* róż */
-      --k-jb:#c4b5fd;        /* fiolet (JB zwykłe) */
-      --k-jb24:#7c3aed;      /* ciemny fiolet (JB OIT/zniecz – 24h) */
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffeef3 0%, #f0e6ff 50%, #e6f3ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    *{box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased}
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
 
-    /* ======= HEADER ======= */
-    .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-    .view-btn{display:flex;align-items-center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
-    .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
+        .header {
+            background: linear-gradient(135deg, #ffd3e1 0%, #e1d8ff 50%, #c8e6ff 100%);
+            color: #6b4c93;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+        }
 
-    /* ======= SUM (desktop) ======= */
-    .sumbar{display:flex;gap:.5rem;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem}
-    .chip{display:inline-flex;gap:.35rem;align-items:center;border:1px solid #e5e7eb;background:#f9fafb;border-radius:9999px;padding:.3rem .55rem;font-size:.82rem}
-    .dot{width:.55rem;height:.55rem;border-radius:9999px}
-    @media (max-width:768px){ .sumbar{display:none} }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.5);
+            font-weight: 300;
+        }
 
-    /* ======= GRID desktop (stabilna IX/X) ======= */
-    .grid{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid #e5e7eb}
-    .cell{border-bottom:1px solid #e5e7eb;border-left:1px solid #e5e7eb;min-height:60px;position:relative;padding:4px}
-    .cell:nth-child(7n+1){border-left:none}
-    .cell.header{background:#f9fafb;font-weight:600}
-    .day-cell{cursor:pointer}
-    .day-num{font-weight:800;color:#374151}
-    .day-name{font-size:.7rem;color:#6b7280}
-    .today .day-num,.today .day-name{color:#6d28d9}
+        .month-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
 
-    .off{position:relative}
-    .off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
+        .month-selector, .year-selector {
+            padding: 10px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            color: #6b4c93;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;transition:transform .12s;position:relative;z-index:2}
-    .fld:hover{transform:translateY(-1px)}
-    .selected{outline:2px solid #8b5cf6}
+        .month-selector:focus, .year-selector:focus {
+            outline: none;
+            border-color: #c8a8d8;
+            box-shadow: 0 0 15px rgba(200, 168, 216, 0.3);
+        }
 
-    /* kolory kolumn */
-    .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)}
-    .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)}
-    .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
+        .month-title {
+            font-size: 1.4em;
+            color: #6b4c93;
+            margin: 10px 0;
+            font-weight: 400;
+        }
 
-    /* kafelki typów (zgodne z sumami) */
-    .tile-ortho{background:var(--k-ortho)!important;font-weight:600}
-    .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600}
-    .tile-lask{background:var(--k-lask)!important;font-weight:600}
-    .tile-jb{background:var(--k-jb)!important;font-weight:600}
-    .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f4ff 0%, #fff8fc 100%);
+        }
 
-    /* ======= MOBILE LIST – odświeżony ======= */
-    .mcal{display:none;padding:.75rem}
-    @media (max-width:768px){
-      .grid{display:none}
-      .mcal{display:block}
-      .m-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:.85rem;margin-bottom:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.05)}
-      .m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:2px solid #f3f4f6}
-      .m-num{font-size:1.25rem;font-weight:800;color:#1f2937}
-      .m-name{font-size:.8rem;color:#6b7280}
-      .tag{font-size:.7rem;border-radius:999px;padding:.15rem .45rem}
-      .m-row{display:flex;gap:.5rem;align-items:stretch;margin:.3rem 0}
-      .m-label{flex:0 0 86px;border-radius:10px;padding:.45rem .5rem;font-weight:600;color:#334155}
-      .m-content{flex:1;border-radius:10px;padding:.45rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:36px;display:flex;align-items:center}
-      .m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.92rem}
-    }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,244,255,0.9) 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(107, 76, 147, 0.1);
+            border: 1px solid rgba(200, 168, 216, 0.2);
+            transition: transform 0.3s ease;
+        }
 
-    /* ======= COMPACT ======= */
-    #compact{display:none;padding:1rem}
-    .cv-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;margin-bottom:12px;padding:12px;cursor:pointer;transition:all .2s}
-    .cv-card:hover{transform:translateY(-2px);box-shadow:0 4px 6px rgba(0,0,0,.1)}
-    .cv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
-    .cv-item{padding:8px;border-radius:10px;font-size:.85rem}
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
 
-    /* ======= MONTH ======= */
-    #month{display:none;padding:1rem}
-    .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-    .mh{background:#f9fafb;padding:.6rem;text-align:center;font-weight:700;color:#6b7280}
-    .mc{background:#fff;min-height:96px;padding:.4rem;cursor:pointer;position:relative}
-    .mc.week::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
-    .mnum{font-weight:700;color:#374151;margin-bottom:.25rem;position:relative;z-index:2}
-    .mitem{font-size:.68rem;padding:2px 4px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:2}
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #c8a8d8 0%, #a8c8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    /* ======= CONTEXT MENU ======= */
-    #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.1);padding:6px;display:none;z-index:1000}
-    .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px}
-    .ctx-it:hover{background:#f3f4f6}
+        .stat-label {
+            color: #6b4c93;
+            margin-top: 8px;
+            font-weight: 500;
+        }
 
-    /* ======= MODAL — poprawione zamykanie i mobile sheet ======= */
-    #edit{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px}
-    .edit-body{
-      background:#fff;border-radius:18px;width:min(720px,100%);max-height:86vh;overflow:auto;
-      padding:0;display:flex;flex-direction:column;
-    }
-    .edit-head{
-      position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #f3f4f6;
-      display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;border-top-left-radius:18px;border-top-right-radius:18px;
-    }
-    .edit-title{font-weight:800;color:#0f172a;font-size:1.1rem}
-    .edit-close{margin-left:auto;flex-shrink:0;width:36px;height:36px;border-radius:10px;border:1px solid #e5e7eb;background:#f8fafc}
-    .edit-close:hover{background:#eef2ff;border-color:#c7d2fe}
-    .edit-content{padding:1rem 1rem 1.25rem}
+        .table-container {
+            padding: 25px;
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.5);
+        }
 
-    /* modal na telefonie = dolny arkusz */
-    @supports (padding: env(safe-area-inset-bottom)){
-      @media (max-width:768px){
-        #edit{align-items:flex-end}
-        .edit-body{width:100%;max-height:90vh;border-bottom-left-radius:0;border-bottom-right-radius:0}
-        .edit-head{padding-top:calc(1rem + env(safe-area-inset-top))}
-        .edit-content{padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
-      }
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(107, 76, 147, 0.1);
+            table-layout: fixed;
+            min-width: 1100px;
+        }
 
-    /* ======= FAB + SHEET (MOBILE) ======= */
-    #fab{position:fixed;right:16px;bottom:16px;z-index:1100;display:none;align-items:center;gap:.5rem;
-      background:linear-gradient(135deg,#a78bfa,#f472b6);color:#fff;border:none;border-radius:9999px;padding:.7rem .95rem;font-weight:800}
-    #fab svg{width:18px;height:18px}
-    @media (max-width:768px){ #fab{display:inline-flex} }
-    #sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;
-      box-shadow:0 -12px 24px rgba(0,0,0,.2);transform:translateY(110%);transition:transform .22s ease-out;z-index:1200}
-    #sheet.open{transform:translateY(0)}
-  </style>
+        th {
+            background: linear-gradient(135deg, #e1d8ff 0%, #ffd3e1 50%, #c8e6ff 100%);
+            color: #6b4c93;
+            padding: 18px 8px;
+            text-align: center;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            vertical-align: middle;
+            font-size: 13px;
+            line-height: 1.3;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+        }
+
+        /* Konkretne szerokości kolumn */
+        th:nth-child(1) { width: 80px; }   /* Data */
+        th:nth-child(2) { width: 100px; }  /* Dzień */
+        th:nth-child(3) { width: 150px; }  /* Ania Praca */
+        th:nth-child(4) { width: 150px; }  /* Ania Inne */
+        th:nth-child(5) { width: 150px; }  /* Michał Praca */
+        th:nth-child(6) { width: 150px; }  /* Michał Inne */
+        th:nth-child(7) { width: 130px; }  /* Niania */
+        th:nth-child(8) { width: 130px; }  /* Inne */
+        th:nth-child(9) { width: 100px; }  /* Priorytet */
+
+        td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid rgba(200, 168, 216, 0.1);
+            vertical-align: middle;
+            transition: background-color 0.3s ease;
+        }
+
+        .date-cell {
+            font-weight: 600;
+            color: #6b4c93;
+        }
+
+        .day-cell {
+            font-weight: 500;
+            color: #8a6ba0;
+        }
+
+        .weekend {
+            background: linear-gradient(135deg, #ffeef7 0%, #fff0f8 100%);
+            color: #d1477a;
+        }
+
+        .weekday {
+            background: linear-gradient(135deg, #f8f4ff 0%, #fafbff 100%);
+        }
+
+        .input-cell {
+            padding: 8px;
+        }
+
+        .task-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid rgba(200, 168, 216, 0.3);
+            border-radius: 10px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            color: #6b4c93;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: #c8a8d8;
+            box-shadow: 0 0 15px rgba(200, 168, 216, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .task-input.filled {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+            border-color: #90c695;
+            color: #2d5a32;
+        }
+
+        .priority-select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid rgba(200, 168, 216, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #6b4c93;
+            cursor: pointer;
+        }
+
+        .priority-high { 
+            background: linear-gradient(135deg, #ffe6ee 0%, #ffebf0 100%);
+            border-color: #ff9fb3; 
+            color: #cc4465;
+        }
+        .priority-medium { 
+            background: linear-gradient(135deg, #fff3e6 0%, #fff7ed 100%);
+            border-color: #ffcc99; 
+            color: #cc7722;
+        }
+        .priority-low { 
+            background: linear-gradient(135deg, #e6f3ff 0%, #f0f8ff 100%);
+            border-color: #99ccff; 
+            color: #2266cc;
+        }
+
+        .controls {
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f4ff 0%, #fff8fc 100%);
+            border-top: 1px solid rgba(200, 168, 216, 0.2);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e1d8ff 0%, #c8e6ff 100%);
+            color: #6b4c93;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #d4f1d4 0%, #e8f5e8 100%);
+            color: #2d5a32;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffe6ee 0%, #ffebf0 100%);
+            color: #cc4465;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #fff3e6 0%, #fff7ed 100%);
+            color: #cc7722;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .summary-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f4ff 0%, #fff8fc 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(200, 168, 216, 0.2);
+        }
+
+        .summary-section h3 {
+            color: #6b4c93;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,244,255,0.9) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(107, 76, 147, 0.08);
+            border: 1px solid rgba(200, 168, 216, 0.2);
+        }
+
+        .summary-card h4 {
+            color: #6b4c93;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .summary-card p {
+            color: #8a6ba0;
+            margin: 5px 0;
+        }
+
+        .summary-card small {
+            color: #a084b8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(200, 168, 216, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #c8a8d8 0%, #a8c8e8 100%);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .today-highlight {
+            background: linear-gradient(135deg, #fff9c4 0%, #ffffcc 100%) !important;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(255, 223, 0, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(255, 223, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 223, 0, 0.5); }
+            100% { box-shadow: 0 0 10px rgba(255, 223, 0, 0.3); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .month-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(225,216,255,0.9) 100%);
+            border: 2px solid rgba(200, 168, 216, 0.5);
+            color: #6b4c93;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: linear-gradient(135deg, #e1d8ff 0%, #ffd3e1 100%);
+            transform: translateY(-1px);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-  <header class="hdr">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow">
-          <span class="text-white font-black">🌸</span>
-        </div>
-        <div>
-          <div class="font-extrabold text-slate-900">Rodzina Fedorczak</div>
-          <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
-        </div>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Organizator Rodzinny</h1>
+            
+            <div class="month-controls">
+                <button class="nav-button" onclick="changeMonth(-1)">← Poprzedni</button>
+                
+                <select class="month-selector" id="monthSelect" onchange="updateCalendar()">
+                    <option value="0">Styczeń</option>
+                    <option value="1">Luty</option>
+                    <option value="2">Marzec</option>
+                    <option value="3">Kwiecień</option>
+                    <option value="4">Maj</option>
+                    <option value="5">Czerwiec</option>
+                    <option value="6">Lipiec</option>
+                    <option value="7">Sierpień</option>
+                    <option value="8">Wrzesień</option>
+                    <option value="9">Październik</option>
+                    <option value="10" selected>Listopad</option>
+                    <option value="11">Grudzień</option>
+                </select>
 
-      <div class="flex items-center gap-2 flex-wrap">
-        <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
-        <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
-        <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
-        <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
-        <div class="flex gap-1 border border-gray-200 rounded-xl p-1">
-          <button id="v-standard" class="view-btn active" data-v="standard" title="Widok normalny">▦</button>
-          <button id="v-compact"  class="view-btn" data-v="compact"  title="Widok kompaktowy">≡</button>
-          <button id="v-month"    class="view-btn" data-v="month"    title="Widok miesięczny">▤</button>
+                <select class="year-selector" id="yearSelect" onchange="updateCalendar()">
+                    <option value="2024">2024</option>
+                    <option value="2025" selected>2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+
+                <button class="nav-button" onclick="changeMonth(1)">Następny →</button>
+            </div>
+
+            <div class="month-title" id="monthTitle">
+                Listopad 2025 - Planowanie dla Ani, Michała i niani
+            </div>
         </div>
+
+        <div class="stats" id="statsContainer">
+            <!-- Statystyki będą generowane dynamicznie -->
+        </div>
+
+        <div class="table-container">
+            <table id="organizerTable">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Dzień</th>
+                        <th>Ania<br/>Praca</th>
+                        <th>Ania<br/>Inne</th>
+                        <th>Michał<br/>Praca</th>
+                        <th>Michał<br/>Inne</th>
+                        <th>Niania</th>
+                        <th>Inne</th>
+                        <th>Priorytet</th>
+                    </tr>
+                </thead>
+                <tbody id="organizerBody">
+                    <!-- Wiersze będą generowane dynamicznie -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-section">
+            <h3>📊 Podsumowanie miesięczne</h3>
+            <div class="summary-grid" id="summaryGrid">
+                <!-- Podsumowania będą generowane dynamicznie -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="fillSampleData()">
+                📝 Wypełnij przykładowymi danymi
+            </button>
+            <button class="btn btn-success" onclick="exportToCSV()">
+                📥 Eksportuj do CSV
+            </button>
+            <button class="btn btn-warning" onclick="clearAllData()">
+                🗑️ Wyczyść wszystkie dane
+            </button>
+            <button class="btn btn-info" onclick="autoBalance()">
+                ⚖️ Automatyczny podział obowiązków
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Stan organizatora
+        let organizerData = {};
+        let currentMonth = 10; // listopad (0-based)
+        let currentYear = 2025;
         
-        <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
-            <input type="file" id="csvFileInput" accept=".csv" class="text-sm">
-            <input type="number" id="importYear" placeholder="Rok" class="w-20 p-2 border border-gray-300 rounded-md text-sm">
-            <input type="number" id="importMonth" placeholder="Miesiąc" class="w-24 p-2 border border-gray-300 rounded-md text-sm">
-            <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
-        </div>
+        // Nazwy miesięcy
+        const monthNames = [
+            'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+            'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+        ];
 
-      </div>
-    </div>
-  </header>
+        // Nazwy miesięcy w dopełniaczu dla daty
+        const monthNamesGenitive = [
+            'stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca',
+            'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia'
+        ];
 
-  <div class="sumbar">
-    <span class="chip"><span class="dot" style="background:var(--k-ortho)"></span> Ortho: <b id="sum-ortho">0h</b></span>
-    <span class="chip"><span class="dot" style="background:var(--k-brzeziny)"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
-    <span class="chip"><span class="dot" style="background:var(--k-lask)"></span> Łask: <b id="sum-lask">0h</b></span>
-    <span class="chip"><span class="dot" style="background:var(--k-jb)"></span> JB: <b id="sum-jb">0h</b></span>
-    <span class="chip"><span class="dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
-  </div>
-
-  <main class="w-full bg-white flex flex-col flex-grow">
-    <div id="standard" class="flex-1 flex flex-col">
-      <div id="desk-wrap" class="overflow-auto hidden md:block flex-1">
-        <div class="bg-white border-t min-w-[900px]">
-          <div class="grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
-            <div class="cell header p-3">Dzień</div>
-            <div class="cell header p-3 c-ania">Ania</div>
-            <div class="cell header p-3 c-aniaP">Ania Praca</div>
-            <div class="cell header p-3 c-michal">Michał</div>
-            <div class="cell header p-3 c-michalP">Michał Praca</div>
-            <div class="cell header p-3 c-wsp">Wspólne</div>
-            <div class="cell header p-3 c-inne">Dom/Finanse</div>
-          </div>
-          <div id="desk" class="grid"></div>
-        </div>
-      </div>
-      <div id="mob" class="mcal md:hidden"></div>
-    </div>
-
-    <div id="compact" style="display:none">
-      <div id="cv-cont" class="p-1"></div>
-    </div>
-
-    <div id="month" style="display:none">
-      <div id="mgrid" class="mgrid"></div>
-    </div>
-  </main>
-
-  <button id="fab" aria-label="Pokaż podsumowanie">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3v18"/></svg>
-    Suma
-  </button>
-
-  <div id="sheet">
-    <div class="w-full p-4">
-      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-2"></div>
-      <div id="sheet-title" class="text-sm text-gray-500 mb-2">Podsumowanie</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Ortho</div><div id="ms-ortho" class="text-lg font-bold">0h</div></div>
-        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Brzeziny</div><div id="ms-brzeziny" class="text-lg font-bold">0h</div></div>
-        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">Łask</div><div id="ms-lask" class="text-lg font-bold">0h</div></div>
-        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50"><div class="text-xs text-gray-500">JB</div><div id="ms-jb" class="text-lg font-bold">0h</div></div>
-        <div class="p-3 rounded-lg border border-gray-200 bg-gray-50 col-span-2"><div class="text-xs text-gray-500">Porty</div><div id="ms-ports" class="text-lg font-bold">0</div></div>
-      </div>
-      <div class="mt-3 text-right">
-        <button id="sheet-close" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Zamknij</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="ctx">
-    <div id="ctx-copy"  class="ctx-it">Kopiuj</div>
-    <div id="ctx-cut"   class="ctx-it">Wytnij</div>
-    <div id="ctx-paste" class="ctx-it">Wklej</div>
-    <div class="h-px bg-gray-200 my-1"></div>
-    <div id="ctx-del"   class="ctx-it text-red-600">Usuń</div>
-  </div>
-
-  <div id="edit">
-    <div class="edit-body">
-      <div class="edit-head">
-        <h3 id="edit-title" class="edit-title">Edycja dnia</h3>
-        <button id="edit-close" class="edit-close">✕</button>
-      </div>
-      <div id="edit-fields" class="edit-content"></div>
-    </div>
-  </div>
-
-  <script type="module">
-    /* ===== Firebase ===== */
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const cfg = {
-      apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
-      authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com",
-      projectId:"kalendarz-rodzinny-68d04",
-      storageBucket:"kalendarz-rodzinny-68d04.appspot.com",
-      messagingSenderId:"1050937545151",
-      appId:"1:1050937545151:web:a85fd1a5f066f4a499910a",
-      measurementId:"G-57YKE2XKQ1"
-    };
-
-    let db;
-    try{
-      const app = initializeApp(cfg);
-      const auth = getAuth(app);
-      db = getFirestore(app);
-      signInAnonymously(auth);
-      onAuthStateChanged(auth, u => u && init());
-    }catch(e){ console.error(e); }
-
-    /* ===== Stan ===== */
-    let cur = new Date();
-    let unsub = () => {};
-    let isMobile = matchMedia("(max-width: 768px)").matches;
-    const fields = ['ania','aniaPraca','michal','michalPraca','wspolne','inne'];
-    const labels = { ania:'Ania', aniaPraca:'Ania Praca', michal:'Michał', michalPraca:'Michał Praca', wspolne:'Wspólne', inne:'Dom/Finanse' };
-    let data = {};
-    let clip = null;
-    let view = 'standard';
-
-    const el = id => document.getElementById(id);
-    const E = {
-      title: el('title'), prev: el('prev'), next: el('next'), today: el('today'),
-      vStandard: el('v-standard'), vCompact: el('v-compact'), vMonth: el('v-month'),
-      desk: el('desk'), mob: el('mob'), cv: el('cv-cont'), mgrid: el('mgrid'),
-      sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'),
-      msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'),
-      sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'),
-      ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
-      edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title'),
-      importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), importYear: el('importYear'), importMonth: el('importMonth')
-    };
-
-    window.addEventListener('resize', ()=>{ const was = isMobile; isMobile = matchMedia("(max-width: 768px)").matches; if (was!==isMobile) update(); });
-
-    /* ===== Nazwy ===== */
-    const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
-    const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
-    const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
-    const getDayIdx = d => (d + 6) % 7; // Pon=0
-
-    /* ===== Typy i kafelki ===== */
-    const jb24 = ['jb oit','jb zniecz','jb znieczulenia','jb znieczuleń']; // 24h dyżury
-    const isOrtho = t => /ortho/i.test(t||'');
-    const isBrzeziny = t => /brzeziny/i.test(t||'');
-    const isLask = t => /łask/i.test(t||'');
-    const isJB = t => !!(t&&(t.toLowerCase().startsWith('jb')||t.toLowerCase().includes('jb ')));
-
-    const getFieldClass = (field) => ({ aniaPraca:'c-aniaP', michalPraca:'c-michalP', wspolne:'c-wsp' }[field] || `c-${field}`);
-
-    const getTileClass = t=>{
-      if(!t) return '';
-      const s=t.toLowerCase();
-      if(jb24.some(k=>s.includes(k))) return 'tile-jb24';   // JB 24h – ciemny fiolet
-      if(isLask(s)) return 'tile-lask';                     // Łask – róż
-      if(isOrtho(s)) return 'tile-ortho';                   // Ortho – mięta
-      if(isBrzeziny(s)) return 'tile-brzeziny';             // Brzeziny – żółty
-      if(s.startsWith('jb')) return 'tile-jb';              // inne JB – jaśniejszy fiolet
-      return '';
-    };
-
-    /* ===== Godziny w tle (bez badge’y) ===== */
-    const getDefaultHours = (txt)=>{
-      if(!txt) return 0;
-      const s = txt.toLowerCase();
-      if(isOrtho(s)||isBrzeziny(s)) return 10;
-      if(isLask(s)) return 24;
-      if(jb24.some(k=>s.includes(k))) return 24;
-      if(/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6;
-      if(isJB(s)) return 6;
-      return 0;
-    };
-    const getSavedHours = (day, field)=>{
-      const v = (data[day]||{})[`hours_${field}`];
-      return (typeof v === 'number' && Number.isFinite(v)) ? v : null; // zabezpiecza przed [object Object]
-    };
-    const getPorts = (day, field)=>{
-      const v = (data[day]||{})[`ports_${field}`];
-      return (typeof v === 'number' && Number.isFinite(v)) ? v : 0;
-    };
-    const effHours = (day, field, txt)=>{
-      const saved = getSavedHours(day, field);
-      return saved!==null ? saved : getDefaultHours(txt);
-    };
-
-    /* ===== Render: desktop ===== */
-    const renderDesktop = (y,m,ev)=>{
-      E.desk.innerHTML='';
-      const days = new Date(y,m+1,0).getDate();
-      const today = new Date();
-      for(let d=1; d<=days; d++){
-        const date = new Date(y,m,d);
-        const dow = date.getDay();
-        const isToday = today.toDateString()===date.toDateString();
-        const de = ev[d]||{};
-        const off = (dow===0||dow===6)||de.isHoliday;
-
-        const dayCell = document.createElement('div');
-        dayCell.className = `cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`;
-        dayCell.dataset.day=d;
-        dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;
-        E.desk.appendChild(dayCell);
-
-        for(const f of fields){
-          const t = de[f]||'';
-          const c = document.createElement('div');
-          c.className = `cell ${off?'off':''} ${getFieldClass(f)}`;
-          const div = document.createElement('div');
-          div.className = `fld ${getTileClass(t)}`;
-          div.dataset.day=d; div.dataset.field=f;
-          const span = document.createElement('span'); span.className='txt'; span.textContent=t;
-          div.appendChild(span); c.appendChild(div); E.desk.appendChild(c);
-          if (!isMobile && t) div.draggable = true; // touch: brak DnD (naprawia „ghosty”)
-        }
-      }
-    };
-
-    /* ===== Render: mobile ===== */
-    const renderMobile = (y,m,ev)=>{
-      E.mob.innerHTML='';
-      const days = new Date(y,m+1,0).getDate();
-      const today = new Date();
-      const frag = document.createDocumentFragment();
-      for(let d=1; d<=days; d++){
-        const date = new Date(y,m,d);
-        const dow = date.getDay();
-        const de = ev[d]||{};
-        const off = (dow===0||dow===6)||de.isHoliday;
-        const isToday = today.toDateString()===date.toDateString();
-        const card = document.createElement('div');
-        card.className = `m-card ${off?'ring-0':''} ${isToday?'ring-2 ring-purple-400':''}`;
-        let html = `<div class="m-head">
-          <div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div>
-          <div class="flex gap-1">
-            ${de.isHoliday?'<span class="tag bg-purple-200 text-purple-700">Święto</span>':''}
-            ${isToday?'<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>':''}
-          </div>
-        </div>`;
-        for(const f of fields){
-          const t = de[f]||'';
-          html += `<div class="m-row">
-            <div class="m-label ${getFieldClass(f)}">${labels[f]}</div>
-            <div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}">
-              <span class="txt">${t||'<span class="text-gray-400">Kliknij aby dodać</span>'}</span>
-            </div>
-          </div>`;
-        }
-        card.innerHTML = html;
-        frag.appendChild(card);
-      }
-      E.mob.appendChild(frag);
-    };
-
-    /* ===== Render: compact (bez przenoszenia do „Dziś”) ===== */
-    const renderCompact = async (y,m)=>{
-      E.cv.innerHTML='';
-      const days = new Date(y,m+1,0).getDate();
-      for(let d=1; d<=days; d++){
-        const de = data[d]||{};
-        const has = fields.some(f=>de[f]);
-        const dow = new Date(y,m,d).getDay();
-        const card = document.createElement('div');
-        card.className = 'cv-card';
-        card.onclick=()=>openEdit(d,de);
-        let html = `<div class="flex items-center justify-between pb-2 border-b-2 border-gray-100 mb-2">
-          <div class="font-extrabold text-lg">${d}</div>
-          <div class="text-sm text-gray-500">${dNamesFull[getDayIdx(dow)]}</div></div>`;
-        if(has){
-          html+='<div class="cv-grid">';
-          for(const f of fields){
-            if(de[f]){
-              html += `<div class="cv-item ${getFieldClass(f)} ${getTileClass(de[f])}">
-                <div class="text-[11px] opacity-70 font-semibold">${labels[f]}</div>
-                <div>${de[f]}</div>
-              </div>`;
+        // Skróty miesięcy
+        const monthAbbr = [
+            'sty', 'lut', 'mar', 'kwi', 'maj', 'cze',
+            'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'
+        ];
+        
+        // Wygenerowanie dat dla danego miesiąca i roku
+        function generateDatesForMonth(month, year) {
+            const dates = [];
+            const daysOfWeek = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+            
+            // Sprawdź ile dni ma miesiąc
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dayName = daysOfWeek[date.getDay()];
+                const isWeekend = dayName === 'sobota' || dayName === 'niedziela';
+                
+                dates.push({
+                    day: day,
+                    date: `${day} ${monthAbbr[month]}`,
+                    dayName: dayName,
+                    isWeekend: isWeekend,
+                    fullDate: date
+                });
             }
-          }
-          html+='</div>';
-        } else {
-          html+='<div class="text-gray-400 text-sm text-center py-2">Brak wydarzeń</div>';
-        }
-        card.innerHTML=html; E.cv.appendChild(card);
-      }
-    };
-
-    /* ===== Render: month ===== */
-    const renderMonth = async (y,m)=>{
-      E.mgrid.innerHTML='';
-      ['Pon','Wt','Śr','Czw','Pt','Sob','Nd'].forEach(h=>{ const e=document.createElement('div'); e.className='mh'; e.textContent=h; E.mgrid.appendChild(e); });
-      const first = new Date(y,m,1); const start = getDayIdx(first.getDay()); const days = new Date(y,m+1,0).getDate();
-      for(let i=0;i<start;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
-      for(let d=1; d<=days; d++){
-        const dow = new Date(y,m,d).getDay();
-        const de = data[d]||{};
-        const cell = document.createElement('div');
-        cell.className=`mc ${(dow===0||dow===6||de.isHoliday)?'week':''}`;
-        cell.onclick=()=>openEdit(d,de);
-        let html = `<div class="mnum">${d}</div>`;
-        let shown=0;
-        for(const f of fields){
-          if(de[f] && shown<3){ html += `<div class="mitem ${getFieldClass(f)} ${getTileClass(de[f])}">${de[f]}</div>`; shown++; }
-        }
-        if(fields.filter(f=>de[f]).length>3) html+=`<div class="mitem" style="color:#6b7280">+ więcej</div>`;
-        cell.innerHTML=html; E.mgrid.appendChild(cell);
-      }
-      const total = start+days; for(let i=total;i<Math.ceil(total/7)*7;i++){ const e=document.createElement('div'); e.className='mc'; e.style.background='#fafafa'; E.mgrid.appendChild(e); }
-    };
-
-    /* ===== Sumy ===== */
-    const computeSums = ()=>{
-      let ortho=0, brz=0, lask=0, jb=0, ports=0;
-      const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();
-      for(let d=1; d<=days; d++){
-        const row=data[d]; if(!row) continue;
-        for(const f of fields){
-          const t=row[f]; if(!t) continue;
-          const h=effHours(d,f,t);
-          if(isOrtho(t)) ortho+=h;
-          if(isBrzeziny(t)) brz+=h;
-          if(isLask(t)) lask+=h;
-          if(isJB(t)) jb+=h;
-          if(f==='michalPraca') ports += getPorts(d,f);
-        }
-      }
-      E.sumOrtho.textContent=ortho+'h';
-      E.sumBrz.textContent=brz+'h';
-      E.sumLask.textContent=lask+'h';
-      E.sumJB.textContent=jb+'h';
-      E.sumPorts.textContent=String(ports);
-      E.msOrtho.textContent=ortho+'h';
-      E.msBrz.textContent=brz+'h';
-      E.msLask.textContent=lask+'h';
-      E.msJB.textContent=jb+'h';
-      E.msPorts.textContent=String(ports);
-      E.sheetTitle.textContent=`Podsumowanie: ${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
-    };
-
-    /* ===== DB helpers ===== */
-    const calId = ()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
-    const save = (day,field,val, customCalId = null)=> setDoc(doc(db, customCalId || calId(), String(day)), { [field]: val }, { merge:true });
-    const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
-    const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
-    const setPortsDb = (day,field,c)=> setDoc(doc(db, calId(), String(day)), { [`ports_${field}`]: (c===''||c===null)? deleteField() : parseInt(c,10) }, { merge:true });
-
-    /* ===== Modal edycji ===== */
-    function openEdit(day, dayRow, singleField = null){
-      const date=new Date(cur.getFullYear(),cur.getMonth(),day);
-      const title = singleField
-        ? `${labels[singleField]} — ${day} ${mNames[cur.getMonth()]}`
-        : `${day} ${mNames[cur.getMonth()]} — ${dNamesFull[getDayIdx(date.getDay())]}`;
-      E.editTitle.textContent = title;
-      E.editFields.innerHTML='';
-
-      const fieldsToRender = singleField ? [singleField] : fields;
-      for(const f of fieldsToRender){
-        const txt = (dayRow&&dayRow[f])||'';
-        const savedH = getSavedHours(day,f);
-        const defH = getDefaultHours(txt);
-        const ports = getPorts(day,f);
-
-        const wrap=document.createElement('div');
-        wrap.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-1 rounded-md ${getFieldClass(f)} text-slate-700 font-semibold">${labels[f]}</span>
-            <button class="ml-auto text-red-500 hover:text-red-600" data-act="del" data-field="${f}" title="Usuń wpis">Usuń</button>
-          </div>
-          <input type="text" class="w-full mt-2 p-3 border border-gray-200 rounded-lg ${getTileClass(txt)}" data-field="${f}" value="${txt}" placeholder="Kliknij aby dodać">
-          <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
-            <div>
-              <label class="text-xs text-gray-500">Godziny (puste = auto)</label>
-              <input type="range" min="0" max="48" step="1" value="${savedH!==null?savedH:defH}" data-field="${f}" data-hrs="slider" class="w-full">
-            </div>
-            <input type="number" min="0" max="48" step="1" value="${savedH!==null?savedH:''}" placeholder="${defH}" data-field="${f}" data-hrs="num" class="w-20 p-2 border border-gray-200 rounded-md text-center">
-          </div>
-          ${f==='michalPraca' ? `
-          <div class="mt-2 grid grid-cols-[1fr_auto] gap-3 items-center">
-            <label class="text-xs text-gray-500">Porty (opcjonalnie)</label>
-            <input type="number" min="0" step="1" value="${ports||''}" placeholder="0" data-field="${f}" data-ports class="w-20 p-2 border border-gray-200 rounded-md text-center">
-          </div>`:''}
-        `;
-        E.editFields.appendChild(wrap);
-      }
-
-      E.editFields.querySelectorAll('input[type="text"]').forEach(inp=>{
-        inp.addEventListener('change', async ()=>{
-          const f=inp.dataset.field; const v=inp.value.trim();
-          if(!v) await del(day,f).catch(()=>{});
-          else await save(day,f,v);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-hrs="slider"]').forEach(sl=>{
-        sl.addEventListener('input', ()=>{
-          const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${sl.dataset.field}"]`);
-          const field=sl.dataset.field;
-          const curTxt=(data[day]||{})[field]||'';
-          const def = getDefaultHours(curTxt);
-          num.value = (parseInt(sl.value,10)===def)? '' : sl.value;
-        });
-        sl.addEventListener('change', async ()=>{
-          const f=sl.dataset.field; const num = E.editFields.querySelector(`input[data-hrs="num"][data-field="${f}"]`);
-          await setHours(day,f,(num.value==='')? '': num.value);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-hrs="num"]').forEach(num=>{
-        num.addEventListener('change', async ()=>{
-          const f=num.dataset.field; const slider = E.editFields.querySelector(`input[data-hrs="slider"][data-field="${f}"]`);
-          const curTxt=(data[day]||{})[f]||''; const def=getDefaultHours(curTxt);
-          slider.value = (num.value===''? def : num.value);
-          await setHours(day,f,num.value);
-        });
-      });
-      E.editFields.querySelectorAll('input[data-ports]').forEach(p=>{
-        p.addEventListener('change', async ()=>{ await setPortsDb(day,p.dataset.field,p.value); });
-      });
-      E.editFields.querySelectorAll('[data-act="del"]').forEach(b=>{
-        b.addEventListener('click', async ()=>{
-          const f=b.dataset.field; await del(day,f).catch(()=>{});
-          const row={...(data[day]||{})}; delete row[f]; openEdit(day,row, singleField);
-        });
-      });
-
-      E.edit.style.display='flex';
-    }
-    E.editClose.onclick=()=>E.edit.style.display='none';
-    E.edit.addEventListener('click',e=>{ if(e.target===E.edit) E.edit.style.display='none'; });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.edit.style.display === 'flex') E.edit.style.display = 'none'; });
-
-    /* ===== Context ===== */
-    document.addEventListener('contextmenu', e=>{
-      const fld = e.target.closest('.fld'); if(!fld) return;
-      e.preventDefault();
-      const r=E.ctx; r.style.display='block';
-      const rect=r.getBoundingClientRect();
-      let x=e.clientX, y=e.clientY;
-      if(x+rect.width>innerWidth) x = innerWidth-rect.width-6;
-      if(y+rect.height>innerHeight) y = innerHeight-rect.height-6;
-      r.style.left=x+'px'; r.style.top=y+'px';
-      r.dataset.day=fld.dataset.day; r.dataset.field=fld.dataset.field;
-    });
-    document.addEventListener('click', e=>{ if(!e.target.closest('#ctx')) E.ctx.style.display='none'; });
-    E.ctxCopy.onclick=()=>{ const d=E.ctx.dataset; clip = (data[d.day]?.[d.field])||''; E.ctx.style.display='none'; };
-    E.ctxCut.onclick=async ()=>{ const d=E.ctx.dataset; clip = (data[d.day]?.[d.field])||''; await del(d.day,d.field); E.ctx.style.display='none'; };
-    E.ctxPaste.onclick=async ()=>{ const d=E.ctx.dataset; if(clip!==null){ await save(d.day,d.field,clip); } E.ctx.style.display='none'; };
-    E.ctxDel.onclick=async ()=>{ const d=E.ctx.dataset; await del(d.day,d.field); E.ctx.style.display='none'; };
-
-    /* ===== Kliknięcia ===== */
-    E.desk.addEventListener('click', e=>{
-      const dayCell = e.target.closest('.day-cell'); 
-      if(dayCell){ toggleHoliday(dayCell.dataset.day); return; }
-      const fld = e.target.closest('.fld'); 
-      if(fld) openEdit(fld.dataset.day, data[fld.dataset.day]||{}, fld.dataset.field);
-    });
-    E.mob.addEventListener('click', e=>{
-      const c = e.target.closest('.m-content'); 
-      if(c) openEdit(c.dataset.day, data[c.dataset.day]||{}, c.dataset.field);
-    });
-
-    /* ===== Holiday toggle ===== */
-    async function toggleHoliday(day){
-      const id=calId(); const ref=doc(db,id,String(day));
-      const snap=await getDoc(ref); const cur=(snap.exists() && snap.data().isHoliday)||false;
-      await setDoc(ref,{isHoliday:!cur},{merge:true});
-    }
-
-    /* ===== Update/render ===== */
-    function setTitle(){ E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; }
-
-    async function update(){
-      if(!db) return;
-      setTitle();
-      const id=calId(); const snap=await getDocs(collection(db,id));
-      data={}; snap.forEach(d=>data[d.id]=d.data());
-
-      if(view==='standard'){
-        isMobile ? renderMobile(cur.getFullYear(),cur.getMonth(),data) : renderDesktop(cur.getFullYear(),cur.getMonth(),data);
-      }else if(view==='compact'){
-        await renderCompact(cur.getFullYear(),cur.getMonth());
-      }else{
-        await renderMonth(cur.getFullYear(),cur.getMonth());
-      }
-      computeSums();
-
-      unsub(); if(view!=='standard') return;
-      unsub = onSnapshot(collection(db,id), s=>{
-        s.docChanges().forEach(ch=>{
-          if(ch.type==='removed'){ delete data[ch.doc.id]; }
-          else { data[ch.doc.id]=ch.doc.data(); }
-        });
-        if(isMobile) renderMobile(cur.getFullYear(),cur.getMonth(),data);
-        else renderDesktop(cur.getFullYear(),cur.getMonth(),data);
-        computeSums();
-      });
-    }
-
-    /* ===== Nawigacja/widoki ===== */
-    E.prev.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()-1); update(); };
-    E.next.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()+1); update(); };
-    E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
-
-    function setActive(){
-      for(const b of [E.vStandard,E.vCompact,E.vMonth]) b.classList.remove('active');
-      ({standard:E.vStandard,compact:E.vCompact,month:E.vMonth})[view].classList.add('active');
-    }
-    [E.vStandard,E.vCompact,E.vMonth].forEach(btn=>{
-      btn.onclick=()=>{ 
-        view=btn.dataset.v; setActive();
-        document.getElementById('standard').style.display = (view==='standard')?'flex':'none';
-        document.getElementById('compact').style.display  = (view==='compact')?'block':'none';
-        document.getElementById('month').style.display    = (view==='month')?'block':'none';
-        update();
-      };
-    });
-
-    /* ===== FAB sheet ===== */
-    E.fab.onclick=()=> E.sheet.classList.add('open');
-    E.sheetClose.onclick=()=> E.sheet.classList.remove('open');
-    E.sheet.addEventListener('click',e=>{ if(e.target===E.sheet) E.sheet.classList.remove('open'); });
-
-    /* ===== FUNKCJA IMPORTU DANYCH Z PLIKU CSV ===== */
-    async function importData(csvData, year, month) {
-        // Mapowanie kolumn z CSV do pól w bazie danych Firebase
-        const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
-        const collectionId = `${year}-${month}`;
-        const lines = csvData.trim().split('\n');
-
-        if (!confirm(`Czy na pewno chcesz zaimportować dane dla ${mNames[month-1]} ${year}? Spowoduje to nadpisanie istniejących danych.`)) {
-            console.log("Import anulowany.");
-            return;
+            return dates;
         }
 
-        console.log(`Rozpoczynam import do kolekcji: ${collectionId}`);
-        const daysInMonth = new Date(year, month, 0).getDate();
+        // Sprawdzenie czy dzień to dzisiaj
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() && 
+                   date.getMonth() === today.getMonth() && 
+                   date.getFullYear() === today.getFullYear();
+        }
 
-        for (let i = 0; i < lines.length && i < daysInMonth; i++) {
-            const day = i + 1;
-            const columns = lines[i].split(',');
-            const dataToSave = {};
-            let hasData = false;
+        // Zmiana miesiąca
+        function changeMonth(direction) {
+            currentMonth += direction;
+            
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            document.getElementById('monthSelect').value = currentMonth;
+            document.getElementById('yearSelect').value = currentYear;
+            
+            updateCalendar();
+        }
 
-            for (let j = 0; j < columnMapping.length; j++) {
-                if (j < columns.length) {
-                    const fieldName = columnMapping[j];
-                    const value = columns[j] ? columns[j].trim().replace(/"/g, '') : '';
-                    if (value) {
-                        dataToSave[fieldName] = value;
-                        hasData = true;
+        // Aktualizacja kalendarza
+        function updateCalendar() {
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            
+            // Aktualizuj tytuł
+            document.getElementById('monthTitle').textContent = 
+                `${monthNames[currentMonth]} ${currentYear} - Planowanie dla Ani, Michała i niani`;
+            
+            // Wygeneruj nową tabelę
+            generateTable();
+        }
+
+        // Generowanie tabeli
+        function generateTable() {
+            const dates = generateDatesForMonth(currentMonth, currentYear);
+            const tbody = document.getElementById('organizerBody');
+            tbody.innerHTML = '';
+
+            dates.forEach((dateInfo, index) => {
+                const row = document.createElement('tr');
+                const rowClass = dateInfo.isWeekend ? 'weekend' : 'weekday';
+                const todayClass = isToday(dateInfo.fullDate) ? 'today-highlight' : '';
+                
+                const monthKey = `${currentYear}-${currentMonth}`;
+                const dayKey = `${monthKey}-${dateInfo.day}`;
+                
+                row.innerHTML = `
+                    <td class="date-cell ${rowClass} ${todayClass}">${dateInfo.date}</td>
+                    <td class="day-cell ${rowClass} ${todayClass}">${dateInfo.dayName}</td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="aniaWork" 
+                               placeholder="np. 9-17 biuro">
+                    </td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="aniaOther" 
+                               placeholder="np. siłownia 18:00">
+                    </td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="michalWork" 
+                               placeholder="np. 8-16 zdalnie">
+                    </td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="michalOther" 
+                               placeholder="np. spotkanie 19:00">
+                    </td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="niania" 
+                               placeholder="np. 10-16">
+                    </td>
+                    <td class="input-cell">
+                        <input type="text" class="task-input" 
+                               data-month="${currentMonth}" data-year="${currentYear}"
+                               data-day="${dateInfo.day}" data-field="inne" 
+                               placeholder="notatki">
+                    </td>
+                    <td class="input-cell">
+                        <select class="priority-select" data-month="${currentMonth}" data-year="${currentYear}" data-day="${dateInfo.day}" data-field="priority">
+                            <option value="low">Niski</option>
+                            <option value="medium" selected>Średni</option>
+                            <option value="high">Wysoki</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Przywróć dane dla bieżącego miesiąca
+            loadDataForCurrentMonth();
+            
+            // Dodanie event listenerów
+            addEventListeners();
+            updateStatistics();
+        }
+
+        // Ładowanie danych dla bieżącego miesiąca
+        function loadDataForCurrentMonth() {
+            const monthKey = `${currentYear}-${currentMonth}`;
+            const monthData = organizerData[monthKey];
+            
+            if (monthData) {
+                Object.keys(monthData).forEach(day => {
+                    const dayData = monthData[day];
+                    Object.keys(dayData).forEach(field => {
+                        const input = document.querySelector(`[data-month="${currentMonth}"][data-year="${currentYear}"][data-day="${day}"][data-field="${field}"]`);
+                        if (input) {
+                            input.value = dayData[field];
+                            
+                            if (input.classList.contains('task-input') && input.value.trim()) {
+                                input.classList.add('filled');
+                            }
+                            
+                            if (input.classList.contains('priority-select')) {
+                                input.className = 'priority-select priority-' + input.value;
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        // Dodanie event listenerów
+        function addEventListeners() {
+            document.querySelectorAll('.task-input, .priority-select').forEach(input => {
+                input.addEventListener('input', function() {
+                    const month = this.dataset.month;
+                    const year = this.dataset.year;
+                    const day = this.dataset.day;
+                    const field = this.dataset.field;
+                    
+                    const monthKey = `${year}-${month}`;
+                    
+                    if (!organizerData[monthKey]) {
+                        organizerData[monthKey] = {};
+                    }
+                    
+                    if (!organizerData[monthKey][day]) {
+                        organizerData[monthKey][day] = {};
+                    }
+                    
+                    organizerData[monthKey][day][field] = this.value;
+                    
+                    // Aktualizacja stylu inputa
+                    if (this.classList.contains('task-input')) {
+                        if (this.value.trim()) {
+                            this.classList.add('filled');
+                        } else {
+                            this.classList.remove('filled');
+                        }
+                    }
+                    
+                    // Aktualizacja stylu select
+                    if (this.classList.contains('priority-select')) {
+                        this.className = 'priority-select priority-' + this.value;
+                    }
+                    
+                    updateStatistics();
+                });
+            });
+        }
+
+        // Aktualizacja statystyk
+        function updateStatistics() {
+            const stats = calculateStatistics();
+            displayStatistics(stats);
+            displaySummary(stats);
+        }
+
+        // Obliczanie statystyk
+        function calculateStatistics() {
+            const dates = generateDatesForMonth(currentMonth, currentYear);
+            let totalDays = dates.length;
+            let plannedDays = 0;
+            let workDaysAnia = 0;
+            let workDaysMichal = 0;
+            let naniaDays = 0;
+            let highPriorityDays = 0;
+            let weekendDays = dates.filter(d => d.isWeekend).length;
+
+            const monthKey = `${currentYear}-${currentMonth}`;
+            const monthData = organizerData[monthKey];
+
+            if (monthData) {
+                Object.keys(monthData).forEach(day => {
+                    const dayData = monthData[day];
+                    
+                    if (dayData.aniaWork || dayData.aniaOther || dayData.michalWork || 
+                        dayData.michalOther || dayData.niania || dayData.inne) {
+                        plannedDays++;
+                    }
+                    
+                    if (dayData.aniaWork) {
+                        workDaysAnia++;
+                    }
+                    
+                    if (dayData.michalWork) {
+                        workDaysMichal++;
+                    }
+                    
+                    if (dayData.niania) {
+                        naniaDays++;
+                    }
+                    
+                    if (dayData.priority === 'high') {
+                        highPriorityDays++;
+                    }
+                });
+            }
+
+            return {
+                totalDays,
+                plannedDays,
+                workDaysAnia,
+                workDaysMichal,
+                naniaDays,
+                highPriorityDays,
+                weekendDays,
+                planningProgress: (plannedDays / totalDays * 100).toFixed(1)
+            };
+        }
+
+        // Wyświetlanie statystyk
+        function displayStatistics(stats) {
+            const container = document.getElementById('statsContainer');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.plannedDays}</div>
+                    <div class="stat-label">Dni zaplanowane</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${stats.planningProgress}%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.workDaysAnia}</div>
+                    <div class="stat-label">Dni pracy Ani</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.workDaysMichal}</div>
+                    <div class="stat-label">Dni pracy Michała</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.naniaDays}</div>
+                    <div class="stat-label">Dni z nianią</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.highPriorityDays}</div>
+                    <div class="stat-label">Dni priorytetowe</div>
+                </div>
+            `;
+        }
+
+        // Wyświetlanie podsumowania
+        function displaySummary(stats) {
+            const container = document.getElementById('summaryGrid');
+            const workBalance = Math.abs(stats.workDaysAnia - stats.workDaysMichal);
+            
+            container.innerHTML = `
+                <div class="summary-card">
+                    <h4>🎯 Postęp planowania</h4>
+                    <p><strong>${stats.plannedDays}</strong> z <strong>${stats.totalDays}</strong> dni zaplanowane</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${stats.planningProgress}%"></div>
+                    </div>
+                    <small>${stats.planningProgress}% ukończone</small>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>⚖️ Balans pracy</h4>
+                    <p>Ania: <strong>${stats.workDaysAnia}</strong> dni</p>
+                    <p>Michał: <strong>${stats.workDaysMichal}</strong> dni</p>
+                    <small>${workBalance === 0 ? '✅ Idealny balans!' : `❗ Różnica: ${workBalance} dni`}</small>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>👶 Opieka nad dzieckiem</h4>
+                    <p>Dni z nianią: <strong>${stats.naniaDays}</strong></p>
+                    <p>Weekendy: <strong>${stats.weekendDays}</strong></p>
+                    <small>Pokrycie: ${stats.totalDays > stats.weekendDays ? ((stats.naniaDays / (stats.totalDays - stats.weekendDays)) * 100).toFixed(1) : 0}% dni roboczych</small>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>📅 Priorytety miesiąca</h4>
+                    <p>Dni priorytetowe: <strong>${stats.highPriorityDays}</strong></p>
+                    <p>Dni zwykłe: <strong>${stats.plannedDays - stats.highPriorityDays}</strong></p>
+                    <small>${stats.highPriorityDays > 0 ? `${((stats.highPriorityDays / stats.plannedDays) * 100).toFixed(1)}% dni to priorytety` : 'Brak dni priorytetowych'}</small>
+                </div>
+            `;
+        }
+
+        // Wypełnienie przykładowymi danymi
+        function fillSampleData() {
+            const dates = generateDatesForMonth(currentMonth, currentYear);
+            const monthKey = `${currentYear}-${currentMonth}`;
+            
+            if (!organizerData[monthKey]) {
+                organizerData[monthKey] = {};
+            }
+            
+            // Dodaj przykładowe dane dla pierwszych kilku dni
+            const sampleDays = [1, 3, 5, 7, 10, 15, 20, 25];
+            
+            sampleDays.forEach((day, index) => {
+                if (day <= dates.length) {
+                    const isWeekend = dates.find(d => d.day === day)?.isWeekend;
+                    
+                    if (!organizerData[monthKey][day]) {
+                        organizerData[monthKey][day] = {};
+                    }
+                    
+                    if (isWeekend) {
+                        organizerData[monthKey][day] = {
+                            aniaOther: 'odpoczynek',
+                            michalOther: 'odpoczynek',
+                            priority: 'low'
+                        };
+                    } else {
+                        organizerData[monthKey][day] = {
+                            aniaWork: index % 2 === 0 ? '9-17 biuro' : '9-17 zdalnie',
+                            michalWork: index % 2 === 0 ? '8-16 zdalnie' : '8-16 biuro',
+                            niania: '10-16',
+                            priority: index % 3 === 0 ? 'high' : 'medium'
+                        };
                     }
                 }
-            }
+            });
 
-            if (hasData) {
-                try {
-                    const customCalId = `${year}-${month}`;
-                    await setDoc(doc(db, customCalId, String(day)), dataToSave, { merge: true });
-                    console.log(`Dzień ${day}: Zapisano dane:`, dataToSave);
-                } catch (error) {
-                    console.error(`Błąd zapisu dla dnia ${day}:`, error);
+            // Załaduj dane do interfejsu
+            loadDataForCurrentMonth();
+            updateStatistics();
+            alert('✅ Wypełniono organizator przykładowymi danymi!');
+        }
+
+        // Automatyczny podział obowiązków
+        function autoBalance() {
+            const dates = generateDatesForMonth(currentMonth, currentYear);
+            const workDays = dates.filter(d => !d.isWeekend);
+            const monthKey = `${currentYear}-${currentMonth}`;
+            
+            if (!organizerData[monthKey]) {
+                organizerData[monthKey] = {};
+            }
+            
+            // Wyczyść obecne dane pracy
+            workDays.forEach((dateInfo, index) => {
+                const day = dateInfo.day;
+                if (!organizerData[monthKey][day]) organizerData[monthKey][day] = {};
+                
+                // Alternuj dni pracy między Anią a Michałem
+                if (index % 2 === 0) {
+                    organizerData[monthKey][day].aniaWork = '9-17 biuro';
+                    organizerData[monthKey][day].michalWork = '8-16 zdalnie';
+                } else {
+                    organizerData[monthKey][day].aniaWork = '9-17 zdalnie';
+                    organizerData[monthKey][day].michalWork = '8-16 biuro';
                 }
+                
+                organizerData[monthKey][day].niania = '10-16';
+                organizerData[monthKey][day].priority = 'medium';
+            });
+
+            // Załaduj dane do interfejsu
+            loadDataForCurrentMonth();
+            updateStatistics();
+            alert('⚖️ Automatycznie podzielono obowiązki między Anią a Michałem!');
+        }
+
+        // Eksport do CSV
+        function exportToCSV() {
+            const dates = generateDatesForMonth(currentMonth, currentYear);
+            const monthKey = `${currentYear}-${currentMonth}`;
+            const monthData = organizerData[monthKey] || {};
+            
+            let csv = 'Data,Dzień,Ania Praca,Ania Inne,Michał Praca,Michał Inne,Niania,Inne,Priorytet\n';
+            
+            dates.forEach(dateInfo => {
+                const day = dateInfo.day;
+                const data = monthData[day] || {};
+                
+                csv += `${dateInfo.date},${dateInfo.dayName},`;
+                csv += `"${data.aniaWork || ''}","${data.aniaOther || ''}",`;
+                csv += `"${data.michalWork || ''}","${data.michalOther || ''}",`;
+                csv += `"${data.niania || ''}","${data.inne || ''}",`;
+                csv += `${data.priority || 'medium'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `organizator_rodzinny_${monthNames[currentMonth].toLowerCase()}_${currentYear}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Wyczyść wszystkie dane
+        function clearAllData() {
+            if (confirm('❓ Czy na pewno chcesz wyczyścić wszystkie dane dla tego miesiąca?')) {
+                const monthKey = `${currentYear}-${currentMonth}`;
+                organizerData[monthKey] = {};
+                
+                document.querySelectorAll('.task-input, .priority-select').forEach(input => {
+                    if (input.classList.contains('task-input')) {
+                        input.value = '';
+                        input.classList.remove('filled');
+                    } else if (input.classList.contains('priority-select')) {
+                        input.value = 'medium';
+                        input.className = 'priority-select priority-medium';
+                    }
+                });
+                
+                updateStatistics();
+                alert('🗑️ Wszystkie dane zostały wyczyszczone!');
             }
         }
 
-        console.log("Import zakończony!");
-        alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane. Odświeżam widok.`);
-        cur = new Date(year, month - 1, 1);
-        update();
-    }
-
-    E.importBtn.addEventListener('click', () => {
-        const file = E.csvFileInput.files[0];
-        const year = parseInt(E.importYear.value, 10);
-        const month = parseInt(E.importMonth.value, 10);
-
-        if (!file) {
-            alert("Proszę wybrać plik CSV. Pamiętaj, aby był zapisany w formacie 'CSV UTF-8'.");
-            return;
-        }
-        if (!year || !month || month < 1 || month > 12) {
-            alert("Proszę podać poprawny rok i miesiąc (od 1 do 12).");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const csvData = event.target.result;
-            // Sprawdzenie, czy nie ma "krzaczków" (znaków zastępczych)
-            if (csvData.includes('') || csvData.includes('_')) {
-                 if(!confirm("Wykryto potencjalne błędy w kodowaniu znaków (mogą pojawić się 'krzaczki' lub podkreślniki). Upewnij się, że plik został zapisany w Excelu jako 'CSV UTF-8'. Czy chcesz kontynuować mimo to?")){
-                    return;
-                 }
-            }
-            importData(csvData, year, month);
-        };
-        // Odczyt pliku z jawnym wskazaniem kodowania UTF-8. 
-        // To kluczowy element, ale zadziała tylko, jeśli plik źródłowy jest poprawnie zapisany.
-        reader.readAsText(file, 'UTF-8');
-    });
-    /* ============================================== */
-
-
-    /* ===== Start Aplikacji ===== */
-    function init(){ 
-        const now = new Date();
-        E.importYear.value = now.getFullYear();
-        E.importMonth.value = now.getMonth() + 1;
-        document.getElementById('standard').style.display='flex'; 
-        update(); 
-    }
-
-  </script>
+        // Inicjalizacja po załadowaniu strony
+        document.addEventListener('DOMContentLoaded', function() {
+            generateTable();
+        });
+    </script>
 </body>
 </html>
