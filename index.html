@@ -678,8 +678,9 @@
     E.sheetClose.onclick=()=> E.sheet.classList.remove('open');
     E.sheet.addEventListener('click',e=>{ if(e.target===E.sheet) E.sheet.classList.remove('open'); });
 
-    /* ===== NOWA FUNKCJA IMPORTU ===== */
+    /* ===== FUNKCJA IMPORTU DANYCH Z PLIKU CSV ===== */
     async function importData(csvData, year, month) {
+        // Mapowanie kolumn z CSV do pól w bazie danych Firebase
         const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
         const collectionId = `${year}-${month}`;
         const lines = csvData.trim().split('\n');
@@ -732,26 +733,33 @@
         const month = parseInt(E.importMonth.value, 10);
 
         if (!file) {
-            alert("Proszę wybrać plik CSV.");
+            alert("Proszę wybrać plik CSV. Pamiętaj, aby był zapisany w formacie 'CSV UTF-8'.");
             return;
         }
         if (!year || !month || month < 1 || month > 12) {
-            alert("Proszę podać poprawny rok i miesiąc (1-12).");
+            alert("Proszę podać poprawny rok i miesiąc (od 1 do 12).");
             return;
         }
 
         const reader = new FileReader();
         reader.onload = (event) => {
             const csvData = event.target.result;
+            // Sprawdzenie, czy nie ma "krzaczków" (znaków zastępczych)
+            if (csvData.includes('') || csvData.includes('_')) {
+                 if(!confirm("Wykryto potencjalne błędy w kodowaniu znaków (mogą pojawić się 'krzaczki' lub podkreślniki). Upewnij się, że plik został zapisany w Excelu jako 'CSV UTF-8'. Czy chcesz kontynuować mimo to?")){
+                    return;
+                 }
+            }
             importData(csvData, year, month);
         };
-        // *** POPRAWKA: Dodanie kodowania UTF-8 ***
+        // Odczyt pliku z jawnym wskazaniem kodowania UTF-8. 
+        // To kluczowy element, ale zadziała tylko, jeśli plik źródłowy jest poprawnie zapisany.
         reader.readAsText(file, 'UTF-8');
     });
-    /* =============================== */
+    /* ============================================== */
 
 
-    /* ===== Start ===== */
+    /* ===== Start Aplikacji ===== */
     function init(){ 
         const now = new Date();
         E.importYear.value = now.getFullYear();
