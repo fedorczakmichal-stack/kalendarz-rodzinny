@@ -10,20 +10,41 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
     :root{
-      /* kolumny (delikatne, by treść była czytelna) */
-      --c-ania:#fff1f2; --c-aniaP:#f0fff4; --c-michal:#f0f9ff; --c-michalP:#f5f3ff; --c-wsp:#fffbeb; --c-inne:#f1f5f9;
+      /* === POPRAWIONE KOLORY KOLUMN === */
+      --c-ania:#f0fff4;      /* ZMIANA: Różowy -> Zielony */
+      --c-aniaP:#fff1f2;     /* ZMIANA: Zielony -> Różowy */
+      --c-michal:#f0f9ff;
+      --c-michalP:#f5f3ff;
+      --c-wsp:#fffbeb;
+      --c-inne:#f1f5f9;
       
-      /* === ZMIANA KOLORÓW === */
-      /* akcenty zgodne z kropkami w pasku sum */
-      --k-lask:#a7f3d0;      /* ZMIANA: różowy stał się miętowy */
-      --k-brzeziny:#fde68a;  /* żółty */
-      --k-ortho:#f9a8d4;     /* ZMIANA: miętowy stał się różowy */
-      --k-jb:#c4b5fd;        /* fiolet (JB zwykłe) */
-      --k-jb24:#7c3aed;      /* ciemny fiolet (JB OIT/zniecz – 24h) */
+      /* === POPRAWIONE KOLORY KAFELKÓW === */
+      --k-lask:#a7f3d0;      /* Miętowy */
+      --k-brzeziny:#fde68a;  /* Żółty */
+      --k-ortho:#f9a8d4;     /* Różowy */
+      --k-jb:#c4b5fd;        /* Fiolet */
+      --k-jb24:#7c3aed;      /* Ciemny fiolet */
     }
 
     *{box-sizing:border-box}
     body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased}
+    
+    /* === NOWY STYL DLA PRZYCISKU IMPORTU === */
+    .file-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background-color: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color .2s;
+    }
+    .file-upload-btn:hover { background-color: #e5e7eb; }
+    .file-upload-btn svg { margin-right: 0.5rem; }
+    #csvFileName { font-size: 0.8rem; color: #6b7280; margin-left: 0.75rem; }
 
     /* Reszta stylów bez zmian... */
     .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
@@ -138,9 +159,13 @@
         </div>
         
         <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
-            <input type="file" id="csvFileInput" accept=".csv" class="text-sm">
-            <input type="number" id="importYear" placeholder="Rok" class="w-20 p-2 border border-gray-300 rounded-md text-sm">
-            <input type="number" id="importMonth" placeholder="Miesiąc" class="w-24 p-2 border border-gray-300 rounded-md text-sm">
+            <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+            <label for="csvFileInput" class="file-upload-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                Wybierz plik...
+            </label>
+            <span id="csvFileName"></span>
+            
             <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
             <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść miesiąc</button>
             <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj .ics</button>
@@ -273,7 +298,7 @@
       sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'),
       ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'),
       edit: el('edit'), editClose: el('edit-close'), editFields: el('edit-fields'), editTitle: el('edit-title'),
-      importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), importYear: el('importYear'), importMonth: el('importMonth'),
+      importBtn: el('importBtn'), csvFileInput: el('csvFileInput'), csvFileName: el('csvFileName'),
       clearMonthBtn: el('clearMonthBtn'), exportIcsBtn: el('exportIcsBtn')
     };
 
@@ -389,8 +414,6 @@
       }
       E.mob.appendChild(frag);
     };
-    const renderCompact = (y,m)=>{};
-    const renderMonth = (y,m)=>{};
     
     /* ===== Sumy i Zarobki ===== */
     const computeSumsAndEarnings = ()=>{
@@ -439,7 +462,6 @@
     const save = (day,field,val, customCalId = null)=> setDoc(doc(db, customCalId || calId(), String(day)), { [field]: val }, { merge:true });
     const del  = (day,field)=> updateDoc(doc(db, calId(), String(day)), { [field]: deleteField() });
     const setHours = (day,field,h)=> setDoc(doc(db, calId(), String(day)), { [`hours_${field}`]: (h===''||h===null)? deleteField() : parseInt(h,10) }, { merge:true });
-    // ZMIANA: Zapis portów
     const setPortsDb = (day,field,count,type)=> setDoc(doc(db, calId(), String(day)), { [`ports_${type}_${field}`]: (count===''||count===null)? deleteField() : parseInt(count,10) }, { merge:true });
 
     /* ===== Modal edycji ===== */
@@ -454,12 +476,11 @@
         const txt = (dayRow&&dayRow[f])||'';
         const savedH = getSavedHours(day,f);
         const defH = getDefaultHours(txt);
-        // ZMIANA: Pobieranie obu typów portów
         const portsInstall = getPorts(day,f,'install');
         const portsRemove = getPorts(day,f,'remove');
 
         const wrap=document.createElement('div');
-        wrap.className = "mb-4 pb-4 border-b";
+        wrap.className = "mb-4 pb-4 border-b last:border-b-0";
         wrap.innerHTML = `
           <div class="flex items-center gap-2">
             <span class="px-2 py-1 rounded-md ${getFieldClass(f)} text-slate-700 font-semibold">${labels[f]}</span>
@@ -512,7 +533,7 @@
     E.edit.addEventListener('click',e=>{ if(e.target===E.edit) E.edit.style.display='none'; });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.edit.style.display === 'flex') E.edit.style.display = 'none'; });
 
-    /* ===== Context Menu i Kliknięcia (bez zmian) ===== */
+    /* ===== Context Menu i Kliknięcia ===== */
     document.addEventListener('contextmenu', e=>{
       const fld = e.target.closest('.fld'); if(!fld) return;
       e.preventDefault();
@@ -567,13 +588,15 @@
       });
     }
     
-    /* ===== Nawigacja (bez zmian) ===== */
+    /* ===== Nawigacja ===== */
     E.prev.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()-1); update(); };
     E.next.onclick=()=>{ cur.setDate(1); cur.setMonth(cur.getMonth()+1); update(); };
     E.today.onclick=()=>{ const t=new Date(); cur=new Date(t.getFullYear(),t.getMonth(),1); update(); };
 
     /* ===== Import, Czyszczenie, Eksport ===== */
-    async function importData(lines, year, month) {
+    async function importData(lines) {
+        const year = cur.getFullYear();
+        const month = cur.getMonth() + 1;
         const columnMapping = ['aniaPraca', 'ania', 'michalPraca', 'michal', 'wspolne', 'inne'];
         if (!confirm(`Czy na pewno chcesz zaimportować dane dla ${mNames[month-1]} ${year}?`)) return;
         
@@ -591,18 +614,16 @@
             if (hasData) await setDoc(doc(db, `${year}-${month}`, String(day)), dataToSave, { merge: true });
         }
         alert(`Dane dla ${mNames[month-1]} ${year} zostały zaimportowane.`);
-        cur = new Date(year, month - 1, 1);
         update();
     }
+    E.csvFileInput.addEventListener('change', () => {
+        const file = E.csvFileInput.files[0];
+        E.csvFileName.textContent = file ? file.name : '';
+    });
     E.importBtn.addEventListener('click', () => {
         const file = E.csvFileInput.files[0];
-        const year = parseInt(E.importYear.value, 10);
-        const month = parseInt(E.importMonth.value, 10);
-        if (!file || !year || !month || month < 1 || month > 12) {
-            alert("Wybierz plik CSV oraz podaj poprawny rok i miesiąc.");
-            return;
-        }
-        Papa.parse(file, { encoding: "UTF-8", complete: res => importData(res.data, year, month) });
+        if (!file) { alert("Najpierw wybierz plik CSV."); return; }
+        Papa.parse(file, { encoding: "UTF-8", complete: res => importData(res.data) });
     });
     
     async function clearMonthData() {
@@ -621,26 +642,19 @@
     function exportToICS() {
         const year = cur.getFullYear();
         const month = cur.getMonth();
-        let icsString = [
-            'BEGIN:VCALENDAR',
-            'VERSION:2.0',
-            'PRODID:-//FedorczakFamilyCalendar//PL',
-        ].join('\r\n') + '\r\n';
+        let icsString = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FedorczakFamilyCalendar//PL'].join('\r\n') + '\r\n';
 
         for (const day in data) {
             const dayData = data[day];
-            const date = new Date(year, month, parseInt(day));
             const dateString = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
-
             for (const field of fields) {
                 if (dayData[field]) {
-                    const summary = `${labels[field]}: ${dayData[field]}`;
                     icsString += [
                         'BEGIN:VEVENT',
                         `UID:${calId()}-${day}-${field}@fedorczak.family`,
                         `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}Z`,
                         `DTSTART;VALUE=DATE:${dateString}`,
-                        `SUMMARY:${summary}`,
+                        `SUMMARY:${labels[field]}: ${dayData[field]}`,
                         'END:VEVENT'
                     ].join('\r\n') + '\r\n';
                 }
@@ -660,9 +674,6 @@
 
     /* ===== Start Aplikacji ===== */
     function init(){ 
-        const now = new Date();
-        E.importYear.value = now.getFullYear();
-        E.importMonth.value = now.getMonth() + 1;
         document.getElementById('standard').style.display='flex'; 
         update(); 
     }
