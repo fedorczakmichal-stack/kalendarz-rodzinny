@@ -24,7 +24,7 @@
 
     /* ======= HEADER ======= */
     .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-    .view-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
+    .view-btn{display:flex;align-items-center;justify-content:center;width:40px;height:40px;border-radius:.5rem;border:1px solid transparent}
     .view-btn.active{background:#ede9fe;border-color:#8b5cf6}
 
     /* ======= SUM (desktop) ======= */
@@ -745,7 +745,8 @@
             const csvData = event.target.result;
             importData(csvData, year, month);
         };
-        reader.readAsText(file);
+        // *** POPRAWKA: Dodanie kodowania UTF-8 ***
+        reader.readAsText(file, 'UTF-8');
     });
     /* =============================== */
 
