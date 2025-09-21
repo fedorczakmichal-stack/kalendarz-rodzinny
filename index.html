@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Kalendarz Rodziny Fedorczak</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -46,7 +46,6 @@
     .file-upload-btn{display:inline-flex;align-items:center;padding:.5rem 1rem;background-color:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:.5rem;cursor:pointer;font-weight:600;transition:background-color .2s}
     .file-upload-btn:hover{background-color:#e5e7eb}
     .file-upload-btn svg{margin-right:.5rem}
-    #csvFileName{font-size:.8rem;color:#6b7280;margin-left:.75rem}
     
     .hdr{
       background:#fff;
@@ -671,10 +670,14 @@
           <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
           <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
           <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
-            <input type="file" id="csvFileInput" accept=".csv" class="hidden">
-            <label for="csvFileInput" class="file-upload-btn"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>Wybierz plik...</label>
-            <span id="csvFileName"></span>
-            <button id="importBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700">Importuj</button>
+            <input type="file" id="xlsxFileInput" accept=".xlsx,.xls" class="hidden">
+            <label for="xlsxFileInput" class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Importuj z Excel
+            </label>
+            <span id="fileName" class="text-sm text-gray-500 max-w-[150px] truncate" title=""></span>
             <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść miesiąc</button>
             <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj .ics</button>
           </div>
@@ -796,13 +799,10 @@
           <div class="menu-title">Menu</div>
           <button id="menu-close" class="menu-close">✕</button>
         </div>
-        <input type="file" id="csvFileInputMobile" accept=".csv" class="hidden">
-        <label for="csvFileInputMobile" class="menu-item">
-          📁 Importuj CSV
+        <input type="file" id="xlsxFileInputMobile" accept=".xlsx,.xls" class="hidden">
+        <label for="xlsxFileInputMobile" class="menu-item">
+          📄 Importuj z Excel
         </label>
-        <button id="importBtnMobile" class="menu-item primary">
-          ⬆️ Wczytaj dane
-        </button>
         <button id="exportIcsBtnMobile" class="menu-item">
           📅 Eksportuj .ics
         </button>
@@ -860,11 +860,11 @@
       sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),
       ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),
       ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),
-      editTitle:el('edit-title'),editSave:el('edit-save'),importBtn:el('importBtn'),
-      csvFileInput:el('csvFileInput'),csvFileName:el('csvFileName'),clearMonthBtn:el('clearMonthBtn'),
+      editTitle:el('edit-title'),editSave:el('edit-save'),
+      xlsxFileInput:el('xlsxFileInput'), fileName:el('fileName'), clearMonthBtn:el('clearMonthBtn'),
       exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'),
-      menuClose:el('menu-close'),importBtnMobile:el('importBtnMobile'),
-      csvFileInputMobile:el('csvFileInputMobile'),clearMonthBtnMobile:el('clearMonthBtnMobile'),
+      menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'),
+      clearMonthBtnMobile:el('clearMonthBtnMobile'),
       exportIcsBtnMobile:el('exportIcsBtnMobile')
     };
     
@@ -989,9 +989,16 @@
             else if (isJB(text)) target.jb += hours;
         };
 
+        let hasZastepcaBonus = false;
         for (let d = 1; d <= days; d++) {
             const dayData = data[d]; 
             if (!dayData) continue;
+
+            const michalPracaText = getEntryText(d, 'michalPraca');
+            if (/zastępca|zastepca|ordynator/i.test(michalPracaText)) {
+                hasZastepcaBonus = true;
+            }
+
             for (const f of fields) {
                 const entry = dayData[f]; 
                 if (!entry) continue;
@@ -1022,7 +1029,9 @@
         sums.earnings += sums.jednodniowki * endoRates.one_day;
         sums.earnings += sums.kwalifikacje * endoRates.qual;
         sums.earnings += sums.komercja * komercjaRate;
-        sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
+        if(hasZastepcaBonus) {
+            sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
+        }
 
         const totalPorts = sums.portsInstall + sums.portsRemove;
         const totalHours = sums.ortho + sums.brz + sums.lask + sums.jb;
@@ -1064,7 +1073,7 @@
         const date = new Date(cur.getFullYear(), cur.getMonth(), day);
         E.editTitle.textContent = `${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;
         
-        let formHTML = `<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${entryText.replace(/"/g, '&quot;')}" placeholder="np. JB wybudzień / ortho od 15:00"></div>`;
+        let formHTML = `<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${entryText.replace(/"/g, '&quot;')}" placeholder="np. JB wybudzeń / ortho od 15:00"></div>`;
         
         const createHoursHTML = (partNum, text, hours) => {
             const defaultH = getDefaultHours(text);
@@ -1211,18 +1220,10 @@
     async function update(){
         if(!db) return; 
         setTitle(); 
-        const id=calId(); 
-        const snap=await getDocs(collection(db,id)); 
-        data={}; 
-        snap.forEach(d=>data[d.id]=d.data());
-        isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data); 
-        computeSumsAndEarnings();
         unsub(); 
-        unsub=onSnapshot(collection(db,id),s=>{ 
-          s.docChanges().forEach(ch=>{
-            if(ch.type==='removed'){delete data[ch.doc.id];}
-            else{data[ch.doc.id]=ch.doc.data();}
-          }); 
+        unsub=onSnapshot(collection(db,calId()),s=>{ 
+          data={};
+          s.forEach(doc => data[doc.id] = doc.data());
           isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data); 
           computeSumsAndEarnings(); 
         });
@@ -1247,90 +1248,164 @@
     E.today.onclick=goToToday;
     E.todayMobile.onclick=goToToday;
     
-    // Import handlers
-    const handleImport = () => {
-      const file = E.csvFileInput.files[0] || E.csvFileInputMobile.files[0]; 
-      if(!file){alert("Wybierz plik CSV."); return;} 
-      Papa.parse(file, { encoding:"UTF-8", header: true, skipEmptyLines: true, complete: importData });
+    // --- NEW EXCEL IMPORT FUNCTIONALITY ---
+    const mNamesToNum = {
+        'styczeń': 0, 'stycznia': 0, 'sty': 0,
+        'luty': 1, 'lutego': 1, 'lut': 1,
+        'marzec': 2, 'marca': 2, 'mar': 2,
+        'kwiecień': 3, 'kwietnia': 3, 'kwi': 3,
+        'maj': 4, 'maja': 4,
+        'czerwiec': 5, 'czerwca': 5, 'cze': 5,
+        'lipiec': 6, 'lipca': 6, 'lip': 6,
+        'sierpień': 7, 'sierpnia': 7, 'sie': 7,
+        'wrzesień': 8, 'września': 8, 'wrz': 8,
+        'październik': 9, 'października': 9, 'paź': 9,
+        'listopad': 10, 'listopada': 10, 'lis': 10,
+        'grudzień': 11, 'grudnia': 11, 'gru': 11
     };
     
-    E.importBtn.onclick=handleImport;
-    E.importBtnMobile.onclick=()=>{
-      handleImport();
-      E.mobileMenu.classList.remove('open');
-    };
-    E.csvFileInput.onchange=()=>{E.csvFileName.textContent=E.csvFileInput.files[0]?E.csvFileInput.files[0].name:'';};
-    
-    async function importData(parseResult) {
-        const { data: lines, meta } = parseResult;
-        if (!lines || lines.length === 0) {
-            alert("Plik CSV jest pusty lub nie udało się go odczytać.");
-            return;
+    function handleExcelImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (E.fileName) {
+            E.fileName.textContent = file.name;
+            E.fileName.title = file.name;
         }
 
-        const monthName = mNames[cur.getMonth()];
-        if (!confirm(`Czy na pewno chcesz zaimportować dane do kalendarza na ${monthName} ${cur.getFullYear()}?`)) {
-            return;
-        }
-
-        const batch = writeBatch(db);
+        const monthNamesPattern = Object.keys(mNamesToNum).join('|');
+        const dateRegex = new RegExp(`(${monthNamesPattern})\\s*(\\d{4})`, 'i');
+        const match = file.name.match(dateRegex);
         
-        const columnToField = {
-            'ania': 'ania',
-            'ania praca': 'aniaPraca', 
-            'michał': 'michal',
-            'michał praca': 'michalPraca',
-            'niania': 'wspolne',
-            'inne': 'inne',
-            'ania inne': 'ania',
-            'michal inne': 'michal',
-            'michal': 'michal',
-            'michal praca': 'michalPraca',
-            'michał inne': 'michal',
-            'dzień': null
-        };
-        
-        let dayColumnName = meta.fields.find(field => 
-            ['data', 'dzień', 'day', 'date'].includes(field.toLowerCase().trim())
-        ) || meta.fields[0];
-        
-        let importCount = 0;
+        let importConfirmed = false;
 
-        for (const line of lines) {
-            const day = parseInt(line[dayColumnName], 10);
-            if (isNaN(day) || day < 1 || day > 31) continue;
+        if (match) {
+            const monthName = match[1].toLowerCase();
+            const year = parseInt(match[2], 10);
+            const month = mNamesToNum[monthName];
 
-            for (const header of meta.fields) {
-                if (header === dayColumnName) continue;
-                
-                const text = (line[header] || '').trim();
-                if (!text) continue;
-
-                const headerLower = header.trim().toLowerCase();
-                const field = columnToField[headerLower];
-                
-                if (field) {
-                    const dataToSave = { text };
-                    const hours = getDefaultHours(text);
-                    if (hours > 0) { dataToSave.h1 = hours; }
-
-                    const docRef = doc(db, calId(), String(day));
-                    batch.set(docRef, { [field]: dataToSave }, { merge: true });
-                    importCount++;
+            if (month !== undefined && year) {
+                if (cur.getFullYear() !== year || cur.getMonth() !== month) {
+                    if (confirm(`Plik "${file.name}" dotyczy miesiąca ${mNames[month]} ${year}. Czy chcesz przełączyć widok i zaimportować dane do tego miesiąca?`)) {
+                        cur = new Date(year, month, 1);
+                        importConfirmed = true;
+                    } else {
+                        event.target.value = '';
+                        if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
+                        return;
+                    }
                 }
             }
         }
+        
+        const processFile = (confirmed) => {
+            if (!confirmed) {
+                if (!confirm(`Czy na pewno chcesz zaimportować dane z pliku "${file.name}" do kalendarza dla ${mNames[cur.getMonth()]} ${cur.getFullYear()}?`)) {
+                    event.target.value = '';
+                    if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
+                    return;
+                }
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false, dateNF: 'yyyy-mm-dd' });
+                    
+                    const batch = writeBatch(db);
+                    let operationsCount = 0;
+                    
+                    const findValue = (row, possibleKeys) => {
+                        const lowerKeys = possibleKeys.map(k => k.toLowerCase());
+                        for (const key in row) {
+                            if (Object.prototype.hasOwnProperty.call(row, key) && lowerKeys.includes(key.toLowerCase())) {
+                                return row[key];
+                            }
+                        }
+                        return undefined;
+                    };
+                    
+                    for (const row of jsonData) {
+                        let day = 0;
+                        const dateValue = findValue(row, ['Data']);
+                        if (dateValue !== undefined && dateValue !== '') {
+                            let parsedDate = new Date(dateValue);
+                            if (typeof dateValue === 'number') {
+                                parsedDate = new Date((dateValue - 25569) * 86400 * 1000);
+                            }
+                            
+                            if (parsedDate && !isNaN(parsedDate.getTime())) {
+                                if (parsedDate.getMonth() === cur.getMonth() && parsedDate.getFullYear() === cur.getFullYear()) {
+                                    day = parsedDate.getDate();
+                                } else {
+                                    continue;
+                                }
+                            }
+                        }
+                        if (!day) {
+                            const dayValue = findValue(row, ['Dzień', 'Data']);
+                            if (dayValue !== undefined) {
+                                const parsedDay = parseInt(String(dayValue).trim(), 10);
+                                if (!isNaN(parsedDay) && parsedDay >= 1 && parsedDay <= 31) {
+                                    day = parsedDay;
+                                }
+                            }
+                        }
+                        if (!day) continue;
+                        
+                        let dayUpdate = {};
+                        let hasAnyData = false;
+                        
+                        const mappings = {
+                            aniaPraca: ['Ania praca'], ania: ['Ania inne'],
+                            michalPraca: ['Michal praca', 'Michał praca'], michal: ['Michał inne', 'Michal inne'],
+                            wspolne: ['Niania'], inne: ['Inne']
+                        };
 
-        try {
-            await batch.commit();
-            alert(`Pomyślnie zaimportowano ${importCount} wpisów.`);
-            update();
-        } catch (error) {
-            console.error("Błąd podczas importowania danych:", error);
-            alert("Wystąpił błąd podczas importu.");
-        }
+                        for (const field in mappings) {
+                            const value = findValue(row, mappings[field]);
+                            if (value && String(value).trim()) {
+                                const text = String(value).trim();
+                                const hours = getDefaultHours(text);
+                                dayUpdate[field] = hours > 0 ? { text, h1: hours } : { text };
+                                hasAnyData = true;
+                            }
+                        }
+                        
+                        if (hasAnyData) {
+                            const docRef = doc(db, calId(), String(day));
+                            batch.set(docRef, dayUpdate, { merge: true });
+                            operationsCount++;
+                        }
+                    }
+                    
+                    await batch.commit();
+                    alert(`Pomyślnie zaimportowano dane dla ${operationsCount} dni.`);
+                    update();
+
+                } catch (error) {
+                    console.error("Błąd importu Excel:", error);
+                    alert("Wystąpił błąd podczas importu pliku Excel.");
+                } finally {
+                    event.target.value = '';
+                    if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        };
+        
+        processFile(importConfirmed);
     }
     
+    E.xlsxFileInput.onchange = handleExcelImport;
+    E.xlsxFileInputMobile.onchange = (e) => {
+        handleExcelImport(e);
+        E.mobileMenu.classList.remove('open');
+    };
+
     const handleClearMonth = async () => {
       const monthName=mNames[cur.getMonth()]; 
       if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${monthName} ${cur.getFullYear()}?`))return; 
@@ -1339,7 +1414,6 @@
       q.docs.forEach(d=>batch.delete(d.ref)); 
       await batch.commit(); 
       alert('Dane usunięte.'); 
-      update();
     };
     
     E.clearMonthBtn.onclick=handleClearMonth;
