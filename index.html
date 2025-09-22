@@ -458,6 +458,7 @@
             </svg>
           </button>
           <button id="today" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 ml-4">Dziś</button>
+          <button id="refreshFirestoreBtn" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 ml-4">Odśwież</button>
           <div id="sync-controls" class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-8">
             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
             <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Pobierz najnowsze dane z OneDrive (Ctrl+R)">🔄 Odśwież</button>
@@ -552,7 +553,6 @@
       </div>
     </main>
     
-    <!-- FAB Button (tylko na mobile) -->
     <button id="fab" aria-label="Pokaż podsumowanie">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -560,7 +560,6 @@
       Podsumowanie
     </button>
     
-    <!-- Bottom Sheet - Podsumowanie -->
     <div id="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-content">
@@ -581,7 +580,6 @@
       </div>
     </div>
     
-    <!-- Mobile Menu -->
     <div id="mobile-menu">
       <div class="menu-panel">
         <div class="menu-header">
@@ -590,6 +588,7 @@
         </div>
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
         <button id="forceSyncBtnMobile" class="menu-item menu-item-disabled" disabled>🔄 Odśwież dane z OneDrive</button>
+        <button id="refreshFirestoreBtnMobile" class="menu-item">🔄 Odśwież z bazy danych</button>
         <button id="testConnectionBtnMobile" class="menu-item menu-item-disabled" disabled>🔍 Testuj połączenie</button>
         <button id="debugFirestoreBtnMobile" class="menu-item">🐛 Debuguj bazę danych</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
@@ -599,7 +598,6 @@
       </div>
     </div>
     
-    <!-- Context Menu -->
     <div id="ctx">
       <div id="ctx-copy" class="ctx-it">📋 Kopiuj</div>
       <div id="ctx-cut" class="ctx-it">✂️ Wytnij</div>
@@ -608,7 +606,6 @@
       <div id="ctx-del" class="ctx-it text-red-600">🗑️ Usuń</div>
     </div>
     
-    <!-- Edit Dialog -->
     <div id="edit">
       <div class="edit-body">
         <div class="edit-head">
@@ -655,7 +652,8 @@
       connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'), testConnectionBtnMobile: el('testConnectionBtnMobile'), debugFirestoreBtnMobile: el('debugFirestoreBtnMobile'),
       summaryBtnMobile: el('summaryBtnMobile'),
       mCardsView: el('m-cards-view'), mGridView: el('m-grid-view'), mGridBody: el('m-grid-body'),
-      viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid')
+      viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid'),
+      refreshFirestoreBtn: el('refreshFirestoreBtn'), refreshFirestoreBtnMobile: el('refreshFirestoreBtnMobile')
     };
     const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
     const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
@@ -704,6 +702,19 @@
     const connectToOnedrive = () => {
       const authUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth";
       window.location.href = authUrl;
+    };
+    const refreshFromFirestore = async () => {
+        console.log("🔄 Odświeżanie z bazy danych Firestore...");
+        try {
+            await update();
+            const now = new Date().toLocaleString('pl-PL');
+            E.syncStatus.textContent = `✅ Odświeżono ${now}`;
+            E.syncStatusMobile.textContent = `✅ Odświeżono z bazy danych: ${now}`;
+            alert("✅ Kalendarz został odświeżony z lokalnej bazy danych.");
+        } catch (error) {
+            console.error("❌ Błąd podczas odświeżania z Firestore:", error);
+            alert(`❌ Błąd odświeżania:\n\n${error.message}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
+        }
     };
 
     const forceSyncFromOnedrive = async () => {
@@ -774,13 +785,7 @@ Czy chcesz odświeżyć kalendarz z lokalnej bazy?`);
           
           if (shouldContinue) {
             console.log("🔄 Odświeżanie z Firestore jako fallback...");
-            update(); // Odśwież lokalnie
-            
-            const now = new Date().toLocaleString('pl-PL');
-            E.syncStatus.textContent = `🔄 Lokalnie odświeżono ${now}`;
-            E.syncStatusMobile.textContent = `🔄 Lokalnie odświeżono: ${now}`;
-            
-            alert("🔄 Kalendarz został odświeżony z lokalnej bazy danych.\n\nAby włączyć pełną synchronizację z OneDrive, skontaktuj się z deweloperem w celu utworzenia Cloud Function 'forceSync'.");
+            refreshFromFirestore(); // Wywołaj nową funkcję do odświeżania z Firestore
           }
           return; // Wyjdź z funkcji
         }
@@ -1015,6 +1020,11 @@ Czy chcesz spróbować synchronizacji?`;
     E.testConnectionBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
       testOneDriveConnection();
+    };
+    E.refreshFirestoreBtn.onclick = refreshFromFirestore;
+    E.refreshFirestoreBtnMobile.onclick = () => {
+        E.mobileMenu.classList.remove('open');
+        refreshFromFirestore();
     };
     E.summaryBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
