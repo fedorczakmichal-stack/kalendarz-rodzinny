@@ -913,14 +913,19 @@ Czy chcesz spróbować synchronizacji?`;
     };
     
     const debugFirestoreData = async () => {
+      console.log("🐛 debugFirestoreData została wywołana!");
+      
       if (!db) {
+        console.log("❌ Baza danych nie połączona");
         alert("Baza danych nie jest połączona");
         return;
       }
 
       try {
-        E.debugFirestoreBtn.textContent = "⏳ Sprawdzam...";
-        E.debugFirestoreBtnMobile.textContent = "⏳ Sprawdzam bazę...";
+        console.log("🐛 Rozpoczynam debugowanie Firestore...");
+        
+        if (E.debugFirestoreBtn) E.debugFirestoreBtn.textContent = "⏳ Sprawdzam...";
+        if (E.debugFirestoreBtnMobile) E.debugFirestoreBtnMobile.textContent = "⏳ Sprawdzam bazę...";
         
         console.log("🐛 === DEBUGOWANIE FIRESTORE ===");
         
@@ -983,22 +988,6 @@ Czy chcesz spróbować synchronizacji?`;
           debugInfo += `❌ Dokument 'user_token' NIE ISTNIEJE!\n`;
         }
         
-        // Sprawdź inne możliwe kolekcje
-        debugInfo += `\n🔍 SPRAWDZANIE INNYCH KOLEKCJI:\n`;
-        
-        const possibleCollections = ['tokens', 'auth', 'onedrive', 'microsoft', 'oauth'];
-        for (const collectionName of possibleCollections) {
-          try {
-            const testCollection = collection(db, collectionName);
-            const testSnapshot = await getDocs(testCollection);
-            if (!testSnapshot.empty) {
-              debugInfo += `📂 '${collectionName}': ${testSnapshot.size} dokumentów\n`;
-            }
-          } catch (e) {
-            // Kolekcja nie istnieje lub brak uprawnień
-          }
-        }
-        
         console.log("🐛 Debug info:", debugInfo);
         
         // Pokaż w alertcie (ograniczona długość)
@@ -1012,8 +1001,8 @@ Czy chcesz spróbować synchronizacji?`;
         console.error("❌ Błąd debugowania:", error);
         alert(`❌ Błąd debugowania:\n\n${error.message}\n\nSprawdź konsolę (F12) po więcej szczegółów.`);
       } finally {
-        E.debugFirestoreBtn.textContent = "🐛 Debug";
-        E.debugFirestoreBtnMobile.textContent = "🐛 Debuguj bazę danych";
+        if (E.debugFirestoreBtn) E.debugFirestoreBtn.textContent = "🐛 Debug";
+        if (E.debugFirestoreBtnMobile) E.debugFirestoreBtnMobile.textContent = "🐛 Debuguj bazę danych";
       }
     };
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
@@ -1582,6 +1571,15 @@ Czy chcesz spróbować synchronizacji?`;
         E.mGridView.classList.add('active');
         E.mCardsView.classList.add('hidden');
       }
+      
+      // Debug: sprawdź czy przyciski debug są znalezione
+      console.log("🔍 Debug przycisków:");
+      console.log("Desktop debug button:", E.debugFirestoreBtn);
+      console.log("Mobile debug button:", E.debugFirestoreBtnMobile);
+      
+      // Sprawdź czy funkcja debugFirestoreData istnieje
+      console.log("Debug function:", typeof debugFirestoreData);
+      
       update();
       checkSyncStatus();
     }
