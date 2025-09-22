@@ -458,10 +458,10 @@
             </svg>
           </button>
           <button id="today" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 ml-4">Dziś</button>
-          <button id="refreshFirestoreBtn" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 ml-4">Odśwież</button>
           <div id="sync-controls" class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-8">
             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
             <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Pobierz najnowsze dane z OneDrive (Ctrl+R)">🔄 Odśwież</button>
+            <button id="refreshFirestoreBtn" class="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700" title="Odśwież dane z bazy danych">🔄 Odśwież z bazy</button>
             <button id="testConnectionBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Sprawdź status połączenia z OneDrive (Ctrl+T)">🔍 Test</button>
             <button id="debugFirestoreBtn" class="px-3 py-2 text-sm font-semibold text-white bg-orange-600 rounded-md hover:bg-orange-700" title="Debuguj zawartość bazy danych (Ctrl+D)">🐛 Debug</button>
             <div id="syncStatus" class="text-sm text-gray-500"></div>
@@ -708,9 +708,8 @@
         try {
             await update();
             const now = new Date().toLocaleString('pl-PL');
-            E.syncStatus.textContent = `✅ Odświeżono ${now}`;
+            E.syncStatus.textContent = `✅ Odświeżono z bazy ${now}`;
             E.syncStatusMobile.textContent = `✅ Odświeżono z bazy danych: ${now}`;
-            alert("✅ Kalendarz został odświeżony z lokalnej bazy danych.");
         } catch (error) {
             console.error("❌ Błąd podczas odświeżania z Firestore:", error);
             alert(`❌ Błąd odświeżania:\n\n${error.message}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
@@ -724,7 +723,6 @@
       }
 
       try {
-        // Sprawdź czy token istnieje
         const tokenDocRef = doc(db, "onedrive_config", "user_token");
         const tokenDoc = await getDoc(tokenDocRef);
         
@@ -733,65 +731,28 @@
           return;
         }
 
-        // Ustaw loading state
         E.forceSyncBtn.disabled = true;
         E.forceSyncBtnMobile.disabled = true;
         E.forceSyncBtnMobile.classList.add('menu-item-disabled');
-        
-        const originalTextDesktop = E.forceSyncBtn.textContent;
-        const originalTextMobile = E.forceSyncBtnMobile.textContent;
-        
         E.forceSyncBtn.textContent = "⏳ Synchronizuję...";
         E.forceSyncBtnMobile.textContent = "⏳ Synchronizuję...";
+        E.syncStatus.textContent = "🔄 Trwa synchronizacja...";
+        E.syncStatusMobile.textContent = "🔄 Trwa synchronizacja...";
         
-        console.log("🔄 Rozpoczynanie synchronizacji...");
-        console.log("📅 Kalendarz ID:", calId());
-        
-        // Wywołaj Cloud Function do force sync
+        console.log("🔄 Rozpoczynanie synchronizacji z OneDrive...");
         const syncUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/forceSync";
         
-        console.log("📡 Wywołuję:", syncUrl);
-        
-        // Najpierw spróbuj z istniejącym endpointem
-        let response;
-        try {
-          response = await fetch(syncUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              forceRefresh: true,
-              calendarId: calId(),
-              timestamp: new Date().toISOString()
-            })
-          });
-        } catch (networkError) {
-          console.log("❌ Błąd sieci lub endpoint nie istnieje:", networkError.message);
-          
-          // Fallback: Zaproponuj użytkownikowi ręczne działania
-          const shouldContinue = confirm(`❌ Cloud Function 'forceSync' nie jest dostępna.
-
-Możliwe przyczyny:
-• Endpoint nie został jeszcze stworzony
-• Problemy z siecią
-• Błąd CORS w Cloud Function
-
-Opcje:
-✅ OK - Odśwież tylko lokalnie z Firestore  
-❌ Anuluj - Nie rób nic
-
-Czy chcesz odświeżyć kalendarz z lokalnej bazy?`);
-          
-          if (shouldContinue) {
-            console.log("🔄 Odświeżanie z Firestore jako fallback...");
-            refreshFromFirestore(); // Wywołaj nową funkcję do odświeżania z Firestore
-          }
-          return; // Wyjdź z funkcji
-        }
-
-        console.log("📦 Odpowiedź HTTP status:", response.status);
-        console.log("📦 Odpowiedź OK:", response.ok);
+        const response = await fetch(syncUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            forceRefresh: true,
+            calendarId: calId(),
+            timestamp: new Date().toISOString()
+          })
+        });
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -805,13 +766,8 @@ Czy chcesz odświeżyć kalendarz z lokalnej bazy?`);
         if (result.success) {
           const now = new Date().toLocaleString('pl-PL');
           alert("✅ Dane zostały odświeżone pomyślnie!");
-          
-          // Pokaż czas ostatniej synchronizacji
           E.syncStatus.textContent = `✅ Odświeżono ${now}`;
           E.syncStatusMobile.textContent = `✅ Ostatnia synchronizacja: ${now}`;
-          
-          // Odśwież lokalnie kalendarz po synchronizacji
-          console.log("🔄 Odświeżanie lokalnego kalendarza...");
           update();
         } else {
           throw new Error(result.error || "Nieznany błąd synchronizacji");
@@ -822,31 +778,21 @@ Czy chcesz odświeżyć kalendarz z lokalnej bazy?`);
         console.error("❌ Stack trace:", error.stack);
         
         let errorMessage = "Nieznany błąd";
-        
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          errorMessage = "Brak połączenia sieciowego lub Cloud Function niedostępna";
+          errorMessage = "Brak połączenia sieciowego lub Cloud Function niedostępna.";
         } else if (error.message.includes('404')) {
           errorMessage = "Cloud Function 'forceSync' nie istnieje. Skontaktuj się z deweloperem.";
         } else if (error.message.includes('CORS')) {
-          errorMessage = "Błąd CORS - problem z konfiguracją serwera";
+          errorMessage = "Błąd CORS - problem z konfiguracją serwera.";
         } else if (error.message.includes('401') || error.message.includes('403')) {
-          errorMessage = "Brak uprawnień - może token OneDrive wygasł?";
+          errorMessage = "Brak uprawnień - token OneDrive mógł wygasnąć.";
         } else {
           errorMessage = error.message;
         }
         
-        alert(`❌ Błąd synchronizacji:\n\n${errorMessage}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
-        
-        // Fallback: spróbuj odświeżyć dane z Firestore
-        console.log("🔄 Próba odświeżenia z Firestore jako fallback...");
-        try {
-          update();
-        } catch (fallbackError) {
-          console.error("❌ Błąd fallback:", fallbackError);
-        }
+        alert(`❌ Błąd synchronizacji z OneDrive:\n\n${errorMessage}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
         
       } finally {
-        // Przywróć stan przycisków
         E.forceSyncBtn.disabled = false;
         E.forceSyncBtnMobile.disabled = false;
         E.forceSyncBtnMobile.classList.remove('menu-item-disabled');
