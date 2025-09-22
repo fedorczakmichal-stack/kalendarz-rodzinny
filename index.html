@@ -392,7 +392,7 @@
     }
     
     @media (max-width:768px){
-      #fab{display:block;}
+      #fab{display:none;}
     }
     @media (min-width:769px){
       #fab{display:none;}
@@ -539,6 +539,7 @@
         </div>
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
+        <button id="summaryBtnMobile" class="menu-item">📊 Podsumowanie miesiąca</button>
       </div>
     </div>
     
@@ -585,7 +586,7 @@
     let cur = new Date();
     let unsub = () => {};
     let isMobile = matchMedia("(max-width: 768px)").matches;
-    let currentView = 'cards';
+    let currentView = 'grid';
     const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
     const labels = { ania: 'Ania', aniaPraca: 'Ania Praca', michal: 'Michał', michalPraca: 'Michał Praca', wspolne: 'Niania', inne: 'Inne' };
     let data = {};
@@ -596,6 +597,7 @@
       connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'),
       mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
       connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'),
+      summaryBtnMobile: el('summaryBtnMobile'),
       mCardsView: el('m-cards-view'), mGridView: el('m-grid-view'), mGridBody: el('m-grid-body'),
       viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid')
     };
@@ -644,6 +646,10 @@
     };
     E.connectOnedriveBtn.onclick = connectToOnedrive;
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
+    E.summaryBtnMobile.onclick = () => {
+      E.mobileMenu.classList.remove('open');
+      E.sheet.classList.add('open');
+    };
     const checkSyncStatus = async () => {
         try {
             if (!db) return;
