@@ -34,73 +34,8 @@
     .fld:hover{transform:translateY(-1px)}
     .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)} .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)} .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
     .tile-ortho{background:var(--k-ortho)!important;font-weight:600} .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600} .tile-lask{background:var(--k-lask)!important;font-weight:600} .tile-jb{background:var(--k-jb)!important;font-weight:600} .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
-    
-    /* Mobile view styles */
-    .mobile-view-switcher{display:none;background:#f9fafb;padding:.5rem;margin:0 .5rem .5rem;border-radius:12px;display:flex;gap:.25rem;}
-    @media (max-width:768px){.mobile-view-switcher{display:flex;}}
-    .view-btn{flex:1;padding:.5rem;border:1px solid #e5e7eb;background:white;border-radius:8px;font-size:.8rem;font-weight:600;color:#6b7280;transition:all .2s;}
-    .view-btn.active{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;border-color:transparent;}
-    .view-btn:active{transform:scale(.95);}
-    
     .mcal{display:none;padding:.5rem;padding-bottom:calc(.5rem + var(--safe-bottom) + 70px);}
-    .mcal-cards{display:block;}
-    .mcal-grid{display:none;}
-    .mcal-cols{display:none;}
-    
-    @media (max-width:768px){
-      .grid{display:none} 
-      .mcal{display:block}
-      
-      /* Card view styles */
-      .m-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:.75rem;margin-bottom:.65rem;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .2s;}
-      .m-card:active{transform:scale(.98);}
-      .m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;padding-bottom:.4rem;border-bottom:1.5px solid #f3f4f6;}
-      .m-num{font-size:1.35rem;font-weight:800;color:#1f2937;}
-      .m-name{font-size:.75rem;color:#6b7280;margin-left:.25rem;}
-      .tag{font-size:.65rem;border-radius:999px;padding:.15rem .4rem;font-weight:600;}
-      .m-row{display:flex;gap:.4rem;align-items:stretch;margin:.25rem 0;}
-      .m-label{flex:0 0 75px;border-radius:8px;padding:.4rem .45rem;font-weight:600;color:#334155;font-size:.75rem;display:flex;align-items:center;}
-      .m-content{flex:1;border-radius:8px;padding:.5rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:34px;display:flex;align-items:center;transition:all .15s;}
-      .m-content:active{background-color:rgba(0,0,0,.05);}
-      .m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.85rem;line-height:1.3;}
-      .m-content .placeholder{color:#9ca3af;font-size:.8rem;}
-      
-      /* Grid view styles */
-      .mg-calendar{background:white;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-      .mg-header{display:grid;grid-template-columns:repeat(7,1fr);background:#f9fafb;border-bottom:1px solid #e5e7eb;}
-      .mg-day-header{padding:.5rem 0;text-align:center;font-size:.65rem;font-weight:700;color:#6b7280;}
-      .mg-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e5e7eb;}
-      .mg-cell{background:white;min-height:70px;padding:.25rem;position:relative;cursor:pointer;transition:all .2s;}
-      .mg-cell:active{background:#f9fafb;}
-      .mg-cell.other-month{background:#fafafa;}
-      .mg-cell.other-month .mg-date{color:#cbd5e1;}
-      .mg-cell.today{background:linear-gradient(135deg,#ede9fe,#fce7f3);}
-      .mg-cell.off{background:linear-gradient(135deg,rgba(239,68,68,.05),rgba(219,39,119,.05));}
-      .mg-date{font-size:.75rem;font-weight:700;color:#374151;margin-bottom:.15rem;}
-      .mg-events{display:flex;flex-direction:column;gap:1px;}
-      .mg-event{font-size:.55rem;padding:1px 3px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .mg-more{font-size:.5rem;color:#6b7280;text-align:center;margin-top:2px;}
-      
-      /* Column view styles */
-      .mc-container{background:white;border-radius:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-      .mc-table{min-width:100%;border-collapse:separate;border-spacing:0;}
-      .mc-header{background:#f9fafb;position:sticky;top:0;z-index:10;}
-      .mc-th{padding:.5rem .25rem;text-align:center;font-size:.65rem;font-weight:700;color:#374151;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;}
-      .mc-th:last-child{border-right:none;}
-      .mc-th.day-col{min-width:60px;}
-      .mc-row{border-bottom:1px solid #e5e7eb;}
-      .mc-row:last-child{border-bottom:none;}
-      .mc-td{padding:.25rem;border-right:1px solid #e5e7eb;vertical-align:top;position:relative;}
-      .mc-td:last-child{border-right:none;}
-      .mc-day-info{text-align:center;padding:.5rem .25rem;}
-      .mc-day-num{font-size:.9rem;font-weight:800;color:#374151;}
-      .mc-day-name{font-size:.55rem;color:#6b7280;}
-      .mc-entry{padding:.35rem;border-radius:6px;font-size:.7rem;line-height:1.2;min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;word-break:break-word;}
-      .mc-entry:active{opacity:.8;}
-      .mc-row.today{background:linear-gradient(90deg,rgba(139,92,246,.05),rgba(236,72,153,.05));}
-      .mc-row.off{background:linear-gradient(90deg,rgba(239,68,68,.03),rgba(219,39,119,.03));}
-    }
-    
+    @media (max-width:768px){.grid{display:none} .mcal{display:block}.m-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:.75rem;margin-bottom:.65rem;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .2s;}.m-card:active{transform:scale(.98);}.m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;padding-bottom:.4rem;border-bottom:1.5px solid #f3f4f6;}.m-num{font-size:1.35rem;font-weight:800;color:#1f2937;}.m-name{font-size:.75rem;color:#6b7280;margin-left:.25rem;}.tag{font-size:.65rem;border-radius:999px;padding:.15rem .4rem;font-weight:600;}.m-row{display:flex;gap:.4rem;align-items:stretch;margin:.25rem 0;}.m-label{flex:0 0 75px;border-radius:8px;padding:.4rem .45rem;font-weight:600;color:#334155;font-size:.75rem;display:flex;align-items:center;}.m-content{flex:1;border-radius:8px;padding:.5rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:34px;display:flex;align-items:center;transition:all .15s;}.m-content:active{background-color:rgba(0,0,0,.05);}.m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.85rem;line-height:1.3;}.m-content .placeholder{color:#9ca3af;font-size:.8rem;}}
     #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.15);padding:6px;display:none;z-index:1000}
     .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px} .ctx-it:hover{background:#f3f4f6}
     #edit{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px;}
@@ -221,17 +156,7 @@
             <div id="desk" class="grid"></div>
           </div>
         </div>
-        
-        <div id="mob" class="mcal md:hidden">
-          <div class="mobile-view-switcher">
-            <button id="view-cards" class="view-btn active">📋 Karty</button>
-            <button id="view-grid" class="view-btn">📅 Miesiąc</button>
-            <button id="view-cols" class="view-btn">📊 Kolumny</button>
-          </div>
-          <div id="mcal-cards" class="mcal-cards"></div>
-          <div id="mcal-grid" class="mcal-grid"></div>
-          <div id="mcal-cols" class="mcal-cols"></div>
-        </div>
+        <div id="mob" class="mcal md:hidden"></div>
       </div>
     </main>
     
@@ -301,18 +226,13 @@
     }
 
     let cur = new Date(); let unsub = () => {}; let isMobile = matchMedia("(max-width: 768px)").matches;
-    let mobileView = localStorage.getItem('mobileView') || 'cards';
     const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
     const labels = { ania: 'Ania', aniaPraca: 'Ania Praca', michal: 'Michał', michalPraca: 'Michał Praca', wspolne: 'Niania', inne: 'Inne' };
-    const shortLabels = { ania: 'A', aniaPraca: 'AP', michal: 'M', michalPraca: 'MP', wspolne: 'N', inne: 'I' };
     let data = {}; let clip = null;
     const el = id => document.getElementById(id);
 
     const E = {
-      title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'),next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'),desk:el('desk'),mob:el('mob'),
-      mcalCards:el('mcal-cards'),mcalGrid:el('mcal-grid'),mcalCols:el('mcal-cols'),
-      viewCards:el('view-cards'),viewGrid:el('view-grid'),viewCols:el('view-cols'),
-      sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'),sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'),sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'),sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'),msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'),msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'),msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'),sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),editTitle:el('edit-title'),editSave:el('edit-save'),
+      title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'),next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'),desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'),sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'),sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'),sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'),msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'),msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'),msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'),sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),editTitle:el('edit-title'),editSave:el('edit-save'),
       connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'),
       mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
       connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile')
@@ -361,27 +281,16 @@
       return typeof entry === 'object' ? entry.text || '' : entry || ''; 
     };
     
-    const switchMobileView = (view) => {
-      mobileView = view;
-      localStorage.setItem('mobileView', view);
-      
-      E.viewCards.classList.toggle('active', view === 'cards');
-      E.viewGrid.classList.toggle('active', view === 'grid');
-      E.viewCols.classList.toggle('active', view === 'cols');
-      
-      E.mcalCards.style.display = view === 'cards' ? 'block' : 'none';
-      E.mcalGrid.style.display = view === 'grid' ? 'block' : 'none';
-      E.mcalCols.style.display = view === 'cols' ? 'block' : 'none';
-      
-      renderMobile(cur.getFullYear(), cur.getMonth(), data);
-    };
-    
-    E.viewCards.onclick = () => switchMobileView('cards');
-    E.viewGrid.onclick = () => switchMobileView('grid');
-    E.viewCols.onclick = () => switchMobileView('cols');
-    
     const connectToOnedrive = () => {
-      const authUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth"; 
+      // === UZUPEŁNIJ TEN ADRES URL ===
+      // Wklej tutaj adres URL do swojej funkcji "auth", który otrzymasz po wdrożeniu `firebase deploy --only functions`
+      const authUrl = ""; 
+      // ==============================
+
+      if (!authUrl) {
+        alert("Błąd: Proszę uzupełnić adres URL funkcji 'auth' w pliku index.html.");
+        return;
+      }
       window.location.href = authUrl;
     };
 
@@ -389,143 +298,49 @@
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
 
     const checkSyncStatus = async () => {
-        try {
-            if (!db) return;
-            const tokenDocRef = doc(db, "onedrive_config", "user_token");
-            const tokenDoc = await getDoc(tokenDocRef);
-            
-            if (tokenDoc.exists()) {
-                E.syncStatus.textContent = "✅ Połączono";
-                E.syncStatus.className = "text-sm text-green-600 font-semibold";
-                E.syncStatusMobile.textContent = "✅ Połączono z OneDrive";
-                E.connectOnedriveBtn.textContent = "Połącz ponownie";
-                E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
-            } else {
-                E.syncStatus.textContent = "❌ Brak połączenia";
-                E.syncStatus.className = "text-sm text-red-600 font-semibold";
-                E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
-            }
-        } catch (error) {
-            console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
-            E.syncStatus.textContent = "⚠️ Błąd";
-            E.syncStatus.className = "text-sm text-yellow-600 font-semibold";
-            E.syncStatusMobile.textContent = "⚠️ Błąd sprawdzania statusu";
+        if (!db) return;
+        const tokenDocRef = doc(db, "onedrive_config", "user_token");
+        const tokenDoc = await getDoc(tokenDocRef);
+        
+        if (tokenDoc.exists()) {
+            E.syncStatus.textContent = "✅ Połączono";
+            E.syncStatus.className = "text-sm text-green-600 font-semibold";
+            E.syncStatusMobile.textContent = "✅ Połączono z OneDrive";
+            E.connectOnedriveBtn.textContent = "Połącz ponownie";
+            E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
+        } else {
+            E.syncStatus.textContent = "❌ Brak połączenia";
+            E.syncStatus.className = "text-sm text-red-600 font-semibold";
+            E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
         }
     };
     
     const renderDesktop=(y,m,ev)=>{E.desk.innerHTML='';const days=new Date(y,m+1,0).getDate();const today=new Date();for(let d=1;d<=days;d++){const date=new Date(y,m,d);const dow=date.getDay();const isToday=today.toDateString()===date.toDateString();const de=ev[d]||{};const off=(dow===0||dow===6)||de.isHoliday;const dayCell=document.createElement('div');dayCell.className=`cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`;dayCell.dataset.day=d;dayCell.innerHTML=`<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;E.desk.appendChild(dayCell);for(const f of fields){const t=getEntryText(d,f);const c=document.createElement('div');c.className=`cell ${off?'off':''} ${getFieldClass(f)}`;const div=document.createElement('div');div.className=`fld ${getTileClass(t)}`;div.dataset.day=d;div.dataset.field=f;const span=document.createElement('span');span.className='txt';span.textContent=t;div.appendChild(span);c.appendChild(div);E.desk.appendChild(c);}}};
+    const renderMobile=(y,m,ev)=>{E.mob.innerHTML='';const days=new Date(y,m+1,0).getDate();const today=new Date();const frag=document.createDocumentFragment();for(let d=1;d<=days;d++){const date=new Date(y,m,d);const dow=date.getDay();const de=ev[d]||{};const off=(dow===0||dow===6)||de.isHoliday;const isToday=today.toDateString()===date.toDateString();const card=document.createElement('div');card.className=`m-card ${off?'ring-1 ring-red-200':''} ${isToday?'ring-2 ring-purple-400':''}`;let html=`<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div><div class="flex gap-1">${de.isHoliday?'<span class="tag bg-red-100 text-red-600">Święto</span>':''}${isToday?'<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>':''}</div></div>`;for(const f of fields){const t=getEntryText(d,f);html+=`<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div><div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}"><span class="txt">${t||'<span class="placeholder">+ Dodaj</span>'}</span></div></div>`;}card.innerHTML=html;frag.appendChild(card);}E.mob.appendChild(frag);};
+    const computeSumsAndEarnings=()=>{let sums={ortho:0,brz:0,lask:0,jb:0,portsInstall:0,portsRemove:0,earnings:0,jednodniowki:0,kwalifikacje:0,komercja:0};const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();const calculateEarningsForText=(text,hours)=>{if(!text||!hours)return 0;if(isOrtho(text))return hours*hourlyRates.ortho;if(isBrzeziny(text))return hours*hourlyRates.brzeziny;if(isLask(text))return hours*hourlyRates.lask;if(isJB(text))return hours*hourlyRates.jb;return 0;};const sumHoursForText=(text,hours,target)=>{if(!text||!hours)return;if(isOrtho(text))target.ortho+=hours;else if(isBrzeziny(text))target.brz+=hours;else if(isLask(text))target.lask+=hours;else if(isJB(text))target.jb+=hours;};let hasZastepcaBonus=false;for(let d=1;d<=days;d++){const dayData=data[d];if(!dayData)continue;const michalPracaText=getEntryText(d,'michalPraca');if(/zastępca|zastepca|ordynator/i.test(michalPracaText)){hasZastepcaBonus=true;}for(const f of fields){const entry=dayData[f];if(!entry)continue;if(typeof entry==='object'){const textParts=(entry.text||'').split('/').map(t=>t.trim());const h1=entry.h1||0,h2=entry.h2||0;sumHoursForText(textParts[0],h1,sums);sums.earnings+=calculateEarningsForText(textParts[0],h1);if(textParts.length>1){sumHoursForText(textParts[1],h2,sums);sums.earnings+=calculateEarningsForText(textParts[1],h2);}}else{const hours=getDefaultHours(entry);sumHoursForText(entry,hours,sums);sums.earnings+=calculateEarningsForText(entry,hours);}if(f==='michalPraca'){sums.portsInstall+=getEntryProp(d,f,'ports_i',0);sums.portsRemove+=getEntryProp(d,f,'ports_r',0);sums.jednodniowki+=getEntryProp(d,f,'endo_od',0);sums.kwalifikacje+=getEntryProp(d,f,'endo_q',0);sums.komercja+=getEntryProp(d,f,'komercja',0);}}}sums.earnings+=(sums.portsInstall*portRates.install)+(sums.portsRemove*portRates.remove);sums.earnings+=sums.jednodniowki*endoRates.one_day;sums.earnings+=sums.kwalifikacje*endoRates.qual;sums.earnings+=sums.komercja*komercjaRate;if(hasZastepcaBonus){sums.earnings+=ZASTEPCA_ORDYNATORA_BONUS;}const totalPorts=sums.portsInstall+sums.portsRemove;const totalHours=sums.ortho+sums.brz+sums.lask+sums.jb;E.sumOrtho.textContent=`${sums.ortho}h`;E.sumBrz.textContent=`${sums.brz}h`;E.sumLask.textContent=`${sums.lask}h`;E.sumJB.textContent=`${sums.jb}h`;E.sumTotalHours.textContent=`${totalHours}h`;E.sumPorts.textContent=String(totalPorts);E.sumJednodniowki.textContent=String(sums.jednodniowki);E.sumKwalifikacje.textContent=String(sums.kwalifikacje);E.sumKomercja.textContent=String(sums.komercja);E.sumEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;E.msOrtho.textContent=`${sums.ortho}h`;E.msBrz.textContent=`${sums.brz}h`;E.msLask.textContent=`${sums.lask}h`;E.msJB.textContent=`${sums.jb}h`;E.msTotalHours.textContent=`${totalHours}h`;E.msPorts.textContent=String(totalPorts);E.msJednodniowki.textContent=String(sums.jednodniowki);E.msKwalifikacje.textContent=String(sums.kwalifikacje);E.msKomercja.textContent=String(sums.komercja);E.msEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;E.sheetTitle.textContent=`${mNames[cur.getMonth()]} ${cur.getFullYear()}`;};
+    const calId=()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
+    const save=async(day,field,val)=>setDoc(doc(db,calId(),String(day)),{[field]:val},{merge:true});
+    const del=async(day,field)=>updateDoc(doc(db,calId(),String(day)),{[field]:deleteField()});
+    function openEdit(day,field,overrideText=null){const entry=data[day]?.[field]||{};const initialText=typeof entry==='object'?entry.text||'':entry||'';const entryText=overrideText??initialText;const textParts=entryText.split('/').map(t=>t.trim());const date=new Date(cur.getFullYear(),cur.getMonth(),day);E.editTitle.textContent=`${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;let formHTML=`<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${entryText.replace(/"/g,'&quot;')}" placeholder="np. JB wybudzeń / ortho od 15:00"></div>`;const createHoursHTML=(partNum,text,hours)=>{const defaultH=getDefaultHours(text);const currentH=hours??defaultH;return`<div class="hours-control"><div class="hours-control-label">${text||`Część ${partNum}`}</div><div class="mt-2"><input type="range" min="0" max="48" step="0.5" value="${currentH}" data-part="${partNum}" data-role="slider" class="hours-slider"><input type="number" min="0" max="48" step="0.5" value="${currentH}" placeholder="${defaultH}" data-part="${partNum}" data-role="num" class="hours-number"></div></div>`;};formHTML+=createHoursHTML(1,textParts[0],getEntryProp(day,field,'h1',null));if(textParts.length>1){formHTML+=createHoursHTML(2,textParts[1],getEntryProp(day,field,'h2',null));}if(field==='michalPraca'){formHTML+=`<div class="hours-control" style="background:#ede9fe;"><div class="hours-control-label">Porty</div><div class="grid grid-cols-2 gap-3 mt-2"><div><label class="text-xs text-gray-500">Założenie</label><input type="number" min="0" value="${getEntryProp(day,field,'ports_i','')}" id="editPortsI" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Usunięcie</label><input type="number" min="0" value="${getEntryProp(day,field,'ports_r','')}" id="editPortsR" placeholder="0" class="form-input text-center"></div></div></div>`;formHTML+=`<div class="hours-control" style="background:#f0fdfa;"><div class="hours-control-label">Inne procedury</div><div class="grid grid-cols-3 gap-2 mt-2"><div><label class="text-xs text-gray-500">Jednodniówki</label><input type="number" min="0" value="${getEntryProp(day,field,'endo_od','')}" id="editEndoOD" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Kwalifikacje</label><input type="number" min="0" value="${getEntryProp(day,field,'endo_q','')}" id="editEndoQ" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Komercja</label><input type="number" min="0" value="${getEntryProp(day,field,'komercja','')}" id="editKomercja" placeholder="0" class="form-input text-center"></div></div></div>`;}E.editContent.innerHTML=formHTML;const editTextEl=el('editText');editTextEl.focus();editTextEl.selectionStart=editTextEl.selectionEnd=editTextEl.value.length;const handleSliderSync=e=>{if(e.target.dataset.role==='slider'){const numInput=E.editContent.querySelector(`input[data-role="num"][data-part="${e.target.dataset.part}"]`);if(numInput)numInput.value=e.target.value;}else if(e.target.dataset.role==='num'){const slider=E.editContent.querySelector(`input[data-role="slider"][data-part="${e.target.dataset.part}"]`);const currentTextPart=textParts[parseInt(e.target.dataset.part,10)-1]||'';if(slider)slider.value=e.target.value||getDefaultHours(currentTextPart);}};E.editContent.addEventListener('input',handleSliderSync);editTextEl.addEventListener('input',e=>{const newText=e.target.value;const needsRerender=(initialText.includes('/')!==newText.includes('/'));if(needsRerender){openEdit(day,field,newText);}});E.editSave.onclick=async()=>{const newText=el('editText').value.trim();if(!newText&&!el('editPortsI')?.value&&!el('editPortsR')?.value&&!el('editEndoOD')?.value&&!el('editEndoQ')?.value&&!el('editKomercja')?.value){await del(day,field);}else{const finalData={text:newText};const getNumVal=(selector,isFloat=false)=>{const i=el(selector)||E.editContent.querySelector(selector);if(!i||i.value==='')return deleteField();return isFloat?parseFloat(i.value.replace(',','.')):parseInt(i.value,10);};const initialParts=initialText.split('/').map(t=>t.trim());const newParts=newText.split('/').map(t=>t.trim());const processHours=(partNum,initialPartText,newPartText)=>{const formVal=getNumVal(`input[data-part="${partNum}"][data-role="num"]`,true);if(typeof formVal==='object'){return getDefaultHours(newPartText)||deleteField();}const oldDefault=getDefaultHours(initialPartText);if(formVal===oldDefault&&initialPartText!==newPartText){return getDefaultHours(newPartText)||deleteField();}return formVal;};finalData.h1=processHours(1,initialParts[0],newParts[0]);if(newText.includes('/')){finalData.h2=processHours(2,initialParts[1]||'',newParts[1]||'');}if(field==='michalPraca'){finalData.ports_i=getNumVal('#editPortsI');finalData.ports_r=getNumVal('#editPortsR');finalData.endo_od=getNumVal('#editEndoOD');finalData.endo_q=getNumVal('#editEndoQ');finalData.komercja=getNumVal('#editKomercja');}await save(day,field,finalData);}E.edit.style.display='none';};E.edit.style.display='flex';}
+    E.editClose.onclick=()=>E.edit.style.display='none';E.edit.addEventListener('click',e=>{if(e.target===E.edit)E.edit.style.display='none';});document.addEventListener('keydown',e=>{if(e.key==='Escape')E.edit.style.display='none';});
+    E.mobileMenuBtn.onclick=()=>E.mobileMenu.classList.add('open');E.menuClose.onclick=()=>E.mobileMenu.classList.remove('open');E.mobileMenu.addEventListener('click',e=>{if(e.target===E.mobileMenu)E.mobileMenu.classList.remove('open');});
+    document.addEventListener('contextmenu',e=>{const fld=e.target.closest('.fld,.m-content');if(!fld)return;e.preventDefault();E.ctx.style.display='block';E.ctx.style.left=e.clientX+'px';E.ctx.style.top=e.clientY+'px';E.ctx.dataset.day=fld.dataset.day;E.ctx.dataset.field=fld.dataset.field;});document.addEventListener('click',e=>{if(!e.target.closest('#ctx'))E.ctx.style.display='none';});
+    E.ctxCopy.onclick=()=>{const d=E.ctx.dataset;clip=data[d.day]?.[d.field];E.ctx.style.display='none';};E.ctxCut.onclick=async()=>{const d=E.ctx.dataset;clip=data[d.day]?.[d.field];await del(d.day,d.field);E.ctx.style.display='none';};E.ctxPaste.onclick=async()=>{const d=E.ctx.dataset;if(clip)await save(d.day,d.field,clip);E.ctx.style.display='none';};E.ctxDel.onclick=async()=>{const d=E.ctx.dataset;await del(d.day,d.field);E.ctx.style.display='none';};
+    const launchEdit=(e)=>{const target=e.target.closest('[data-day][data-field]');if(target)openEdit(target.dataset.day,target.dataset.field);};
+    E.desk.addEventListener('click',launchEdit);E.mob.addEventListener('click',launchEdit);E.desk.addEventListener('click',e=>{const dayCell=e.target.closest('.day-cell');if(dayCell)toggleHoliday(dayCell.dataset.day);});
+    async function toggleHoliday(day){const ref=doc(db,calId(),String(day));const snap=await getDoc(ref);const cur=(snap.exists()&&snap.data().isHoliday)||false;await setDoc(ref,{isHoliday:!cur},{merge:true});}
+    function setTitle(){const title=`${mNames[cur.getMonth()]} ${cur.getFullYear()}`;E.title.textContent=title;E.titleMobile.textContent=title;}
+    async function update(){if(!db)return;setTitle();unsub();unsub=onSnapshot(collection(db,calId()),s=>{data={};s.forEach(doc=>data[doc.id]=doc.data());isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data);computeSumsAndEarnings();});}
+    const changeMonth=(delta)=>{cur.setDate(1);cur.setMonth(cur.getMonth()+delta);update();};
+    const goToToday=()=>{const t=new Date();cur=new Date(t.getFullYear(),t.getMonth(),1);update();};
+    E.prev.onclick=()=>changeMonth(-1);E.next.onclick=()=>changeMonth(1);E.prevMobile.onclick=()=>changeMonth(-1);E.nextMobile.onclick=()=>changeMonth(1);E.today.onclick=goToToday;E.todayMobile.onclick=goToToday;
+    E.fab.onclick=()=>E.sheet.classList.add('open');E.sheetClose.onclick=()=>E.sheet.classList.remove('open');
+    let startY=0,currentY=0;const sheet=E.sheet;sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;});sheet.addEventListener('touchmove',e=>{currentY=e.touches[0].clientY;const diff=currentY-startY;if(diff>0){sheet.style.transform=`translateY(${diff}px)`;}});sheet.addEventListener('touchend',()=>{const diff=currentY-startY;if(diff>50){sheet.classList.remove('open');}sheet.style.transform='';});
     
-    const renderMobileCards=(y,m,ev)=>{E.mcalCards.innerHTML='';const days=new Date(y,m+1,0).getDate();const today=new Date();const frag=document.createDocumentFragment();for(let d=1;d<=days;d++){const date=new Date(y,m,d);const dow=date.getDay();const de=ev[d]||{};const off=(dow===0||dow===6)||de.isHoliday;const isToday=today.toDateString()===date.toDateString();const card=document.createElement('div');card.className=`m-card ${off?'ring-1 ring-red-200':''} ${isToday?'ring-2 ring-purple-400':''}`;let html=`<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div><div class="flex gap-1">${de.isHoliday?'<span class="tag bg-red-100 text-red-600">Święto</span>':''}${isToday?'<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>':''}</div></div>`;for(const f of fields){const t=getEntryText(d,f);html+=`<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div><div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}"><span class="txt">${t||'<span class="placeholder">+ Dodaj</span>'}</span></div></div>`;}card.innerHTML=html;frag.appendChild(card);}E.mcalCards.appendChild(frag);};
-    
-    const renderMobileGrid=(y,m,ev)=>{
-      E.mcalGrid.innerHTML='';
-      const days=new Date(y,m+1,0).getDate();
-      const firstDay=new Date(y,m,1).getDay();
-      const startIdx=getDayIdx(firstDay);
-      const today=new Date();
-      
-      let html='<div class="mg-calendar"><div class="mg-header">';
-      for(let i=0;i<7;i++){html+=`<div class="mg-day-header">${dShort[i]}</div>`;}
-      html+='</div><div class="mg-grid">';
-      
-      for(let i=0;i<startIdx;i++){html+='<div class="mg-cell other-month"></div>';}
-      
-      for(let d=1;d<=days;d++){
-        const date=new Date(y,m,d);
-        const dow=date.getDay();
-        const de=ev[d]||{};
-        const off=(dow===0||dow===6)||de.isHoliday;
-        const isToday=today.toDateString()===date.toDateString();
-        
-        html+=`<div class="mg-cell ${off?'off':''} ${isToday?'today':''}" data-day="${d}">`;
-        html+=`<div class="mg-date">${d}</div>`;
-        html+='<div class="mg-events">';
-        
-        let hasEvents=false;
-        for(const f of fields){
-          const t=getEntryText(d,f);
-          if(t){
-            hasEvents=true;
-            html+=`<div class="mg-event ${getFieldClass(f)} ${getTileClass(t)}">${shortLabels[f]}: ${t.substring(0,15)}${t.length>15?'...':''}</div>`;
-          }
-        }
-        if(!hasEvents){html+='<div class="mg-event" style="color:#cbd5e1;font-size:.5rem;">—</div>';}
-        html+='</div></div>';
-      }
-      
-      const totalCells=startIdx+days;
-      const remainingCells=totalCells%7===0?0:7-(totalCells%7);
-      for(let i=0;i<remainingCells;i++){html+='<div class="mg-cell other-month"></div>';}
-      
-      html+='</div></div>';
-      E.mcalGrid.innerHTML=html;
-      
-      E.mcalGrid.addEventListener('click',e=>{
-        const cell=e.target.closest('.mg-cell[data-day]');
-        if(cell){showDayDetails(cell.dataset.day);}
-      });
-    };
-    
-    const renderMobileColumns=(y,m,ev)=>{
-      E.mcalCols.innerHTML='';
-      const days=new Date(y,m+1,0).getDate();
-      const today=new Date();
-      
-      let html='<div class="mc-container"><table class="mc-table"><thead class="mc-header"><tr>';
-      html+='<th class="mc-th">Dzień</th>';
-      for(const f of fields){html+=`<th class="mc-th ${getFieldClass(f)}">${shortLabels[f]}</th>`;}
-      html+='</tr></thead><tbody>';
-      
-      for(let d=1;d<=days;d++){
-        const date=new Date(y,m,d);
-        const dow=date.getDay();
-        const de=ev[d]||{};
-        const off=(dow===0||dow===6)||de.isHoliday;
-        const isToday=today.toDateString()===date.toDateString();
-        
-        html+=`<tr class="mc-row ${off?'off':''} ${isToday?'today':''}">`;
-        html+=`<td class="mc-td mc-day-info"><div class="mc-day-num">${d}</div><div class="mc-day-name">${dShort[getDayIdx(dow)]}</div></td>`;
-        
-        for(const f of fields){
-          const t=getEntryText(d,f);
-          html+=`<td class="mc-td"><div class="mc-entry ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}">${t||'—'}</div></td>`;
-        }
-        html+='</tr>';
-      }
-      
-      html+='</tbody></table></div>';
-      E.mcalCols.innerHTML=html;
-    };
-    
-    const showDayDetails=(day)=>{
-      const date=new Date(cur.getFullYear(),cur.getMonth(),day);
-      const dow=date.getDay();
-      const de=data[day]||{};
-      const off=(dow===0||dow===6)||de.isHoliday;
-      
-      let html=`<div class="m-card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;width:90%;max-width:400px;box-shadow:0 20px 40px rgba(0,0,0,.2);">`;
-      html+=`<div class="m-head"><div><span class="m-num">${day}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div>`;
-      html+=`<button onclick="this.closest('.m-card').remove()" style="width:32px;height:32px;border-radius:8px;background:#f3f4f6;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;">✕</button></div>`;
-      
-      for(const f of fields){
-        const t=getEntryText(day,f);
-        html+=`<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div>`;
-        html+=`<div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${day}" data-field="${f}">`;
-        html+=`<span class="txt">${t||'<span class="placeholder">+ Dodaj</span>'}</span></div></div>`;
-      }
-      html+='</div>';
-      
-      const overlay=document.createElement('div');
-      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1400;';
-      overlay.innerHTML=html;
-      overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
-      document.body.appendChild(overlay);
-    };
-    
-    const renderMobile=(y,m,ev)=>{
-      if(mobileView==='cards'){renderMobileCards(y,m,ev);}
-      else if(mobileView==='grid'){renderMobileGrid(y,m,ev);}
-      else if(mobileView==='cols'){renderMobileColumns(y,m,ev);}
-    };
-    
-    const computeSumsAndEarnings=()=>{let sums={ortho:0,brz:0,lask:0,jb:0,portsInstall:0,portsRemove:0,earnings:0,jednodniowki:0,kwalifikacje:0,komercja:0};const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();const calculateEarningsForText=(text,hours)=>{if(!text||!hours)return 0;if(isOrtho(text))return hours*hourlyRates.ortho;if(isBrzeziny(text))return hours*hourlyRates.brzeziny;if(isLask(text))return hours*hourlyRates.lask;if(isJB(text))return hours*hourlyRates.jb;return 0;};const sumHoursForText=(text,hours,target)=>{if(!text||!hours)return;if(isOrtho(text))target.ortho+=hours;else if(isBrzeziny(text))target.brz+=hours;else if(isLask(text))target.lask+=hours;else if(isJB(text))target.jb+=hours;};let hasZastepcaBonus=false;for(let d=1;d<=days;d++){const dayData=data[d];if(!dayData)continue;const michalPracaText=getEntryText(d,'michalPraca');if(/zastępca|zastepca|ordynator/i.test(michalPracaText)){hasZastepcaBonus=true;}for(const f of fields){const entry=dayData[f];if(!entry)continue;if(typeof entry==='object'){const textParts=(entry.text||'').split('/').map(t=>t.trim());const h1=entry.h1||0,h2=entry.h2||0;sumHoursForText(textParts[0],h1,sums);sums.earnings+=calculateEarningsForText(textParts[0],h1);if(textParts.length>1){sumHoursForText(textParts[1],h2,sums);sums.earnings+=calculateEarningsForText(textParts[1],h2);}}else{const hours=getDefaultHours(entry);sumHoursForText(entry,hours,sums);sums.earnings+=calculateEarningsForText(entry,hours);}if(f==='michalPraca'){sums.portsInstall+=getEntryProp(d,f,'ports_i',0);sums.portsRemove+=getEntryProp(d,f,'ports_r',0);sums.jednodniowki+=getEntryProp(d,f,'endo_od',0);sums.kwalifikacje+=getEntryProp(d,f,'endo_q',0);sums.komercja+=getEntryProp(d,f,'komercja',0);}}}sums.earnings+=(sums.portsInstall*portRates.install)+(sums.portsRemove*portRates.remove);sums.earnings+=sums.jednodniowki*endoRates.one_day;sums.earnings+=sums.kwalifikacje*endoRates.qual;sums.earnings+=sums.komercja*komercjaRate;if(hasZastepcaBonus){sums.earnings+=ZASTEPCA_ORDYNATORA_BONUS;}const totalPorts=sums.portsInstall+sums.portsRemove;const totalHours=sums.ortho+sums.brz+sums.lask+sums.jb;E.sumOrtho.textContent=`${sums.ortho}h`;E.sumBrz.textContent=`${sums.brz}h`;E.sumLask.textContent=`${sums.lask}h`;E.sumJB.textContent=`${sums.jb}h`;E.sumTotalHours.textContent=`${totalHours}h`;E.sumPorts.textContent=String(totalPorts);E.sumJednodniowki.textContent=String(sums.jednodniowki);E.sumKwalifikacje.textContent=String(sums.kwalifikacje);E.sumKomercja.textContent=String(sums.komercja);E.sumEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;E.msOrtho.textContent=`${sums.ortho}h`;E.msBrz.textContent=`${sums.brz}h`;E.msLask.textContent=`${sums.lask}h`;E.msJB.textContent=`${sums.jb}h`;E.msTotalHours.textContent=`${totalHours}h`;E.msPorts.textContent=String(totalPorts);E.msJednodniowki.textContent=String(sums.jednodniowki);E.msKwalifikacje.textContent=String(sums.kwalifikacje);E.msKomercja.textContent=String(sums.komercja);E.ms
+    function init(){
+      update(); 
+      checkSyncStatus();
+    }
+  </script>
+</body>
+</html>
