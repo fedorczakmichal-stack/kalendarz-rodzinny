@@ -461,9 +461,7 @@
           <div id="sync-controls" class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-8">
             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
             <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Pobierz najnowsze dane z OneDrive (Ctrl+R)">🔄 Odśwież</button>
-            <button id="refreshFirestoreBtn" class="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700" title="Odśwież dane z bazy danych">🔄 Odśwież z bazy</button>
-            <button id="testConnectionBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Sprawdź status połączenia z OneDrive (Ctrl+T)">🔍 Test</button>
-            <button id="debugFirestoreBtn" class="px-3 py-2 text-sm font-semibold text-white bg-orange-600 rounded-md hover:bg-orange-700" title="Debuguj zawartość bazy danych (Ctrl+D)">🐛 Debug</button>
+            <button id="testConnectionBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Sprawdź status połączenia z OneDrive">🔍 Test</button>
             <div id="syncStatus" class="text-sm text-gray-500"></div>
           </div>
         </div>
@@ -553,6 +551,7 @@
       </div>
     </main>
     
+    <!-- FAB Button (tylko na mobile) -->
     <button id="fab" aria-label="Pokaż podsumowanie">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -560,6 +559,7 @@
       Podsumowanie
     </button>
     
+    <!-- Bottom Sheet - Podsumowanie -->
     <div id="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-content">
@@ -580,6 +580,7 @@
       </div>
     </div>
     
+    <!-- Mobile Menu -->
     <div id="mobile-menu">
       <div class="menu-panel">
         <div class="menu-header">
@@ -588,9 +589,7 @@
         </div>
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
         <button id="forceSyncBtnMobile" class="menu-item menu-item-disabled" disabled>🔄 Odśwież dane z OneDrive</button>
-        <button id="refreshFirestoreBtnMobile" class="menu-item">🔄 Odśwież z bazy danych</button>
         <button id="testConnectionBtnMobile" class="menu-item menu-item-disabled" disabled>🔍 Testuj połączenie</button>
-        <button id="debugFirestoreBtnMobile" class="menu-item">🐛 Debuguj bazę danych</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
         <div class="h-px bg-gray-200 mx-4 my-2"></div>
         <button id="today-mobile" class="menu-item">📅 Idź do dzisiaj</button>
@@ -598,6 +597,7 @@
       </div>
     </div>
     
+    <!-- Context Menu -->
     <div id="ctx">
       <div id="ctx-copy" class="ctx-it">📋 Kopiuj</div>
       <div id="ctx-cut" class="ctx-it">✂️ Wytnij</div>
@@ -606,6 +606,7 @@
       <div id="ctx-del" class="ctx-it text-red-600">🗑️ Usuń</div>
     </div>
     
+    <!-- Edit Dialog -->
     <div id="edit">
       <div class="edit-body">
         <div class="edit-head">
@@ -623,7 +624,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     const cfg = { apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ", authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com", projectId:"kalendarz-rodzinny-68d04", storageBucket:"kalendarz-rodzinny-68d04.appspot.com", messagingSenderId:"1050937545151", appId:"1:1050937545151:web:a85fd1a5f066f4a499910a", measurementId:"G-57YKE2XKQ1"};
     let db;
     try {
@@ -647,13 +648,12 @@
     const el = id => document.getElementById(id);
     const E = {
       title: el('title'), titleMobile: el('title-mobile'), prev: el('prev'), prevMobile: el('prev-mobile'), next: el('next'), nextMobile: el('next-mobile'), today: el('today'), todayMobile: el('today-mobile'), desk: el('desk'), mob: el('mob'), sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'), sumJednodniowki: el('sum-jednodniowki'), sumKwalifikacje: el('sum-kwalifikacje'), sumKomercja: el('sum-komercja'), sumEarnings: el('sum-earnings'), sumTotalHours: el('sum-total-hours'), msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'), msJednodniowki: el('ms-jednodniowki'), msKwalifikacje: el('ms-kwalifikacje'), msKomercja: el('ms-komercja'), msEarnings: el('ms-earnings'), msTotalHours: el('ms-total-hours'), sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'), ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'), edit: el('edit'), editClose: el('edit-close'), editContent: el('edit-content'), editTitle: el('edit-title'), editSave: el('edit-save'),
-      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'), forceSyncBtn: el('forceSyncBtn'), testConnectionBtn: el('testConnectionBtn'), debugFirestoreBtn: el('debugFirestoreBtn'),
+      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'), forceSyncBtn: el('forceSyncBtn'), testConnectionBtn: el('testConnectionBtn'),
       mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
-      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'), testConnectionBtnMobile: el('testConnectionBtnMobile'), debugFirestoreBtnMobile: el('debugFirestoreBtnMobile'),
+      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'), testConnectionBtnMobile: el('testConnectionBtnMobile'),
       summaryBtnMobile: el('summaryBtnMobile'),
       mCardsView: el('m-cards-view'), mGridView: el('m-grid-view'), mGridBody: el('m-grid-body'),
-      viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid'),
-      refreshFirestoreBtn: el('refreshFirestoreBtn'), refreshFirestoreBtnMobile: el('refreshFirestoreBtnMobile')
+      viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid')
     };
     const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
     const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela'];
@@ -703,18 +703,6 @@
       const authUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth";
       window.location.href = authUrl;
     };
-    const refreshFromFirestore = async () => {
-        console.log("🔄 Odświeżanie z bazy danych Firestore...");
-        try {
-            await update();
-            const now = new Date().toLocaleString('pl-PL');
-            E.syncStatus.textContent = `✅ Odświeżono z bazy ${now}`;
-            E.syncStatusMobile.textContent = `✅ Odświeżono z bazy danych: ${now}`;
-        } catch (error) {
-            console.error("❌ Błąd podczas odświeżania z Firestore:", error);
-            alert(`❌ Błąd odświeżania:\n\n${error.message}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
-        }
-    };
 
     const forceSyncFromOnedrive = async () => {
       if (!db) {
@@ -723,6 +711,7 @@
       }
 
       try {
+        // Sprawdź czy token istnieje
         const tokenDocRef = doc(db, "onedrive_config", "user_token");
         const tokenDoc = await getDoc(tokenDocRef);
         
@@ -731,16 +720,24 @@
           return;
         }
 
+        // Ustaw loading state
         E.forceSyncBtn.disabled = true;
         E.forceSyncBtnMobile.disabled = true;
         E.forceSyncBtnMobile.classList.add('menu-item-disabled');
+        
+        const originalTextDesktop = E.forceSyncBtn.textContent;
+        const originalTextMobile = E.forceSyncBtnMobile.textContent;
+        
         E.forceSyncBtn.textContent = "⏳ Synchronizuję...";
         E.forceSyncBtnMobile.textContent = "⏳ Synchronizuję...";
-        E.syncStatus.textContent = "🔄 Trwa synchronizacja...";
-        E.syncStatusMobile.textContent = "🔄 Trwa synchronizacja...";
         
-        console.log("🔄 Rozpoczynanie synchronizacji z OneDrive...");
+        console.log("🔄 Rozpoczynanie synchronizacji...");
+        console.log("📅 Kalendarz ID:", calId());
+        
+        // Wywołaj Cloud Function do force sync
         const syncUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/forceSync";
+        
+        console.log("📡 Wywołuję:", syncUrl);
         
         const response = await fetch(syncUrl, {
           method: 'POST',
@@ -754,6 +751,9 @@
           })
         });
 
+        console.log("📦 Odpowiedź HTTP status:", response.status);
+        console.log("📦 Odpowiedź OK:", response.ok);
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error("❌ Błąd HTTP:", errorText);
@@ -766,8 +766,13 @@
         if (result.success) {
           const now = new Date().toLocaleString('pl-PL');
           alert("✅ Dane zostały odświeżone pomyślnie!");
+          
+          // Pokaż czas ostatniej synchronizacji
           E.syncStatus.textContent = `✅ Odświeżono ${now}`;
           E.syncStatusMobile.textContent = `✅ Ostatnia synchronizacja: ${now}`;
+          
+          // Odśwież lokalnie kalendarz po synchronizacji
+          console.log("🔄 Odświeżanie lokalnego kalendarza...");
           update();
         } else {
           throw new Error(result.error || "Nieznany błąd synchronizacji");
@@ -778,21 +783,31 @@
         console.error("❌ Stack trace:", error.stack);
         
         let errorMessage = "Nieznany błąd";
+        
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          errorMessage = "Brak połączenia sieciowego lub Cloud Function niedostępna.";
+          errorMessage = "Brak połączenia sieciowego lub Cloud Function niedostępna";
         } else if (error.message.includes('404')) {
           errorMessage = "Cloud Function 'forceSync' nie istnieje. Skontaktuj się z deweloperem.";
         } else if (error.message.includes('CORS')) {
-          errorMessage = "Błąd CORS - problem z konfiguracją serwera.";
+          errorMessage = "Błąd CORS - problem z konfiguracją serwera";
         } else if (error.message.includes('401') || error.message.includes('403')) {
-          errorMessage = "Brak uprawnień - token OneDrive mógł wygasnąć.";
+          errorMessage = "Brak uprawnień - może token OneDrive wygasł?";
         } else {
           errorMessage = error.message;
         }
         
-        alert(`❌ Błąd synchronizacji z OneDrive:\n\n${errorMessage}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
+        alert(`❌ Błąd synchronizacji:\n\n${errorMessage}\n\nSprawdź konsolę deweloperską (F12) aby zobaczyć więcej szczegółów.`);
+        
+        // Fallback: spróbuj odświeżyć dane z Firestore
+        console.log("🔄 Próba odświeżenia z Firestore jako fallback...");
+        try {
+          update();
+        } catch (fallbackError) {
+          console.error("❌ Błąd fallback:", fallbackError);
+        }
         
       } finally {
+        // Przywróć stan przycisków
         E.forceSyncBtn.disabled = false;
         E.forceSyncBtnMobile.disabled = false;
         E.forceSyncBtnMobile.classList.remove('menu-item-disabled');
@@ -828,32 +843,39 @@
         const tokenData = tokenDoc.data();
         console.log("📋 Token data keys:", Object.keys(tokenData));
         
-        // Fallback: jeśli Cloud Function nie istnieje, sprawdź tylko lokalnie
-        const hasAccessToken = !!(tokenData.access_token);
-        const expiresAt = tokenData.expires_at || 'Nieznany';
-        const createdAt = tokenData.created_at || 'Nieznany';
+        // Test endpoint - może być inny niż forceSync
+        const testUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/testConnection";
         
-        const statusMessage = `✅ Test połączenia (lokalne sprawdzenie):
-
-🔑 Token dostępu: ${hasAccessToken ? 'Obecny' : 'Brak'}
-⏰ Wygasa: ${expiresAt}
-📅 Utworzony: ${createdAt}
-
-⚠️ Uwaga: Endpoint testowy nie jest dostępny.
-Aby pełni test, potrzebujemy Cloud Function 'testConnection'.
-
-Czy chcesz spróbować synchronizacji?`;
-
-        const shouldSync = confirm(statusMessage);
+        console.log("📡 Testuje endpoint:", testUrl);
         
-        if (shouldSync) {
-          // Wywołaj synchronizację
-          await forceSyncFromOnedrive();
+        const response = await fetch(testUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        console.log("📦 Test response status:", response.status);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log("✅ Test result:", result);
+          alert(`✅ Połączenie działa!\n\nStatus: ${result.status || 'OK'}\nToken: ${tokenData.access_token ? 'Obecny' : 'Brak'}`);
+        } else {
+          const errorText = await response.text();
+          console.log("❌ Test failed:", errorText);
+          
+          // Jeśli test endpoint nie istnieje, sprawdź tylko token
+          if (response.status === 404) {
+            alert(`⚠️ Endpoint testowy nie istnieje, ale token jest w bazie:\n\nToken: ${tokenData.access_token ? 'Obecny' : 'Brak'}\nExpires: ${tokenData.expires_at || 'Nieznany'}\n\nSpróbuj synchronizacji ręcznej.`);
+          } else {
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+          }
         }
         
       } catch (error) {
         console.error("❌ Błąd testu połączenia:", error);
-        alert(`❌ Test połączenia nieudany:\n\n${error.message}`);
+        alert(`❌ Test połączenia nieudany:\n\n${error.message}\n\nSprawdź konsolę deweloperską (F12).`);
       } finally {
         E.testConnectionBtn.disabled = false;
         E.testConnectionBtnMobile.disabled = false;
@@ -863,99 +885,7 @@ Czy chcesz spróbować synchronizacji?`;
       }
     };
     
-    const debugFirestoreData = async () => {
-      console.log("🐛 debugFirestoreData została wywołana!");
-      
-      if (!db) {
-        console.log("❌ Baza danych nie połączona");
-        alert("Baza danych nie jest połączona");
-        return;
-      }
-
-      try {
-        console.log("🐛 Rozpoczynam debugowanie Firestore...");
-        
-        if (E.debugFirestoreBtn) E.debugFirestoreBtn.textContent = "⏳ Sprawdzam...";
-        if (E.debugFirestoreBtnMobile) E.debugFirestoreBtnMobile.textContent = "⏳ Sprawdzam bazę...";
-        
-        console.log("🐛 === DEBUGOWANIE FIRESTORE ===");
-        
-        // Sprawdź kolekcję onedrive_config
-        console.log("📂 Sprawdzanie kolekcji 'onedrive_config'...");
-        
-        const onedriveCollection = collection(db, 'onedrive_config');
-        const onedriveSnapshot = await getDocs(onedriveCollection);
-        
-        console.log("📊 Liczba dokumentów w onedrive_config:", onedriveSnapshot.size);
-        
-        let debugInfo = `🐛 DEBUGOWANIE FIRESTORE:\n\n`;
-        debugInfo += `📂 Kolekcja: onedrive_config\n`;
-        debugInfo += `📊 Liczba dokumentów: ${onedriveSnapshot.size}\n\n`;
-        
-        if (onedriveSnapshot.empty) {
-          debugInfo += `❌ Kolekcja jest PUSTA!\n`;
-          debugInfo += `To oznacza, że autoryzacja OneDrive nie zapisała żadnych danych.\n\n`;
-          debugInfo += `Możliwe przyczyny:\n`;
-          debugInfo += `• Cloud Function '/auth' nie działa\n`;
-          debugInfo += `• Błąd w procesie autoryzacji\n`;
-          debugInfo += `• Token zapisany w innej kolekcji\n`;
-        } else {
-          debugInfo += `📄 DOKUMENTY W KOLEKCJI:\n`;
-          debugInfo += `${'='.repeat(50)}\n`;
-          
-          onedriveSnapshot.forEach((doc) => {
-            const data = doc.data();
-            debugInfo += `\n📄 Dokument ID: "${doc.id}"\n`;
-            debugInfo += `📋 Klucze: ${Object.keys(data).join(', ')}\n`;
-            
-            // Pokaż pierwszy poziom danych (bez tokenów dla bezpieczeństwa)
-            for (const [key, value] of Object.entries(data)) {
-              if (key.toLowerCase().includes('token') || key.toLowerCase().includes('secret')) {
-                debugInfo += `   ${key}: [UKRYTY - ${typeof value}]\n`;
-              } else if (typeof value === 'string' && value.length > 100) {
-                debugInfo += `   ${key}: "${value.substring(0, 100)}..." (${value.length} znaków)\n`;
-              } else {
-                debugInfo += `   ${key}: ${JSON.stringify(value)}\n`;
-              }
-            }
-            debugInfo += `${'='.repeat(50)}\n`;
-          });
-        }
-        
-        // Sprawdź również dokument user_token bezpośrednio
-        console.log("🔍 Sprawdzanie dokumentu 'user_token' bezpośrednio...");
-        const tokenDocRef = doc(db, "onedrive_config", "user_token");
-        const tokenDoc = await getDoc(tokenDocRef);
-        
-        debugInfo += `\n🎯 DOKUMENT 'user_token':\n`;
-        if (tokenDoc.exists()) {
-          const tokenData = tokenDoc.data();
-          debugInfo += `✅ Dokument istnieje!\n`;
-          debugInfo += `📋 Klucze: ${Object.keys(tokenData).join(', ')}\n`;
-          debugInfo += `🔑 Posiada access_token: ${!!tokenData.access_token}\n`;
-          debugInfo += `⏰ Expires at: ${tokenData.expires_at || 'Brak'}\n`;
-          debugInfo += `📅 Created at: ${tokenData.created_at || 'Brak'}\n`;
-        } else {
-          debugInfo += `❌ Dokument 'user_token' NIE ISTNIEJE!\n`;
-        }
-        
-        console.log("🐛 Debug info:", debugInfo);
-        
-        // Pokaż w alertcie (ograniczona długość)
-        const shortDebugInfo = debugInfo.length > 2000 ? 
-          debugInfo.substring(0, 2000) + "\n\n... (sprawdź konsolę po więcej)" : 
-          debugInfo;
-          
-        alert(shortDebugInfo + "\n\nPełne informacje w konsoli deweloperskiej (F12)");
-        
-      } catch (error) {
-        console.error("❌ Błąd debugowania:", error);
-        alert(`❌ Błąd debugowania:\n\n${error.message}\n\nSprawdź konsolę (F12) po więcej szczegółów.`);
-      } finally {
-        if (E.debugFirestoreBtn) E.debugFirestoreBtn.textContent = "🐛 Debug";
-        if (E.debugFirestoreBtnMobile) E.debugFirestoreBtnMobile.textContent = "🐛 Debuguj bazę danych";
-      }
-    };
+    E.connectOnedriveBtn.onclick = connectToOnedrive;
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
     E.forceSyncBtn.onclick = forceSyncFromOnedrive;
     E.forceSyncBtnMobile.onclick = () => {
@@ -966,11 +896,6 @@ Czy chcesz spróbować synchronizacji?`;
     E.testConnectionBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
       testOneDriveConnection();
-    };
-    E.refreshFirestoreBtn.onclick = refreshFromFirestore;
-    E.refreshFirestoreBtnMobile.onclick = () => {
-        E.mobileMenu.classList.remove('open');
-        refreshFromFirestore();
     };
     E.summaryBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
@@ -989,25 +914,19 @@ Czy chcesz spróbować synchronizacji?`;
                 E.connectOnedriveBtn.textContent = "Połącz ponownie";
                 E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
                 
-                // Włącz przyciski force sync i test
+                // Włącz przyciski force sync
                 E.forceSyncBtn.disabled = false;
                 E.forceSyncBtnMobile.disabled = false;
                 E.forceSyncBtnMobile.classList.remove('menu-item-disabled');
-                E.testConnectionBtn.disabled = false;
-                E.testConnectionBtnMobile.disabled = false;
-                E.testConnectionBtnMobile.classList.remove('menu-item-disabled');
             } else {
                 E.syncStatus.textContent = "❌ Brak połączenia";
                 E.syncStatus.className = "text-sm text-red-600 font-semibold";
                 E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
                 
-                // Wyłącz przyciski force sync i test
+                // Wyłącz przyciski force sync
                 E.forceSyncBtn.disabled = true;
                 E.forceSyncBtnMobile.disabled = true;
                 E.forceSyncBtnMobile.classList.add('menu-item-disabled');
-                E.testConnectionBtn.disabled = true;
-                E.testConnectionBtnMobile.disabled = true;
-                E.testConnectionBtnMobile.classList.add('menu-item-disabled');
             }
         } catch (error) {
             console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
@@ -1015,13 +934,10 @@ Czy chcesz spróbować synchronizacji?`;
             E.syncStatus.className = "text-sm text-yellow-600 font-semibold";
             E.syncStatusMobile.textContent = "⚠️ Błąd sprawdzania statusu";
             
-            // Wyłącz przyciski przy błędzie
+            // Wyłącz przyciski force sync przy błędzie
             E.forceSyncBtn.disabled = true;
             E.forceSyncBtnMobile.disabled = true;
             E.forceSyncBtnMobile.classList.add('menu-item-disabled');
-            E.testConnectionBtn.disabled = true;
-            E.testConnectionBtnMobile.disabled = true;
-            E.testConnectionBtnMobile.classList.add('menu-item-disabled');
         }
     };
     const renderDesktop = (y, m, ev) => {
@@ -1289,18 +1205,6 @@ Czy chcesz spróbować synchronizacji?`;
         e.preventDefault();
         forceSyncFromOnedrive();
       }
-      
-      // Ctrl+T lub Cmd+T dla testu połączenia (jeśli połączono)
-      if ((e.ctrlKey || e.metaKey) && e.key === 't' && !E.testConnectionBtn.disabled) {
-        e.preventDefault();
-        testOneDriveConnection();
-      }
-      
-      // Ctrl+D lub Cmd+D dla debugowania
-      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-        e.preventDefault();
-        debugFirestoreData();
-      }
     });
     E.mobileMenuBtn.onclick = () => E.mobileMenu.classList.add('open');
     E.menuClose.onclick = () => E.mobileMenu.classList.remove('open');
@@ -1527,15 +1431,6 @@ Czy chcesz spróbować synchronizacji?`;
         E.mGridView.classList.add('active');
         E.mCardsView.classList.add('hidden');
       }
-      
-      // Debug: sprawdź czy przyciski debug są znalezione
-      console.log("🔍 Debug przycisków:");
-      console.log("Desktop debug button:", E.debugFirestoreBtn);
-      console.log("Mobile debug button:", E.debugFirestoreBtnMobile);
-      
-      // Sprawdź czy funkcja debugFirestoreData istnieje
-      console.log("Debug function:", typeof debugFirestoreData);
-      
       update();
       checkSyncStatus();
     }
