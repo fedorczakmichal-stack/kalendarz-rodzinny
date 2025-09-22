@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Kalendarz Rodziny Fedorczak</title>
+  <title>Kalendarz Rodziny</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -17,23 +17,21 @@
     .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 3px rgba(0,0,0,.08);position:sticky;top:0;z-index:100;padding-top:calc(.75rem + var(--safe-top));}
     
     @media (max-width:768px){
-      .hdr{padding:.5rem;padding-top:calc(.5rem + var(--safe-top));}
+      .hdr{padding:.25rem;padding-top:calc(.25rem + var(--safe-top));}
       .hdr .desktop-controls{display:none;}
-      .mobile-header{display:flex;flex-direction:column;gap:.75rem;}
+      .mobile-header{display:flex;flex-direction:column;gap:.5rem;}
       .mobile-nav{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:0 .25rem;}
-      .mobile-brand{display:flex;align-items:center;gap:.5rem;}
-      .mobile-brand .logo{width:32px;height:32px;background:linear-gradient(135deg,#ec4899,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}
-      .mobile-brand .title{font-weight:800;font-size:1rem;color:#1f2937;}
-      .mobile-controls{display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border-radius:16px;padding:.75rem;margin:0 .25rem;gap:1rem;}
-      .month-selector{display:flex;align-items:center;gap:.75rem;flex:1;}
-      .month-title{flex:1;text-align:center;font-weight:700;font-size:1.1rem;color:#1f2937;}
-      .nav-btn{width:40px;height:40px;border-radius:12px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;transition:all .2s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+      .mobile-brand{display:flex;align-items:center;gap:.4rem;}
+      .mobile-brand .logo{width:28px;height:28px;background:linear-gradient(135deg,#ec4899,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+      .mobile-brand .title{font-weight:700;font-size:.9rem;color:#1f2937;}
+      .mobile-controls{display:flex;align-items:center;justify-content:center;background:#f9fafb;border-radius:12px;padding:.5rem;margin:0 .25rem;}
+      .month-selector{display:flex;align-items:center;gap:.5rem;}
+      .month-title{text-align:center;font-weight:700;font-size:1rem;color:#1f2937;}
+      .nav-btn{width:34px;height:34px;border-radius:10px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;transition:all .2s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.05);}
       .nav-btn:active{background:#f3f4f6;transform:scale(.95);box-shadow:0 1px 2px rgba(0,0,0,.1);}
       .nav-btn svg{transition:all .2s;}
       .nav-btn:hover svg{color:#8b5cf6;}
-      .today-btn{padding:.75rem 1.25rem;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;border:none;border-radius:12px;font-weight:700;font-size:.9rem;transition:all .2s;cursor:pointer;box-shadow:0 2px 8px rgba(139,92,246,.25);}
-      .today-btn:active{transform:scale(.95);box-shadow:0 1px 4px rgba(139,92,246,.35);}
-      .mobile-menu-btn{width:36px;height:36px;border-radius:8px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
+      .mobile-menu-btn{width:34px;height:34px;border-radius:10px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
       .mobile-menu-btn:active{background:#f3f4f6;transform:scale(.95);}
     }
     
@@ -478,7 +476,6 @@
               </svg>
             </button>
           </div>
-          <button id="today-mobile" class="today-btn">Dziś</button>
         </div>
       </div>
     </header>
@@ -576,6 +573,8 @@
         </div>
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
+        <div class="h-px bg-gray-200 mx-4 my-2"></div>
+        <button id="today-mobile" class="menu-item">📅 Idź do dzisiaj</button>
         <button id="summaryBtnMobile" class="menu-item">📊 Podsumowanie miesiąca</button>
       </div>
     </div>
@@ -900,7 +899,15 @@
         }
       };
       E.editContent.addEventListener('input', handleSliderSync);
-      editTextEl.addEventListener('input', e => { const newText = e.target.value; const needsRerender = (initialText.includes('/') !== newText.includes('/')); if (needsRerender) { openEdit(day, field, newText); } });
+      editTextEl.addEventListener('input', e => { 
+        if (field === 'michalPraca') {
+          const newText = e.target.value; 
+          const needsRerender = (initialText.includes('/') !== newText.includes('/')); 
+          if (needsRerender) { 
+            openEdit(day, field, newText); 
+          }
+        }
+      });
       E.editSave.onclick = async () => {
         const newText = el('editText').value.trim();
         const portsI = el('editPortsI')?.value.trim();
@@ -916,29 +923,34 @@
           await del(day, field);
         } else {
           const finalData = { text: newText };
-          const getNumVal = (selector, isFloat = false) => {
-            const i = el(selector) || E.editContent.querySelector(selector);
-            if (!i || i.value === '') return deleteField();
-            const val = isFloat ? parseFloat(i.value.replace(',', '.')) : parseInt(i.value, 10);
-            return isNaN(val) ? deleteField() : val;
-          };
-          const initialParts = initialText.split('/').map(t => t.trim());
-          const newParts = newText.split('/').map(t => t.trim());
-          const processHours = (partNum, initialPartText, newPartText) => {
-            const formVal = getNumVal(`input[data-part="${partNum}"][data-role="num"]`, true);
-            if (typeof formVal === 'object') {
-              return getDefaultHours(newPartText) || deleteField();
+          
+          // Godziny tylko dla Michał Praca
+          if (field === 'michalPraca') {
+            const getNumVal = (selector, isFloat = false) => {
+              const i = el(selector) || E.editContent.querySelector(selector);
+              if (!i || i.value === '') return deleteField();
+              const val = isFloat ? parseFloat(i.value.replace(',', '.')) : parseInt(i.value, 10);
+              return isNaN(val) ? deleteField() : val;
+            };
+            const initialParts = initialText.split('/').map(t => t.trim());
+            const newParts = newText.split('/').map(t => t.trim());
+            const processHours = (partNum, initialPartText, newPartText) => {
+              const formVal = getNumVal(`input[data-part="${partNum}"][data-role="num"]`, true);
+              if (typeof formVal === 'object') {
+                return getDefaultHours(newPartText) || deleteField();
+              }
+              const oldDefault = getDefaultHours(initialPartText);
+              if (formVal === oldDefault && initialPartText !== newPartText) {
+                return getDefaultHours(newPartText) || deleteField();
+              }
+              return formVal;
+            };
+            finalData.h1 = processHours(1, initialParts[0], newParts[0]);
+            if (newText.includes('/')) {
+              finalData.h2 = processHours(2, initialParts[1] || '', newParts[1] || '');
             }
-            const oldDefault = getDefaultHours(initialPartText);
-            if (formVal === oldDefault && initialPartText !== newPartText) {
-              return getDefaultHours(newPartText) || deleteField();
-            }
-            return formVal;
-          };
-          finalData.h1 = processHours(1, initialParts[0], newParts[0]);
-          if (newText.includes('/')) {
-            finalData.h2 = processHours(2, initialParts[1] || '', newParts[1] || '');
           }
+          
           if (field === 'michalPraca') {
             finalData.ports_i = portsI ? parseInt(portsI) : deleteField();
             finalData.ports_r = portsR ? parseInt(portsR) : deleteField();
@@ -958,7 +970,42 @@
     E.mobileMenuBtn.onclick = () => E.mobileMenu.classList.add('open');
     E.menuClose.onclick = () => E.mobileMenu.classList.remove('open');
     E.mobileMenu.addEventListener('click', e => { if (e.target === E.mobileMenu) E.mobileMenu.classList.remove('open'); });
-    document.addEventListener('contextmenu', e => { const fld = e.target.closest('.fld,.m-content'); if (!fld) return; e.preventDefault(); E.ctx.style.display = 'block'; E.ctx.style.left = e.clientX + 'px'; E.ctx.style.top = e.clientY + 'px'; E.ctx.dataset.day = fld.dataset.day; E.ctx.dataset.field = fld.dataset.field; });
+    document.addEventListener('contextmenu', e => { 
+      const fld = e.target.closest('.fld,.m-content,.m-grid-cell'); 
+      if (!fld) return; 
+      e.preventDefault(); 
+      
+      // Pokaż menu
+      E.ctx.style.display = 'block';
+      E.ctx.dataset.day = fld.dataset.day; 
+      E.ctx.dataset.field = fld.dataset.field; 
+      
+      // Pobierz wymiary menu i okna
+      const menuRect = E.ctx.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      
+      // Oblicz pozycję
+      let left = e.clientX;
+      let top = e.clientY;
+      
+      // Sprawdź czy menu wyjdzie poza prawą krawędź
+      if (left + menuRect.width > windowWidth - 10) {
+        left = windowWidth - menuRect.width - 10;
+      }
+      
+      // Sprawdź czy menu wyjdzie poza dolną krawędź
+      if (top + menuRect.height > windowHeight - 10) {
+        top = windowHeight - menuRect.height - 10;
+      }
+      
+      // Upewnij się że nie wyjdzie poza lewą i górną krawędź
+      if (left < 10) left = 10;
+      if (top < 10) top = 10;
+      
+      E.ctx.style.left = left + 'px'; 
+      E.ctx.style.top = top + 'px';
+    });
     document.addEventListener('click', e => { if (!e.target.closest('#ctx')) E.ctx.style.display = 'none'; });
     E.ctxCopy.onclick = () => { const d = E.ctx.dataset; clip = data[d.day]?.[d.field]; E.ctx.style.display = 'none'; };
     E.ctxCut.onclick = async () => { const d = E.ctx.dataset; clip = data[d.day]?.[d.field]; await del(d.day, d.field); E.ctx.style.display = 'none'; };
@@ -999,7 +1046,11 @@
     }
     const changeMonth = (delta) => { cur.setDate(1); cur.setMonth(cur.getMonth() + delta); update(); };
     const goToToday = () => { const t = new Date(); cur = new Date(t.getFullYear(), t.getMonth(), 1); update(); };
-    E.prev.onclick = () => changeMonth(-1); E.next.onclick = () => changeMonth(1); E.prevMobile.onclick = () => changeMonth(-1); E.nextMobile.onclick = () => changeMonth(1); E.today.onclick = goToToday; E.todayMobile.onclick = goToToday;
+    E.prev.onclick = () => changeMonth(-1); E.next.onclick = () => changeMonth(1); E.prevMobile.onclick = () => changeMonth(-1); E.nextMobile.onclick = () => changeMonth(1); E.today.onclick = goToToday; 
+    E.todayMobile.onclick = () => {
+      E.mobileMenu.classList.remove('open');
+      goToToday();
+    };
     E.fab.onclick = () => E.sheet.classList.add('open'); E.sheetClose.onclick = () => E.sheet.classList.remove('open');
     let startY = 0, currentY = 0; const sheet = E.sheet; sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }); sheet.addEventListener('touchmove', e => { currentY = e.touches[0].clientY; const diff = currentY - startY; if (diff > 0) { sheet.style.transform = `translateY(${diff}px)`; } }); sheet.addEventListener('touchend', () => { const diff = currentY - startY; if (diff > 50) { sheet.classList.remove('open'); } sheet.style.transform = ''; });
     E.viewCardsBtn.addEventListener('click', () => {
