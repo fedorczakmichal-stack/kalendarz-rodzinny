@@ -703,6 +703,107 @@
     };
     E.connectOnedriveBtn.onclick = connectToOnedrive;
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
+
+    const defaultConnectLabelDesktop = E.connectOnedriveBtn.textContent;
+    const defaultConnectLabelMobile = E.connectOnedriveBtnMobile.textContent;
+    const defaultForceSyncLabelDesktop = E.forceSyncBtn.textContent;
+    const defaultForceSyncLabelMobile = E.forceSyncBtnMobile.textContent;
+    const cloudFunctionsBaseUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net";
+    const defaultManualSyncEndpoint = `${cloudFunctionsBaseUrl}/sync`;
+    let manualSyncEndpoint = defaultManualSyncEndpoint;
+    let manualSyncInProgress = false;
+
+    const syncStatusClassByVariant = {
+      info: "text-sm text-gray-500",
+      success: "text-sm text-green-600 font-semibold",
+      error: "text-sm text-red-600 font-semibold",
+      warning: "text-sm text-yellow-600 font-semibold"
+    };
+
+    const setSyncStatusMessage = (message, variant = 'info') => {
+      const cls = syncStatusClassByVariant[variant] || syncStatusClassByVariant.info;
+      E.syncStatus.textContent = message;
+      E.syncStatus.className = cls;
+      E.syncStatusMobile.textContent = message;
+    };
+
+    const updateForceSyncButtons = () => {
+      const shouldDisable = manualSyncInProgress || !manualSyncEndpoint;
+      E.forceSyncBtn.disabled = shouldDisable;
+      E.forceSyncBtnMobile.disabled = shouldDisable;
+      E.forceSyncBtnMobile.classList.toggle('menu-item-disabled', shouldDisable);
+      E.forceSyncBtn.textContent = manualSyncInProgress ? '⏳ Odświeżanie...' : defaultForceSyncLabelDesktop;
+      E.forceSyncBtnMobile.textContent = manualSyncInProgress ? '⏳ Odświeżanie...' : defaultForceSyncLabelMobile;
+    };
+
+    const setManualSyncState = (isActive) => {
+      manualSyncInProgress = isActive;
+      updateForceSyncButtons();
+    };
+
+    const triggerManualSync = async () => {
+      if (manualSyncInProgress) return;
+      if (!manualSyncEndpoint) {
+        console.warn('Brak skonfigurowanego endpointu manualnej synchronizacji OneDrive.');
+        setSyncStatusMessage('❌ Brak skonfigurowanego endpointu synchronizacji', 'error');
+        return;
+      }
+
+      setManualSyncState(true);
+      setSyncStatusMessage('⏳ Odświeżanie danych z OneDrive...', 'info');
+
+      try {
+        const response = await fetch(manualSyncEndpoint, {
+          method: 'POST',
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        let bodyText = '';
+        try {
+          bodyText = await response.text();
+        } catch (readError) {
+          console.warn('Nie udało się odczytać odpowiedzi funkcji synchronizacji:', readError);
+        }
+
+        let statusMessage = '';
+        if (bodyText) {
+          try {
+            const parsed = JSON.parse(bodyText);
+            statusMessage = parsed?.message || parsed?.status || '';
+          } catch {
+            statusMessage = bodyText;
+          }
+        }
+
+        const finalMessage = statusMessage ? statusMessage.trim() : '';
+        setSyncStatusMessage(finalMessage ? `✅ ${finalMessage}` : '✅ Odświeżono dane z OneDrive', 'success');
+      } catch (error) {
+        console.error('Błąd ręcznej synchronizacji z OneDrive:', error);
+        setSyncStatusMessage('❌ Błąd podczas odświeżania danych z OneDrive', 'error');
+      } finally {
+        setManualSyncState(false);
+        setTimeout(checkSyncStatus, 4000);
+      }
+    };
+
+    const handleManualSyncClick = (source) => {
+      if (source === 'mobile') {
+        E.mobileMenu.classList.remove('open');
+      }
+      triggerManualSync();
+    };
+
+    E.forceSyncBtn.addEventListener('click', () => handleManualSyncClick('desktop'));
+    E.forceSyncBtnMobile.addEventListener('click', () => {
+      if (E.forceSyncBtnMobile.disabled) return;
+      handleManualSyncClick('mobile');
+    });
+
+    updateForceSyncButtons();
     E.summaryBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
       E.sheet.classList.add('open');
@@ -713,21 +814,26 @@
             const tokenDocRef = doc(db, "onedrive_config", "user_token");
             const tokenDoc = await getDoc(tokenDocRef);
             if (tokenDoc.exists()) {
-                E.syncStatus.textContent = "✅ Połączono";
-                E.syncStatus.className = "text-sm text-green-600 font-semibold";
-                E.syncStatusMobile.textContent = "✅ Połączono z OneDrive";
+                const tokenData = tokenDoc.data() || {};
+                const customEndpoint = tokenData.manualSyncUrl || tokenData.manualSyncEndpoint || tokenData.forceSyncUrl || tokenData.syncEndpoint || tokenData.syncUrl;
+                manualSyncEndpoint = customEndpoint || defaultManualSyncEndpoint;
+                setSyncStatusMessage("✅ Połączono z OneDrive", 'success');
                 E.connectOnedriveBtn.textContent = "Połącz ponownie";
                 E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
             } else {
-                E.syncStatus.textContent = "❌ Brak połączenia";
-                E.syncStatus.className = "text-sm text-red-600 font-semibold";
-                E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
+                manualSyncEndpoint = defaultManualSyncEndpoint;
+                setSyncStatusMessage("❌ Brak połączenia z OneDrive", 'error');
+                E.connectOnedriveBtn.textContent = defaultConnectLabelDesktop;
+                E.connectOnedriveBtnMobile.textContent = defaultConnectLabelMobile;
             }
+            updateForceSyncButtons();
         } catch (error) {
             console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
-            E.syncStatus.textContent = "⚠️ Błąd";
-            E.syncStatus.className = "text-sm text-yellow-600 font-semibold";
-            E.syncStatusMobile.textContent = "⚠️ Błąd sprawdzania statusu";
+            setSyncStatusMessage("⚠️ Błąd sprawdzania statusu", 'warning');
+            manualSyncEndpoint = manualSyncEndpoint || defaultManualSyncEndpoint;
+            E.connectOnedriveBtn.textContent = defaultConnectLabelDesktop;
+            E.connectOnedriveBtnMobile.textContent = defaultConnectLabelMobile;
+            updateForceSyncButtons();
         }
     };
     const renderDesktop = (y, m, ev) => {
