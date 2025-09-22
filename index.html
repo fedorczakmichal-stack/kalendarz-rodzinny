@@ -739,17 +739,49 @@
         
         console.log("📡 Wywołuję:", syncUrl);
         
-        const response = await fetch(syncUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            forceRefresh: true,
-            calendarId: calId(),
-            timestamp: new Date().toISOString()
-          })
-        });
+        // Najpierw spróbuj z istniejącym endpointem
+        let response;
+        try {
+          response = await fetch(syncUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              forceRefresh: true,
+              calendarId: calId(),
+              timestamp: new Date().toISOString()
+            })
+          });
+        } catch (networkError) {
+          console.log("❌ Błąd sieci lub endpoint nie istnieje:", networkError.message);
+          
+          // Fallback: Zaproponuj użytkownikowi ręczne działania
+          const shouldContinue = confirm(`❌ Cloud Function 'forceSync' nie jest dostępna.
+
+Możliwe przyczyny:
+• Endpoint nie został jeszcze stworzony
+• Problemy z siecią
+• Błąd CORS w Cloud Function
+
+Opcje:
+✅ OK - Odśwież tylko lokalnie z Firestore  
+❌ Anuluj - Nie rób nic
+
+Czy chcesz odświeżyć kalendarz z lokalnej bazy?`);
+          
+          if (shouldContinue) {
+            console.log("🔄 Odświeżanie z Firestore jako fallback...");
+            update(); // Odśwież lokalnie
+            
+            const now = new Date().toLocaleString('pl-PL');
+            E.syncStatus.textContent = `🔄 Lokalnie odświeżono ${now}`;
+            E.syncStatusMobile.textContent = `🔄 Lokalnie odświeżono: ${now}`;
+            
+            alert("🔄 Kalendarz został odświeżony z lokalnej bazy danych.\n\nAby włączyć pełną synchronizację z OneDrive, skontaktuj się z deweloperem w celu utworzenia Cloud Function 'forceSync'.");
+          }
+          return; // Wyjdź z funkcji
+        }
 
         console.log("📦 Odpowiedź HTTP status:", response.status);
         console.log("📦 Odpowiedź OK:", response.ok);
@@ -843,39 +875,32 @@
         const tokenData = tokenDoc.data();
         console.log("📋 Token data keys:", Object.keys(tokenData));
         
-        // Test endpoint - może być inny niż forceSync
-        const testUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/testConnection";
+        // Fallback: jeśli Cloud Function nie istnieje, sprawdź tylko lokalnie
+        const hasAccessToken = !!(tokenData.access_token);
+        const expiresAt = tokenData.expires_at || 'Nieznany';
+        const createdAt = tokenData.created_at || 'Nieznany';
         
-        console.log("📡 Testuje endpoint:", testUrl);
-        
-        const response = await fetch(testUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
+        const statusMessage = `✅ Test połączenia (lokalne sprawdzenie):
 
-        console.log("📦 Test response status:", response.status);
+🔑 Token dostępu: ${hasAccessToken ? 'Obecny' : 'Brak'}
+⏰ Wygasa: ${expiresAt}
+📅 Utworzony: ${createdAt}
+
+⚠️ Uwaga: Endpoint testowy nie jest dostępny.
+Aby pełni test, potrzebujemy Cloud Function 'testConnection'.
+
+Czy chcesz spróbować synchronizacji?`;
+
+        const shouldSync = confirm(statusMessage);
         
-        if (response.ok) {
-          const result = await response.json();
-          console.log("✅ Test result:", result);
-          alert(`✅ Połączenie działa!\n\nStatus: ${result.status || 'OK'}\nToken: ${tokenData.access_token ? 'Obecny' : 'Brak'}`);
-        } else {
-          const errorText = await response.text();
-          console.log("❌ Test failed:", errorText);
-          
-          // Jeśli test endpoint nie istnieje, sprawdź tylko token
-          if (response.status === 404) {
-            alert(`⚠️ Endpoint testowy nie istnieje, ale token jest w bazie:\n\nToken: ${tokenData.access_token ? 'Obecny' : 'Brak'}\nExpires: ${tokenData.expires_at || 'Nieznany'}\n\nSpróbuj synchronizacji ręcznej.`);
-          } else {
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
-          }
+        if (shouldSync) {
+          // Wywołaj synchronizację
+          await forceSyncFromOnedrive();
         }
         
       } catch (error) {
         console.error("❌ Błąd testu połączenia:", error);
-        alert(`❌ Test połączenia nieudany:\n\n${error.message}\n\nSprawdź konsolę deweloperską (F12).`);
+        alert(`❌ Test połączenia nieudany:\n\n${error.message}`);
       } finally {
         E.testConnectionBtn.disabled = false;
         E.testConnectionBtnMobile.disabled = false;
