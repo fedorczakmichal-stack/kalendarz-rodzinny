@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Kalendarz Rodziny Fedorczak</title>
+  <title>Kalendarz rodzinny</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -256,9 +256,15 @@
       cursor:pointer;
       font-size:.9rem;
       color:#374151;
+      transition:all .2s;
     }
-    .menu-item:hover{
+    .menu-item:hover:not(.menu-item-disabled){
       background:#f9fafb;
+    }
+    .menu-item-disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      color:#9ca3af;
     }
     
     /* Context Menu */
@@ -454,6 +460,7 @@
           <button id="today" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 ml-4">Dziś</button>
           <div id="sync-controls" class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-8">
             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
+            <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Pobierz najnowsze dane z OneDrive (Ctrl+R)">🔄 Odśwież</button>
             <div id="syncStatus" class="text-sm text-gray-500"></div>
           </div>
         </div>
@@ -580,6 +587,7 @@
           <button id="menu-close" class="menu-close">✕</button>
         </div>
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
+        <button id="forceSyncBtnMobile" class="menu-item menu-item-disabled" disabled>🔄 Odśwież dane z OneDrive</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
         <div class="h-px bg-gray-200 mx-4 my-2"></div>
         <button id="today-mobile" class="menu-item">📅 Idź do dzisiaj</button>
@@ -638,9 +646,9 @@
     const el = id => document.getElementById(id);
     const E = {
       title: el('title'), titleMobile: el('title-mobile'), prev: el('prev'), prevMobile: el('prev-mobile'), next: el('next'), nextMobile: el('next-mobile'), today: el('today'), todayMobile: el('today-mobile'), desk: el('desk'), mob: el('mob'), sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'), sumJednodniowki: el('sum-jednodniowki'), sumKwalifikacje: el('sum-kwalifikacje'), sumKomercja: el('sum-komercja'), sumEarnings: el('sum-earnings'), sumTotalHours: el('sum-total-hours'), msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'), msJednodniowki: el('ms-jednodniowki'), msKwalifikacje: el('ms-kwalifikacje'), msKomercja: el('ms-komercja'), msEarnings: el('ms-earnings'), msTotalHours: el('ms-total-hours'), sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'), ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'), edit: el('edit'), editClose: el('edit-close'), editContent: el('edit-content'), editTitle: el('edit-title'), editSave: el('edit-save'),
-      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'),
+      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'), forceSyncBtn: el('forceSyncBtn'),
       mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
-      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'),
+      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'),
       summaryBtnMobile: el('summaryBtnMobile'),
       mCardsView: el('m-cards-view'), mGridView: el('m-grid-view'), mGridBody: el('m-grid-body'),
       viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid')
@@ -693,8 +701,89 @@
       const authUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth";
       window.location.href = authUrl;
     };
+
+    const forceSyncFromOnedrive = async () => {
+      if (!db) {
+        alert("Baza danych nie jest połączona");
+        return;
+      }
+
+      try {
+        // Sprawdź czy token istnieje
+        const tokenDocRef = doc(db, "onedrive_config", "user_token");
+        const tokenDoc = await getDoc(tokenDocRef);
+        
+        if (!tokenDoc.exists()) {
+          alert("Najpierw połącz się z OneDrive");
+          return;
+        }
+
+        // Ustaw loading state
+        E.forceSyncBtn.disabled = true;
+        E.forceSyncBtnMobile.disabled = true;
+        E.forceSyncBtnMobile.classList.add('menu-item-disabled');
+        
+        const originalTextDesktop = E.forceSyncBtn.textContent;
+        const originalTextMobile = E.forceSyncBtnMobile.textContent;
+        
+        E.forceSyncBtn.textContent = "⏳ Synchronizuję...";
+        E.forceSyncBtnMobile.textContent = "⏳ Synchronizuję...";
+        
+        // Wywołaj Cloud Function do force sync
+        const syncUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/forceSync";
+        
+        const response = await fetch(syncUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // Możesz dodać dodatkowe parametry jeśli potrzebujesz
+          body: JSON.stringify({
+            forceRefresh: true,
+            calendarId: calId()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+          const now = new Date().toLocaleString('pl-PL');
+          alert("✅ Dane zostały odświeżone pomyślnie!");
+          
+          // Pokaż czas ostatniej synchronizacji
+          E.syncStatus.textContent = `✅ Odświeżono ${now}`;
+          E.syncStatusMobile.textContent = `✅ Ostatnia synchronizacja: ${now}`;
+          
+          // Odśwież lokalnie kalendarz po synchronizacji
+          update();
+        } else {
+          throw new Error(result.error || "Błąd synchronizacji");
+        }
+
+      } catch (error) {
+        console.error("Błąd podczas synchronizacji:", error);
+        alert(`❌ Błąd synchronizacji: ${error.message}`);
+      } finally {
+        // Przywróć stan przycisków
+        E.forceSyncBtn.disabled = false;
+        E.forceSyncBtnMobile.disabled = false;
+        E.forceSyncBtnMobile.classList.remove('menu-item-disabled');
+        E.forceSyncBtn.textContent = "🔄 Odśwież";
+        E.forceSyncBtnMobile.textContent = "🔄 Odśwież dane z OneDrive";
+      }
+    };
+    
     E.connectOnedriveBtn.onclick = connectToOnedrive;
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
+    E.forceSyncBtn.onclick = forceSyncFromOnedrive;
+    E.forceSyncBtnMobile.onclick = () => {
+      E.mobileMenu.classList.remove('open');
+      forceSyncFromOnedrive();
+    };
     E.summaryBtnMobile.onclick = () => {
       E.mobileMenu.classList.remove('open');
       E.sheet.classList.add('open');
@@ -704,22 +793,38 @@
             if (!db) return;
             const tokenDocRef = doc(db, "onedrive_config", "user_token");
             const tokenDoc = await getDoc(tokenDocRef);
+            
             if (tokenDoc.exists()) {
                 E.syncStatus.textContent = "✅ Połączono";
                 E.syncStatus.className = "text-sm text-green-600 font-semibold";
                 E.syncStatusMobile.textContent = "✅ Połączono z OneDrive";
                 E.connectOnedriveBtn.textContent = "Połącz ponownie";
                 E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
+                
+                // Włącz przyciski force sync
+                E.forceSyncBtn.disabled = false;
+                E.forceSyncBtnMobile.disabled = false;
+                E.forceSyncBtnMobile.classList.remove('menu-item-disabled');
             } else {
                 E.syncStatus.textContent = "❌ Brak połączenia";
                 E.syncStatus.className = "text-sm text-red-600 font-semibold";
                 E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
+                
+                // Wyłącz przyciski force sync
+                E.forceSyncBtn.disabled = true;
+                E.forceSyncBtnMobile.disabled = true;
+                E.forceSyncBtnMobile.classList.add('menu-item-disabled');
             }
         } catch (error) {
             console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
             E.syncStatus.textContent = "⚠️ Błąd";
             E.syncStatus.className = "text-sm text-yellow-600 font-semibold";
             E.syncStatusMobile.textContent = "⚠️ Błąd sprawdzania statusu";
+            
+            // Wyłącz przyciski force sync przy błędzie
+            E.forceSyncBtn.disabled = true;
+            E.forceSyncBtnMobile.disabled = true;
+            E.forceSyncBtnMobile.classList.add('menu-item-disabled');
         }
     };
     const renderDesktop = (y, m, ev) => {
@@ -974,7 +1079,20 @@
     }
     E.editClose.onclick = () => E.edit.style.display = 'none';
     E.edit.addEventListener('click', e => { if (e.target === E.edit) E.edit.style.display = 'none'; });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') E.edit.style.display = 'none'; });
+    document.addEventListener('keydown', e => { 
+      if (e.key === 'Escape') {
+        E.edit.style.display = 'none';
+        E.ctx.style.display = 'none';
+        E.sheet.classList.remove('open');
+        E.mobileMenu.classList.remove('open');
+      }
+      
+      // Ctrl+R lub Cmd+R dla force sync (jeśli połączono)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r' && !E.forceSyncBtn.disabled) {
+        e.preventDefault();
+        forceSyncFromOnedrive();
+      }
+    });
     E.mobileMenuBtn.onclick = () => E.mobileMenu.classList.add('open');
     E.menuClose.onclick = () => E.mobileMenu.classList.remove('open');
     E.mobileMenu.addEventListener('click', e => { if (e.target === E.mobileMenu) E.mobileMenu.classList.remove('open'); });
@@ -993,23 +1111,31 @@
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
       
+      // Sprawdź dzień - od 25 dnia pokazuj nad kursorem
+      const day = parseInt(fld.dataset.day);
+      const showAbove = day >= 25;
+      
       // Oblicz pozycję
       let left = e.clientX;
-      let top = e.clientY;
+      let top = showAbove ? e.clientY - menuRect.height - 10 : e.clientY;
       
       // Sprawdź czy menu wyjdzie poza prawą krawędź
       if (left + menuRect.width > windowWidth - 10) {
         left = windowWidth - menuRect.width - 10;
       }
       
-      // Sprawdź czy menu wyjdzie poza dolną krawędź
-      if (top + menuRect.height > windowHeight - 10) {
+      // Sprawdź czy menu wyjdzie poza dolną krawędź (jeśli nie jest pokazane nad)
+      if (!showAbove && top + menuRect.height > windowHeight - 10) {
         top = windowHeight - menuRect.height - 10;
       }
       
-      // Upewnij się że nie wyjdzie poza lewą i górną krawędź
+      // Sprawdź czy menu wyjdzie poza górną krawędź (jeśli jest pokazane nad)
+      if (showAbove && top < 10) {
+        top = e.clientY + 10; // Pokaż pod kursorem jeśli nie ma miejsca nad
+      }
+      
+      // Upewnij się że nie wyjdzie poza lewą krawędź
       if (left < 10) left = 10;
-      if (top < 10) top = 10;
       
       E.ctx.style.left = left + 'px'; 
       E.ctx.style.top = top + 'px';
@@ -1088,23 +1214,31 @@
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
       
+      // Sprawdź dzień - od 25 dnia pokazuj nad kursorem
+      const day = parseInt(fld.dataset.day);
+      const showAbove = day >= 25;
+      
       // Oblicz pozycję
       let left = e.detail.clientX;
-      let top = e.detail.clientY;
+      let top = showAbove ? e.detail.clientY - menuRect.height - 10 : e.detail.clientY;
       
       // Sprawdź czy menu wyjdzie poza prawą krawędź
       if (left + menuRect.width > windowWidth - 10) {
         left = windowWidth - menuRect.width - 10;
       }
       
-      // Sprawdź czy menu wyjdzie poza dolną krawędź
-      if (top + menuRect.height > windowHeight - 10) {
+      // Sprawdź czy menu wyjdzie poza dolną krawędź (jeśli nie jest pokazane nad)
+      if (!showAbove && top + menuRect.height > windowHeight - 10) {
         top = windowHeight - menuRect.height - 10;
       }
       
-      // Upewnij się że nie wyjdzie poza lewą i górną krawędź
+      // Sprawdź czy menu wyjdzie poza górną krawędź (jeśli jest pokazane nad)
+      if (showAbove && top < 10) {
+        top = e.detail.clientY + 10; // Pokaż pod kursorem jeśli nie ma miejsca nad
+      }
+      
+      // Upewnij się że nie wyjdzie poza lewą krawędź
       if (left < 10) left = 10;
-      if (top < 10) top = 10;
       
       E.ctx.style.left = left + 'px'; 
       E.ctx.style.top = top + 'px';
