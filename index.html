@@ -75,7 +75,7 @@
     .m-grid-off{background:linear-gradient(135deg,rgba(239,68,68,.05),rgba(219,39,119,.05));}
     .m-grid-today .m-grid-day{background:linear-gradient(135deg,#ede9fe,#fce7f3);}
     .m-grid-today .m-grid-day-num{color:#8b5cf6;}
-    </style>
+  </style>
 </head>
 <body>
   <div id="app-container">
@@ -539,7 +539,13 @@
     E.ctxPaste.onclick = async () => { const d = E.ctx.dataset; if (clip) await save(d.day, d.field, clip); E.ctx.style.display = 'none'; };
     E.ctxDel.onclick = async () => { const d = E.ctx.dataset; await del(d.day, d.field); E.ctx.style.display = 'none'; };
     const launchEdit = (e) => { const target = e.target.closest('[data-day][data-field]'); if (target) openEdit(target.dataset.day, target.dataset.field); };
-    E.desk.addEventListener('click', launchEdit); E.mCardsView.addEventListener('click', launchEdit); E.mGridBody.addEventListener('click', launchEdit); E.desk.addEventListener('click', e => { const dayCell = e.target.closest('.day-cell'); if (dayCell) toggleHoliday(dayCell.dataset.day); });
+    E.desk.addEventListener('click', launchEdit);
+    E.mCardsView.addEventListener('click', launchEdit);
+    E.mGridBody.addEventListener('click', launchEdit);
+    E.desk.addEventListener('click', e => {
+      const dayCell = e.target.closest('.day-cell');
+      if (dayCell) toggleHoliday(dayCell.dataset.day);
+    });
     async function toggleHoliday(day) { const ref = doc(db, calId(), String(day)); const snap = await getDoc(ref); const cur = (snap.exists() && snap.data().isHoliday) || false; await setDoc(ref, { isHoliday: !cur }, { merge: true }); }
     function setTitle() { const title = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`; E.title.textContent = title; E.titleMobile.textContent = title; }
     async function update() {
@@ -550,8 +556,15 @@
         data = {};
         s.forEach(doc => data[doc.id] = doc.data());
         if (isMobile) {
-          renderMobileCards(cur.getFullYear(), cur.getMonth(), data);
-          renderMobileGrid(cur.getFullYear(), cur.getMonth(), data);
+          if (currentView === 'cards') {
+            E.mCardsView.classList.remove('hidden');
+            E.mGridView.classList.remove('active');
+            renderMobileCards(cur.getFullYear(), cur.getMonth(), data);
+          } else {
+            E.mGridView.classList.add('active');
+            E.mCardsView.classList.add('hidden');
+            renderMobileGrid(cur.getFullYear(), cur.getMonth(), data);
+          }
         } else {
           renderDesktop(cur.getFullYear(), cur.getMonth(), data);
         }
@@ -564,16 +577,20 @@
     E.fab.onclick = () => E.sheet.classList.add('open'); E.sheetClose.onclick = () => E.sheet.classList.remove('open');
     let startY = 0, currentY = 0; const sheet = E.sheet; sheet.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }); sheet.addEventListener('touchmove', e => { currentY = e.touches[0].clientY; const diff = currentY - startY; if (diff > 0) { sheet.style.transform = `translateY(${diff}px)`; } }); sheet.addEventListener('touchend', () => { const diff = currentY - startY; if (diff > 50) { sheet.classList.remove('open'); } sheet.style.transform = ''; });
     E.viewCardsBtn.addEventListener('click', () => {
+      currentView = 'cards';
       E.viewCardsBtn.classList.add('active');
       E.viewGridBtn.classList.remove('active');
       E.mCardsView.classList.remove('hidden');
       E.mGridView.classList.remove('active');
+      renderMobileCards(cur.getFullYear(), cur.getMonth(), data);
     });
     E.viewGridBtn.addEventListener('click', () => {
+      currentView = 'grid';
       E.viewGridBtn.classList.add('active');
       E.viewCardsBtn.classList.remove('active');
       E.mGridView.classList.add('active');
       E.mCardsView.classList.add('hidden');
+      renderMobileGrid(cur.getFullYear(), cur.getMonth(), data);
     });
     function init() {
       update();
