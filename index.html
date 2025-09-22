@@ -462,6 +462,7 @@
             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
             <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Pobierz najnowsze dane z OneDrive (Ctrl+R)">🔄 Odśwież</button>
             <button id="testConnectionBtn" class="px-3 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Sprawdź status połączenia z OneDrive (Ctrl+T)">🔍 Test</button>
+            <button id="debugFirestoreBtn" class="px-3 py-2 text-sm font-semibold text-white bg-orange-600 rounded-md hover:bg-orange-700" title="Debuguj zawartość bazy danych (Ctrl+D)">🐛 Debug</button>
             <div id="syncStatus" class="text-sm text-gray-500"></div>
           </div>
         </div>
@@ -590,6 +591,7 @@
         <button id="connectOnedriveBtnMobile" class="menu-item">🔗 Połącz z OneDrive</button>
         <button id="forceSyncBtnMobile" class="menu-item menu-item-disabled" disabled>🔄 Odśwież dane z OneDrive</button>
         <button id="testConnectionBtnMobile" class="menu-item menu-item-disabled" disabled>🔍 Testuj połączenie</button>
+        <button id="debugFirestoreBtnMobile" class="menu-item">🐛 Debuguj bazę danych</button>
         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
         <div class="h-px bg-gray-200 mx-4 my-2"></div>
         <button id="today-mobile" class="menu-item">📅 Idź do dzisiaj</button>
@@ -624,7 +626,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     const cfg = { apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ", authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com", projectId:"kalendarz-rodzinny-68d04", storageBucket:"kalendarz-rodzinny-68d04.appspot.com", messagingSenderId:"1050937545151", appId:"1:1050937545151:web:a85fd1a5f066f4a499910a", measurementId:"G-57YKE2XKQ1"};
     let db;
     try {
@@ -648,9 +650,9 @@
     const el = id => document.getElementById(id);
     const E = {
       title: el('title'), titleMobile: el('title-mobile'), prev: el('prev'), prevMobile: el('prev-mobile'), next: el('next'), nextMobile: el('next-mobile'), today: el('today'), todayMobile: el('today-mobile'), desk: el('desk'), mob: el('mob'), sumOrtho: el('sum-ortho'), sumBrz: el('sum-brzeziny'), sumLask: el('sum-lask'), sumJB: el('sum-jb'), sumPorts: el('sum-ports'), sumJednodniowki: el('sum-jednodniowki'), sumKwalifikacje: el('sum-kwalifikacje'), sumKomercja: el('sum-komercja'), sumEarnings: el('sum-earnings'), sumTotalHours: el('sum-total-hours'), msOrtho: el('ms-ortho'), msBrz: el('ms-brzeziny'), msLask: el('ms-lask'), msJB: el('ms-jb'), msPorts: el('ms-ports'), msJednodniowki: el('ms-jednodniowki'), msKwalifikacje: el('ms-kwalifikacje'), msKomercja: el('ms-komercja'), msEarnings: el('ms-earnings'), msTotalHours: el('ms-total-hours'), sheet: el('sheet'), sheetClose: el('sheet-close'), fab: el('fab'), sheetTitle: el('sheet-title'), ctx: el('ctx'), ctxCopy: el('ctx-copy'), ctxCut: el('ctx-cut'), ctxPaste: el('ctx-paste'), ctxDel: el('ctx-del'), edit: el('edit'), editClose: el('edit-close'), editContent: el('edit-content'), editTitle: el('edit-title'), editSave: el('edit-save'),
-      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'), forceSyncBtn: el('forceSyncBtn'), testConnectionBtn: el('testConnectionBtn'),
+      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'), forceSyncBtn: el('forceSyncBtn'), testConnectionBtn: el('testConnectionBtn'), debugFirestoreBtn: el('debugFirestoreBtn'),
       mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
-      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'), testConnectionBtnMobile: el('testConnectionBtnMobile'),
+      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile'), forceSyncBtnMobile: el('forceSyncBtnMobile'), testConnectionBtnMobile: el('testConnectionBtnMobile'), debugFirestoreBtnMobile: el('debugFirestoreBtnMobile'),
       summaryBtnMobile: el('summaryBtnMobile'),
       mCardsView: el('m-cards-view'), mGridView: el('m-grid-view'), mGridBody: el('m-grid-body'),
       viewCardsBtn: el('view-cards'), viewGridBtn: el('view-grid')
@@ -910,7 +912,110 @@ Czy chcesz spróbować synchronizacji?`;
       }
     };
     
-    E.connectOnedriveBtn.onclick = connectToOnedrive;
+    const debugFirestoreData = async () => {
+      if (!db) {
+        alert("Baza danych nie jest połączona");
+        return;
+      }
+
+      try {
+        E.debugFirestoreBtn.textContent = "⏳ Sprawdzam...";
+        E.debugFirestoreBtnMobile.textContent = "⏳ Sprawdzam bazę...";
+        
+        console.log("🐛 === DEBUGOWANIE FIRESTORE ===");
+        
+        // Sprawdź kolekcję onedrive_config
+        console.log("📂 Sprawdzanie kolekcji 'onedrive_config'...");
+        
+        const onedriveCollection = collection(db, 'onedrive_config');
+        const onedriveSnapshot = await getDocs(onedriveCollection);
+        
+        console.log("📊 Liczba dokumentów w onedrive_config:", onedriveSnapshot.size);
+        
+        let debugInfo = `🐛 DEBUGOWANIE FIRESTORE:\n\n`;
+        debugInfo += `📂 Kolekcja: onedrive_config\n`;
+        debugInfo += `📊 Liczba dokumentów: ${onedriveSnapshot.size}\n\n`;
+        
+        if (onedriveSnapshot.empty) {
+          debugInfo += `❌ Kolekcja jest PUSTA!\n`;
+          debugInfo += `To oznacza, że autoryzacja OneDrive nie zapisała żadnych danych.\n\n`;
+          debugInfo += `Możliwe przyczyny:\n`;
+          debugInfo += `• Cloud Function '/auth' nie działa\n`;
+          debugInfo += `• Błąd w procesie autoryzacji\n`;
+          debugInfo += `• Token zapisany w innej kolekcji\n`;
+        } else {
+          debugInfo += `📄 DOKUMENTY W KOLEKCJI:\n`;
+          debugInfo += `${'='.repeat(50)}\n`;
+          
+          onedriveSnapshot.forEach((doc) => {
+            const data = doc.data();
+            debugInfo += `\n📄 Dokument ID: "${doc.id}"\n`;
+            debugInfo += `📋 Klucze: ${Object.keys(data).join(', ')}\n`;
+            
+            // Pokaż pierwszy poziom danych (bez tokenów dla bezpieczeństwa)
+            for (const [key, value] of Object.entries(data)) {
+              if (key.toLowerCase().includes('token') || key.toLowerCase().includes('secret')) {
+                debugInfo += `   ${key}: [UKRYTY - ${typeof value}]\n`;
+              } else if (typeof value === 'string' && value.length > 100) {
+                debugInfo += `   ${key}: "${value.substring(0, 100)}..." (${value.length} znaków)\n`;
+              } else {
+                debugInfo += `   ${key}: ${JSON.stringify(value)}\n`;
+              }
+            }
+            debugInfo += `${'='.repeat(50)}\n`;
+          });
+        }
+        
+        // Sprawdź również dokument user_token bezpośrednio
+        console.log("🔍 Sprawdzanie dokumentu 'user_token' bezpośrednio...");
+        const tokenDocRef = doc(db, "onedrive_config", "user_token");
+        const tokenDoc = await getDoc(tokenDocRef);
+        
+        debugInfo += `\n🎯 DOKUMENT 'user_token':\n`;
+        if (tokenDoc.exists()) {
+          const tokenData = tokenDoc.data();
+          debugInfo += `✅ Dokument istnieje!\n`;
+          debugInfo += `📋 Klucze: ${Object.keys(tokenData).join(', ')}\n`;
+          debugInfo += `🔑 Posiada access_token: ${!!tokenData.access_token}\n`;
+          debugInfo += `⏰ Expires at: ${tokenData.expires_at || 'Brak'}\n`;
+          debugInfo += `📅 Created at: ${tokenData.created_at || 'Brak'}\n`;
+        } else {
+          debugInfo += `❌ Dokument 'user_token' NIE ISTNIEJE!\n`;
+        }
+        
+        // Sprawdź inne możliwe kolekcje
+        debugInfo += `\n🔍 SPRAWDZANIE INNYCH KOLEKCJI:\n`;
+        
+        const possibleCollections = ['tokens', 'auth', 'onedrive', 'microsoft', 'oauth'];
+        for (const collectionName of possibleCollections) {
+          try {
+            const testCollection = collection(db, collectionName);
+            const testSnapshot = await getDocs(testCollection);
+            if (!testSnapshot.empty) {
+              debugInfo += `📂 '${collectionName}': ${testSnapshot.size} dokumentów\n`;
+            }
+          } catch (e) {
+            // Kolekcja nie istnieje lub brak uprawnień
+          }
+        }
+        
+        console.log("🐛 Debug info:", debugInfo);
+        
+        // Pokaż w alertcie (ograniczona długość)
+        const shortDebugInfo = debugInfo.length > 2000 ? 
+          debugInfo.substring(0, 2000) + "\n\n... (sprawdź konsolę po więcej)" : 
+          debugInfo;
+          
+        alert(shortDebugInfo + "\n\nPełne informacje w konsoli deweloperskiej (F12)");
+        
+      } catch (error) {
+        console.error("❌ Błąd debugowania:", error);
+        alert(`❌ Błąd debugowania:\n\n${error.message}\n\nSprawdź konsolę (F12) po więcej szczegółów.`);
+      } finally {
+        E.debugFirestoreBtn.textContent = "🐛 Debug";
+        E.debugFirestoreBtnMobile.textContent = "🐛 Debuguj bazę danych";
+      }
+    };
     E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
     E.forceSyncBtn.onclick = forceSyncFromOnedrive;
     E.forceSyncBtnMobile.onclick = () => {
@@ -1244,6 +1349,12 @@ Czy chcesz spróbować synchronizacji?`;
       if ((e.ctrlKey || e.metaKey) && e.key === 't' && !E.testConnectionBtn.disabled) {
         e.preventDefault();
         testOneDriveConnection();
+      }
+      
+      // Ctrl+D lub Cmd+D dla debugowania
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        debugFirestoreData();
       }
     });
     E.mobileMenuBtn.onclick = () => E.mobileMenu.classList.add('open');
