@@ -200,7 +200,7 @@
       display: none;
       overflow-x: auto;
       padding: 0.5rem;
-      padding-bottom: calc(.5rem + var(--safe-bottom) + 110px);
+      padding-bottom: calc(.5rem + var(--safe-bottom) + 70px);
       -webkit-overflow-scrolling: touch;
       position: relative;
     }
@@ -226,18 +226,14 @@
       20%, 80% { opacity: 1; }
     }
     
-    .mobile-grid {
-      min-width: 100%;
+    .mobile-grid-wrapper {
+      min-width: 550px;
       background: white;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,.06);
     }
-    
-    .mobile-grid-wrapper {
-      min-width: 550px;
-    }
-    
+        
     .mobile-grid-table {
       display: grid;
       grid-template-columns: 45px repeat(6, minmax(70px, 1fr));
@@ -312,17 +308,14 @@
     
     /* View toggle */
     .view-toggle {
-      display: none;
-      position: fixed;
-      bottom: calc(80px + var(--safe-bottom));
-      left: 50%;
-      transform: translateX(-50%);
       background: white;
       border-radius: 999px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
       padding: 4px;
       z-index: 1000;
       border: 1px solid #e5e7eb;
+      display:flex;
+      gap:4px;
     }
     
     .view-toggle button {
@@ -333,6 +326,7 @@
       transition: all 0.2s;
       background: transparent;
       color: #6b7280;
+      border: none;
     }
     
     .view-toggle button.active {
@@ -344,7 +338,6 @@
       .grid{display:none} 
       .mcal{display:none}
       .mobile-grid-view{display:block}
-      .view-toggle{display:flex;gap:4px;}
       body.card-view .mcal{display:block}
       body.card-view .mobile-grid-view{display:none}
       .m-card{
@@ -856,9 +849,9 @@
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
+          <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
           <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
-          <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
+          <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
           <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
           
           <div class="flex items-center gap-2 ml-4">
@@ -890,11 +883,17 @@
         </div>
         <div class="mobile-controls">
           <div class="month-selector">
-            <button id="prev-mobile" class="nav-btn">◀</button>
+            <button id="prev-mobile" class="nav-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
             <h2 id="title-mobile" class="month-title">—</h2>
-            <button id="next-mobile" class="nav-btn">▶</button>
+            <button id="next-mobile" class="nav-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
           </div>
           <button id="today-mobile" class="today-btn">Dziś</button>
+        </div>
+         <div class="flex items-center justify-center pt-2">
+            <div class="view-toggle">
+              <button id="grid-view-btn" class="active">Siatka</button>
+              <button id="card-view-btn">Karty</button>
+            </div>
         </div>
       </div>
     </header>
@@ -923,20 +922,13 @@
           </div>
         </div>
         <div id="mobile-grid-view" class="mobile-grid-view md:hidden">
-          <div class="mobile-grid">
-            <div class="mobile-grid-wrapper">
-              <div id="mobile-grid-content" class="mobile-grid-table"></div>
-            </div>
+          <div class="mobile-grid-wrapper">
+            <div id="mobile-grid-content" class="mobile-grid-table"></div>
           </div>
         </div>
         <div id="mob" class="mcal md:hidden"></div>
       </div>
     </main>
-    
-    <div class="view-toggle">
-      <button id="grid-view-btn" class="active">Siatka</button>
-      <button id="card-view-btn">Karty</button>
-    </div>
     
     <button id="fab" aria-label="Pokaż podsumowanie">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1160,7 +1152,6 @@
       const days=new Date(y,m+1,0).getDate();
       const today=new Date();
       
-      // Headers - skrócone dla mobile
       const headers = ['', 'Ania', 'A.Praca', 'Michał', 'M.Praca', 'Niania', 'Inne'];
       headers.forEach(h => {
         const header = document.createElement('div');
@@ -1169,7 +1160,6 @@
         E.mobileGridContent.appendChild(header);
       });
       
-      // Days
       let todayElement = null;
       for(let d=1; d<=days; d++){
         const date=new Date(y,m,d);
@@ -1178,7 +1168,6 @@
         const de=ev[d]||{};
         const off=(dow===0||dow===6)||de.isHoliday;
         
-        // Day cell
         const dayCell = document.createElement('div');
         dayCell.className = `mobile-grid-cell mobile-grid-day ${off?'weekend':''} ${isToday?'today':''}`;
         dayCell.innerHTML = `<div class="day-num">${d}</div><div style="font-size:0.5rem">${dShort[getDayIdx(dow)]}</div>`;
@@ -1187,7 +1176,6 @@
         E.mobileGridContent.appendChild(dayCell);
         if(isToday) todayElement = dayCell;
         
-        // Field cells
         for(const f of fields){
           const t=getEntryText(d,f);
           const cell=document.createElement('div');
@@ -1196,19 +1184,17 @@
           content.className=`mobile-grid-content ${getTileClass(t)}`;
           content.dataset.day=d;
           content.dataset.field=f;
-          // Skracamy tekst dla mobile
           const shortText = t.length > 12 ? t.substring(0,10) + '...' : t;
           content.textContent=shortText;
-          content.title=t; // Pełny tekst w tooltip
+          content.title=t;
           cell.appendChild(content);
           E.mobileGridContent.appendChild(cell);
         }
       }
       
-      // Automatyczne przewinięcie do dzisiejszego dnia
       if(todayElement && isMobile) {
         setTimeout(() => {
-          todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          todayElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
         }, 100);
       }
     };
@@ -1291,7 +1277,6 @@
         sums.earnings += sums.kwalifikacje * endoRates.qual;
         sums.earnings += sums.komercja * komercjaRate;
         
-        // BONUS: 4000 zł - zawsze dodawany
         sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
         
         if(E.sumEarnings) {
@@ -1338,7 +1323,6 @@
         const entryText = overrideText ?? initialText;
         
         const textParts = entryText.split('/').map(t => t.trim());
-        const date = new Date(cur.getFullYear(), cur.getMonth(), day);
         E.editTitle.textContent = `${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;
         
         let formHTML = `<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${entryText.replace(/"/g, '&quot;')}" placeholder="np. JB wybudzeń / ortho od 15:00"></div>`;
@@ -1346,8 +1330,9 @@
         const createHoursHTML = (partNum, text, hours) => {
             const defaultH = getDefaultHours(text);
             const currentH = hours ?? defaultH;
+            const labelText = text || (partNum === 1 ? "Główny wpis" : "Dodatkowy wpis");
             return `<div class="hours-control">
-                        <div class="hours-control-label">${text || `Część ${partNum}`}</div>
+                        <div class="hours-control-label">${labelText}</div>
                         <div class="mt-2">
                             <input type="range" min="0" max="48" step="0.5" value="${currentH}" data-part="${partNum}" data-role="slider" class="hours-slider">
                             <input type="number" min="0" max="48" step="0.5" value="${currentH}" placeholder="${defaultH}" data-part="${partNum}" data-role="num" class="hours-number">
@@ -1442,33 +1427,27 @@
     E.edit.addEventListener('click',e=>{if(e.target===E.edit) E.edit.style.display='none';});
     document.addEventListener('keydown', e=>{if(e.key==='Escape') E.edit.style.display='none';});
 
-    // Mobile menu handlers
     E.mobileMenuBtn.onclick=()=>E.mobileMenu.classList.add('open');
     E.menuClose.onclick=()=>E.mobileMenu.classList.remove('open');
     E.mobileMenu.addEventListener('click',e=>{if(e.target===E.mobileMenu) E.mobileMenu.classList.remove('open');});
 
-    // Context menu with smart positioning
     document.addEventListener('contextmenu', e=>{ 
       const fld=e.target.closest('.fld,.m-content,.mobile-grid-content'); 
       if(!fld)return; 
       e.preventDefault(); 
       E.ctx.style.display='block';
       
-      // Smart positioning - show above cursor for days 25+
       const day = parseInt(fld.dataset.day);
-      const menuHeight = 180; // approximate height of context menu
+      const menuHeight = 180;
       
       if(day >= 25 && e.clientY > window.innerHeight - menuHeight - 50) {
-        // Show above cursor
         E.ctx.style.left = e.clientX + 'px';
         E.ctx.style.top = (e.clientY - menuHeight) + 'px';
       } else {
-        // Normal positioning
         E.ctx.style.left = e.clientX + 'px';
         E.ctx.style.top = e.clientY + 'px';
       }
       
-      // Keep menu within viewport
       setTimeout(() => {
         const rect = E.ctx.getBoundingClientRect();
         if(rect.right > window.innerWidth) {
@@ -1500,7 +1479,6 @@
     E.mobileGridView.addEventListener('click', launchEdit);
     E.desk.addEventListener('click', e => { const dayCell = e.target.closest('.day-cell'); if (dayCell) toggleHoliday(dayCell.dataset.day); });
     
-    // View toggle buttons
     if(E.gridViewBtn && E.cardViewBtn) {
       E.gridViewBtn.onclick = () => {
         document.body.classList.remove('card-view');
@@ -1515,7 +1493,6 @@
       };
     }
     
-    // Clock in header
     function updateClock() {
       if(E.currentTime) {
         const now = new Date();
@@ -1574,19 +1551,12 @@
     E.today.onclick=goToToday;
     E.todayMobile.onclick=goToToday;
     
-    // === ULEPSZONA FUNKCJA IMPORTU EXCEL ===
     const mNamesToNum = {
-        'styczeń': 0, 'stycznia': 0, 'sty': 0,
-        'luty': 1, 'lutego': 1, 'lut': 1,
-        'marzec': 2, 'marca': 2, 'mar': 2,
-        'kwiecień': 3, 'kwietnia': 3, 'kwi': 3,
-        'maj': 4, 'maja': 4,
-        'czerwiec': 5, 'czerwca': 5, 'cze': 5,
-        'lipiec': 6, 'lipca': 6, 'lip': 6,
-        'sierpień': 7, 'sierpnia': 7, 'sie': 7,
-        'wrzesień': 8, 'września': 8, 'wrz': 8,
-        'październik': 9, 'października': 9, 'paź': 9,
-        'listopad': 10, 'listopada': 10, 'lis': 10,
+        'styczeń': 0, 'stycznia': 0, 'sty': 0, 'luty': 1, 'lutego': 1, 'lut': 1,
+        'marzec': 2, 'marca': 2, 'mar': 2, 'kwiecień': 3, 'kwietnia': 3, 'kwi': 3,
+        'maj': 4, 'maja': 4, 'czerwiec': 5, 'czerwca': 5, 'cze': 5, 'lipiec': 6, 'lipca': 6, 'lip': 6,
+        'sierpień': 7, 'sierpnia': 7, 'sie': 7, 'wrzesień': 8, 'września': 8, 'wrz': 8,
+        'październik': 9, 'października': 9, 'paź': 9, 'listopad': 10, 'listopada': 10, 'lis': 10,
         'grudzień': 11, 'grudnia': 11, 'gru': 11
     };
     
@@ -1596,9 +1566,7 @@
         E.importStatus.innerHTML = message;
         
         if (type !== 'loading') {
-            setTimeout(() => {
-                E.importStatus.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { E.importStatus.style.display = 'none'; }, 5000);
         }
     }
     
@@ -1610,54 +1578,29 @@
         showImportStatus('Przetwarzanie pliku...', 'loading');
 
         try {
-            // Próba rozpoznania miesiąca z nazwy pliku
             const monthNamesPattern = Object.keys(mNamesToNum).join('|');
             const dateRegex = new RegExp(`(${monthNamesPattern})\\s*(\\d{4})`, 'i');
             const match = file.name.match(dateRegex);
             
-            let targetMonth = null;
-            let targetYear = null;
-            
+            let targetMonth = null, targetYear = null;
             if (match) {
-                const monthName = match[1].toLowerCase();
                 targetYear = parseInt(match[2], 10);
-                targetMonth = mNamesToNum[monthName];
+                targetMonth = mNamesToNum[match[1].toLowerCase()];
             }
 
             const reader = new FileReader();
-            
             reader.onload = async function(e) {
                 try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { 
-                        type: 'array',
-                        cellDates: true,
-                        dateNF: 'yyyy-mm-dd'
-                    });
+                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true, dateNF: 'yyyy-mm-dd' });
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "", raw: false, dateNF: 'dd-mm-yyyy' });
                     
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
-                        defval: "", 
-                        raw: false,
-                        dateNF: 'dd-mm-yyyy'
-                    });
-                    
-                    // Funkcja pomocnicza do znajdowania wartości w wierszu
-                    const findValue = (row, possibleKeys) => {
-                        const lowerKeys = possibleKeys.map(k => k.toLowerCase());
-                        for (const key in row) {
-                            if (lowerKeys.includes(key.toLowerCase())) {
-                                return row[key];
-                            }
-                        }
-                        return undefined;
+                    const findValue = (row, keys) => {
+                        const lowerKeys = keys.map(k => k.toLowerCase());
+                        for (const key in row) { if (lowerKeys.includes(key.toLowerCase())) return row[key]; }
                     };
                     
-                    // Próba automatycznego wykrycia miesiąca z danych
                     if (!targetMonth && jsonData.length > 0) {
-                        const firstRow = jsonData[0];
-                        const dateField = findValue(firstRow, ['Data', 'Date']);
-                        
+                        const dateField = findValue(jsonData[0], ['Data', 'Date']);
                         if (dateField) {
                             const parsedDate = new Date(dateField);
                             if (!isNaN(parsedDate.getTime())) {
@@ -1667,81 +1610,39 @@
                         }
                     }
                     
-                    // Jeśli udało się wykryć miesiąc i jest inny niż obecny
-                    if (targetMonth !== null && targetYear !== null) {
-                        if (cur.getFullYear() !== targetYear || cur.getMonth() !== targetMonth) {
-                            const switchMonth = confirm(
-                                `Plik zawiera dane dla ${mNames[targetMonth]} ${targetYear}.\n` +
-                                `Czy chcesz przełączyć widok i zaimportować dane?`
-                            );
-                            
-                            if (switchMonth) {
-                                cur = new Date(targetYear, targetMonth, 1);
-                                await update();
-                            } else {
-                                const importAnyway = confirm(
-                                    `Czy mimo to chcesz zaimportować dane do obecnego miesiąca (${mNames[cur.getMonth()]} ${cur.getFullYear()})?`
-                                );
-                                if (!importAnyway) {
-                                    event.target.value = '';
-                                    E.importBtnText.textContent = 'Importuj Excel';
-                                    showImportStatus('Import anulowany', 'error');
-                                    return;
-                                }
-                            }
+                    if (targetMonth !== null && (cur.getFullYear() !== targetYear || cur.getMonth() !== targetMonth)) {
+                        if (confirm(`Plik zawiera dane dla ${mNames[targetMonth]} ${targetYear}.\nCzy chcesz przełączyć widok i zaimportować dane?`)) {
+                            cur = new Date(targetYear, targetMonth, 1);
+                            await update();
+                        } else if (!confirm(`Czy mimo to chcesz zaimportować dane do obecnego miesiąca (${mNames[cur.getMonth()]} ${cur.getFullYear()})?`)) {
+                            event.target.value = '';
+                            E.importBtnText.textContent = 'Importuj Excel';
+                            showImportStatus('Import anulowany', 'error');
+                            return;
                         }
                     }
                     
                     showImportStatus('Importowanie danych do bazy...', 'loading');
-                    
                     const batch = writeBatch(db);
                     let importedDays = 0;
                     const processedDays = new Set();
-                    
-                    // Mapowanie kolumn
-                    const fieldMappings = {
-                        aniaPraca: ['Ania praca'],
-                        ania: ['Ania inne', 'Ania'],
-                        michalPraca: ['Michal praca', 'Michał praca'],
-                        michal: ['Michał inne', 'Michal inne', 'Michał'],
-                        wspolne: ['Niania', 'Wspólne'],
-                        inne: ['Inne']
-                    };
+                    const fieldMappings = { aniaPraca: ['Ania praca'], ania: ['Ania inne', 'Ania'], michalPraca: ['Michal praca', 'Michał praca'], michal: ['Michał inne', 'Michal inne', 'Michał'], wspolne: ['Niania', 'Wspólne'], inne: ['Inne'] };
                     
                     for (const row of jsonData) {
                         let day = 0;
-                        
-                        // Próba odczytu daty
                         const dateValue = findValue(row, ['Data', 'Date', 'Dzień']);
-                        
                         if (dateValue) {
-                            // Jeśli to data
-                            if (dateValue.includes('-') || dateValue.includes('/')) {
-                                const parsedDate = new Date(dateValue);
-                                if (!isNaN(parsedDate.getTime())) {
-                                    day = parsedDate.getDate();
-                                }
-                            }
-                            // Jeśli to format "1 Dec", "2 Dec" itd.
-                            else if (/^\d+\s+(Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov)/i.test(dateValue)) {
+                            if (String(dateValue).includes('-') || String(dateValue).includes('/')) {
+                                const parsedDate = new Date(dateValue); if (!isNaN(parsedDate.getTime())) day = parsedDate.getDate();
+                            } else if (/^\d+\s+(Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov)/i.test(dateValue)) {
                                 day = parseInt(dateValue.match(/^\d+/)[0], 10);
-                            }
-                            // Jeśli to tylko numer dnia
-                            else {
-                                const parsed = parseInt(String(dateValue).trim(), 10);
-                                if (!isNaN(parsed) && parsed >= 1 && parsed <= 31) {
-                                    day = parsed;
-                                }
+                            } else {
+                                const parsed = parseInt(String(dateValue).trim(), 10); if (!isNaN(parsed) && parsed >= 1 && parsed <= 31) day = parsed;
                             }
                         }
+                        if (!day || processedDays.has(day)) continue;
                         
-                        if (!day || day < 1 || day > 31) continue;
-                        if (processedDays.has(day)) continue;
-                        
-                        let dayData = {};
-                        let hasData = false;
-                        
-                        // Przetwarzanie pól
+                        let dayData = {}, hasData = false;
                         for (const field in fieldMappings) {
                             const value = findValue(row, fieldMappings[field]);
                             if (value && String(value).trim()) {
@@ -1753,32 +1654,23 @@
                         }
                         
                         if (hasData) {
-                            const docRef = doc(db, calId(), String(day));
-                            batch.set(docRef, dayData, { merge: true });
+                            batch.set(doc(db, calId(), String(day)), dayData, { merge: true });
                             processedDays.add(day);
                             importedDays++;
                         }
                     }
                     
                     await batch.commit();
-                    
                     E.importBtnText.textContent = 'Importuj Excel';
                     showImportStatus(`✓ Zaimportowano dane dla ${importedDays} dni`, 'success');
-                    
                     await update();
-                    
                 } catch (error) {
                     console.error("Błąd importu:", error);
                     E.importBtnText.textContent = 'Importuj Excel';
                     showImportStatus('✕ Błąd podczas importu pliku', 'error');
-                    alert("Wystąpił błąd podczas importu pliku. Sprawdź format pliku Excel.");
-                } finally {
-                    event.target.value = '';
-                }
+                } finally { event.target.value = ''; }
             };
-            
             reader.readAsArrayBuffer(file);
-            
         } catch (error) {
             console.error("Błąd czytania pliku:", error);
             E.importBtnText.textContent = 'Importuj Excel';
@@ -1787,75 +1679,47 @@
         }
     }
     
-    // Podpięcie funkcji importu
     E.xlsxFileInput.onchange = handleExcelImport;
-    E.xlsxFileInputMobile.onchange = (e) => {
-        handleExcelImport(e);
-        E.mobileMenu.classList.remove('open');
-    };
+    E.xlsxFileInputMobile.onchange = (e) => { handleExcelImport(e); E.mobileMenu.classList.remove('open'); };
 
     const handleClearMonth = async () => {
-      const monthName=mNames[cur.getMonth()]; 
-      if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${monthName} ${cur.getFullYear()}?`))return; 
+      if(!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE wpisy z ${mNames[cur.getMonth()]} ${cur.getFullYear()}?`))return; 
       const q=await getDocs(collection(db,calId())); 
       const batch=writeBatch(db); 
       q.docs.forEach(d=>batch.delete(d.ref)); 
       await batch.commit(); 
-      alert('Dane usunięte.'); 
     };
     
     E.clearMonthBtn.onclick=handleClearMonth;
-    E.clearMonthBtnMobile.onclick=()=>{
-      handleClearMonth();
-      E.mobileMenu.classList.remove('open');
-    };
+    E.clearMonthBtnMobile.onclick=()=>{ handleClearMonth(); E.mobileMenu.classList.remove('open'); };
 
     function exportToICS() {
         const year = cur.getFullYear(), month = cur.getMonth();
         const formatICSDate = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}${String(d.getSeconds()).padStart(2,'0')}`;
         const parseStartTime = text => {
-            if (!text) return { hour: 8, minute: 0 };
-            const match = text.match(/\bod\s+(\d{1,2})[:.]?(\d{2})?/i);
+            const match = text?.match(/\bod\s+(\d{1,2})[:.]?(\d{2})?/i);
             return match ? { hour: parseInt(match[1],10), minute: match[2]?parseInt(match[2],10):0 } : { hour: 8, minute: 0 };
         };
-        let icsString = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//FedorczakFamilyCalendar//PL'].join('\r\n')+'\r\n';
+        let icsString = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//FedorczakFamilyCalendar//PL\r\n';
 
         for (const day in data) {
-            const dayData = data[day];
             for (const field of ['michalPraca', 'michal']) {
-                const entry = dayData[field]; 
-                if (!entry) continue;
+                const entry = data[day][field]; if (!entry) continue;
                 const entryText = typeof entry === 'object' ? entry.text : entry;
                 const textParts = (entryText || '').split('/').map(t => t.trim());
                 let lastEndDate = null;
 
                 textParts.forEach((part, index) => {
                     if (!part) return;
-                    let hours = 0;
-                    if (typeof entry === 'object') {
-                        hours = index === 0 ? (entry.h1 || 0) : (entry.h2 || 0);
-                    } else {
-                        hours = getDefaultHours(part);
-                    }
+                    let hours = (typeof entry === 'object') ? (index === 0 ? (entry.h1 || 0) : (entry.h2 || 0)) : getDefaultHours(part);
                     if (hours <= 0) return;
 
                     const timeInfo = parseStartTime(part);
-                    let startDate;
-                    if (part.match(/\bod\s+\d/i)) {
-                        startDate = new Date(year, month, parseInt(day), timeInfo.hour, timeInfo.minute);
-                    } else {
-                        startDate = lastEndDate || new Date(year, month, parseInt(day), 8, 0);
-                    }
-                    
+                    let startDate = (part.match(/\bod\s+\d/i)) ? new Date(year, month, parseInt(day), timeInfo.hour, timeInfo.minute) : (lastEndDate || new Date(year, month, parseInt(day), 8, 0));
                     const endDate = new Date(startDate.getTime() + hours * 3600000);
                     lastEndDate = endDate;
 
-                    icsString += [
-                        'BEGIN:VEVENT', `UID:${calId()}-${day}-${field}-${index}@fedorczak.family`,
-                        `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g,'')}Z`,
-                        `DTSTART:${formatICSDate(startDate)}`, `DTEND:${formatICSDate(endDate)}`,
-                        `SUMMARY:${labels[field]}: ${part}`, 'END:VEVENT'
-                    ].join('\r\n')+'\r\n';
+                    icsString += `BEGIN:VEVENT\r\nUID:${calId()}-${day}-${field}-${index}@fedorczak.family\r\nDTSTAMP:${new Date().toISOString().replace(/[-:.]/g,'')}Z\r\nDTSTART:${formatICSDate(startDate)}\r\nDTEND:${formatICSDate(endDate)}\r\nSUMMARY:${labels[field]}: ${part}\r\nEND:VEVENT\r\n`;
                 });
             }
         }
@@ -1864,43 +1728,26 @@
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = `kalendarz_michal_${year}_${String(month+1).padStart(2,'0')}.ics`;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
     }
     
     E.exportIcsBtn.addEventListener('click', exportToICS);
-    E.exportIcsBtnMobile.addEventListener('click', ()=>{
-      exportToICS();
-      E.mobileMenu.classList.remove('open');
-    });
+    E.exportIcsBtnMobile.addEventListener('click', ()=>{ exportToICS(); E.mobileMenu.classList.remove('open'); });
 
     E.fab.onclick = () => E.sheet.classList.add('open');
     E.sheetClose.onclick = () => E.sheet.classList.remove('open');
     
-    // Touch gestures for bottom sheet
-    let startY = 0;
-    let currentY = 0;
-    const sheet = E.sheet;
-    
-    sheet.addEventListener('touchstart', (e) => {
-      startY = e.touches[0].clientY;
-    });
-    
-    sheet.addEventListener('touchmove', (e) => {
+    let startY = 0, currentY = 0;
+    E.sheet.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; });
+    E.sheet.addEventListener('touchmove', (e) => {
       currentY = e.touches[0].clientY;
       const diff = currentY - startY;
-      if (diff > 0) {
-        sheet.style.transform = `translateY(${diff}px)`;
-      }
+      if (diff > 0) E.sheet.style.transform = `translateY(${diff}px)`;
     });
-    
-    sheet.addEventListener('touchend', () => {
-      const diff = currentY - startY;
-      if (diff > 50) {
-        sheet.classList.remove('open');
-      }
-      sheet.style.transform = '';
+    E.sheet.addEventListener('touchend', () => {
+      if (currentY - startY > 50) E.sheet.classList.remove('open');
+      E.sheet.style.transform = '';
     });
 
     function init(){ update(); }
