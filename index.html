@@ -621,16 +621,47 @@
   
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, onIdTokenChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     const cfg = { apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ", authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com", projectId:"kalendarz-rodzinny-68d04", storageBucket:"kalendarz-rodzinny-68d04.appspot.com", messagingSenderId:"1050937545151", appId:"1:1050937545151:web:a85fd1a5f066f4a499910a", measurementId:"G-57YKE2XKQ1"};
     let db;
+    let auth;
+    let currentIdToken = null;
+    let hasInitialized = false;
     try {
       const app = initializeApp(cfg);
-      const auth = getAuth(app);
+      auth = getAuth(app);
       db = getFirestore(app);
       signInAnonymously(auth);
-      onAuthStateChanged(auth, u => u && init());
+      onAuthStateChanged(auth, async u => {
+        if (u) {
+          try {
+            currentIdToken = await u.getIdToken();
+          } catch (tokenError) {
+            console.error('Błąd pobierania tokenu uwierzytelniającego:', tokenError);
+            currentIdToken = null;
+          }
+          if (!hasInitialized) {
+            hasInitialized = true;
+            init();
+          }
+        } else {
+          currentIdToken = null;
+          hasInitialized = false;
+        }
+      });
+      onIdTokenChanged(auth, async (user) => {
+        if (!user) {
+          currentIdToken = null;
+          return;
+        }
+        try {
+          currentIdToken = await user.getIdToken();
+        } catch (tokenError) {
+          console.error('Błąd odświeżania tokenu identyfikacyjnego:', tokenError);
+          currentIdToken = null;
+        }
+      });
     } catch(e) {
       console.error("Błąd inicjalizacji Firebase:", e);
       alert("Nie udało się połączyć z bazą danych. Odśwież stronę.");
@@ -720,6 +751,12 @@
       warning: "text-sm text-yellow-600 font-semibold"
     };
 
+    const normalizeManualSyncEndpoint = (value) => {
+      if (typeof value !== 'string') return '';
+      const trimmed = value.trim();
+      return trimmed;
+    };
+
     const setSyncStatusMessage = (message, variant = 'info') => {
       const cls = syncStatusClassByVariant[variant] || syncStatusClassByVariant.info;
       E.syncStatus.textContent = message;
@@ -741,6 +778,72 @@
       updateForceSyncButtons();
     };
 
+    const ensureAuthIdToken = async (forceRefresh = false) => {
+      if (currentIdToken && !forceRefresh) return currentIdToken;
+      const user = auth?.currentUser;
+      if (!user) {
+        throw new Error('Brak uwierzytelnionego użytkownika Firebase.');
+      }
+      try {
+        currentIdToken = await user.getIdToken(forceRefresh);
+        return currentIdToken;
+      } catch (tokenError) {
+        currentIdToken = null;
+        throw tokenError;
+      }
+    };
+
+    const safeReadResponseText = async (response) => {
+      try {
+        return await response.text();
+      } catch (readError) {
+        console.warn('Nie udało się odczytać odpowiedzi funkcji synchronizacji:', readError);
+        return '';
+      }
+    };
+
+    const parseStatusMessage = (rawText) => {
+      if (!rawText) return '';
+      const trimmed = rawText.trim();
+      if (!trimmed) return '';
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed === 'string') {
+          return parsed;
+        }
+        if (parsed && typeof parsed === 'object') {
+          if (typeof parsed.message === 'string') return parsed.message;
+          if (typeof parsed.status === 'string') return parsed.status;
+          if (typeof parsed.error === 'string') return parsed.error;
+        }
+      } catch (_jsonError) {
+        // Ignorujemy błąd i traktujemy odpowiedź jako zwykły tekst.
+      }
+      return trimmed;
+    };
+
+    const performManualSyncRequest = async (url, idToken) => {
+      const headers = {};
+      if (idToken) {
+        headers.Authorization = `Bearer ${idToken}`;
+      }
+      let response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+        mode: 'cors'
+      });
+      if (response.status === 405) {
+        response = await fetch(url, {
+          method: 'GET',
+          credentials: 'include',
+          headers,
+          mode: 'cors'
+        });
+      }
+      return response;
+    };
+
     const triggerManualSync = async () => {
       if (manualSyncInProgress) return;
       if (!manualSyncEndpoint) {
@@ -752,38 +855,46 @@
       setManualSyncState(true);
       setSyncStatusMessage('⏳ Odświeżanie danych z OneDrive...', 'info');
 
+      let idToken = '';
       try {
-        const response = await fetch(manualSyncEndpoint, {
-          method: 'POST',
-          credentials: 'include'
-        });
+        idToken = await ensureAuthIdToken();
+      } catch (tokenError) {
+        console.error('Nie udało się pobrać tokenu ID Firebase do synchronizacji OneDrive:', tokenError);
+        setSyncStatusMessage('❌ Błąd uwierzytelniania podczas odświeżania OneDrive', 'error');
+        setManualSyncState(false);
+        setTimeout(checkSyncStatus, 4000);
+        return;
+      }
 
-        if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
-        }
-
-        let bodyText = '';
-        try {
-          bodyText = await response.text();
-        } catch (readError) {
-          console.warn('Nie udało się odczytać odpowiedzi funkcji synchronizacji:', readError);
-        }
-
-        let statusMessage = '';
-        if (bodyText) {
+      try {
+        let response = await performManualSyncRequest(manualSyncEndpoint, idToken);
+        if (response.status === 401 || response.status === 403) {
           try {
-            const parsed = JSON.parse(bodyText);
-            statusMessage = parsed?.message || parsed?.status || '';
-          } catch {
-            statusMessage = bodyText;
+            idToken = await ensureAuthIdToken(true);
+            response = await performManualSyncRequest(manualSyncEndpoint, idToken);
+          } catch (refreshError) {
+            console.error('Błąd ponownego uwierzytelniania dla synchronizacji OneDrive:', refreshError);
+            throw new Error('Błąd uwierzytelniania podczas odświeżania OneDrive');
           }
         }
+        const bodyText = await safeReadResponseText(response);
 
-        const finalMessage = statusMessage ? statusMessage.trim() : '';
+        if (!response.ok) {
+          const errorMessage = parseStatusMessage(bodyText) || `Request failed with status ${response.status}`;
+          throw new Error(errorMessage);
+        }
+
+        const finalMessage = parseStatusMessage(bodyText);
         setSyncStatusMessage(finalMessage ? `✅ ${finalMessage}` : '✅ Odświeżono dane z OneDrive', 'success');
       } catch (error) {
         console.error('Błąd ręcznej synchronizacji z OneDrive:', error);
-        setSyncStatusMessage('❌ Błąd podczas odświeżania danych z OneDrive', 'error');
+        const fallbackError = 'Błąd podczas odświeżania danych z OneDrive';
+        const message = typeof error?.message === 'string' && error.message.trim() ? error.message.trim() : fallbackError;
+        let normalizedMessage = message.replace(/^✅|^❌|^⚠️|^⏳/, '').trim();
+        if (/failed to fetch/i.test(normalizedMessage) || /networkerror/i.test(normalizedMessage)) {
+          normalizedMessage = 'Nie udało się połączyć z serwerem synchronizacji OneDrive';
+        }
+        setSyncStatusMessage(`❌ ${normalizedMessage || fallbackError}`, 'error');
       } finally {
         setManualSyncState(false);
         setTimeout(checkSyncStatus, 4000);
@@ -816,7 +927,8 @@
             if (tokenDoc.exists()) {
                 const tokenData = tokenDoc.data() || {};
                 const customEndpoint = tokenData.manualSyncUrl || tokenData.manualSyncEndpoint || tokenData.forceSyncUrl || tokenData.syncEndpoint || tokenData.syncUrl;
-                manualSyncEndpoint = customEndpoint || defaultManualSyncEndpoint;
+                const normalizedEndpoint = normalizeManualSyncEndpoint(customEndpoint);
+                manualSyncEndpoint = normalizedEndpoint || defaultManualSyncEndpoint;
                 setSyncStatusMessage("✅ Połączono z OneDrive", 'success');
                 E.connectOnedriveBtn.textContent = "Połącz ponownie";
                 E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
@@ -830,7 +942,7 @@
         } catch (error) {
             console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
             setSyncStatusMessage("⚠️ Błąd sprawdzania statusu", 'warning');
-            manualSyncEndpoint = manualSyncEndpoint || defaultManualSyncEndpoint;
+            manualSyncEndpoint = normalizeManualSyncEndpoint(manualSyncEndpoint) || defaultManualSyncEndpoint;
             E.connectOnedriveBtn.textContent = defaultConnectLabelDesktop;
             E.connectOnedriveBtnMobile.textContent = defaultConnectLabelMobile;
             updateForceSyncButtons();
