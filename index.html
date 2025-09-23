@@ -740,7 +740,7 @@
     const defaultForceSyncLabelDesktop = E.forceSyncBtn.textContent;
     const defaultForceSyncLabelMobile = E.forceSyncBtnMobile.textContent;
     const cloudFunctionsBaseUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net";
-    const defaultManualSyncEndpoint = `${cloudFunctionsBaseUrl}/sync`;
+    const defaultManualSyncEndpoint = `${cloudFunctionsBaseUrl}/forceSync`;
     let manualSyncEndpoint = defaultManualSyncEndpoint;
     let manualSyncInProgress = false;
 
@@ -754,7 +754,14 @@
     const normalizeManualSyncEndpoint = (value) => {
       if (typeof value !== 'string') return '';
       const trimmed = value.trim();
-      return trimmed;
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+      }
+      if (trimmed.startsWith('/')) {
+        return `${cloudFunctionsBaseUrl}${trimmed}`;
+      }
+      return `${cloudFunctionsBaseUrl}/${trimmed}`;
     };
 
     const setSyncStatusMessage = (message, variant = 'info') => {
@@ -802,36 +809,52 @@
       }
     };
 
-    const parseStatusMessage = (rawText) => {
-      if (!rawText) return '';
+    const parseManualSyncBody = (rawText) => {
+      if (!rawText) {
+        return { message: '', success: undefined };
+      }
       const trimmed = rawText.trim();
-      if (!trimmed) return '';
+      if (!trimmed) {
+        return { message: '', success: undefined };
+      }
       try {
         const parsed = JSON.parse(trimmed);
         if (typeof parsed === 'string') {
-          return parsed;
+          return { message: parsed, success: undefined };
         }
         if (parsed && typeof parsed === 'object') {
-          if (typeof parsed.message === 'string') return parsed.message;
-          if (typeof parsed.status === 'string') return parsed.status;
-          if (typeof parsed.error === 'string') return parsed.error;
+          const message =
+            typeof parsed.message === 'string' ? parsed.message :
+            typeof parsed.status === 'string' ? parsed.status :
+            typeof parsed.error === 'string' ? parsed.error : '';
+          const success =
+            typeof parsed.success === 'boolean'
+              ? parsed.success
+              : (typeof parsed.error === 'string' ? false : undefined);
+          return { message, success };
         }
       } catch (_jsonError) {
-        // Ignorujemy błąd i traktujemy odpowiedź jako zwykły tekst.
+        // Traktujemy odpowiedź jako zwykły tekst.
       }
-      return trimmed;
+      return { message: trimmed, success: undefined };
     };
 
-    const performManualSyncRequest = async (url, idToken) => {
+    const performManualSyncRequest = async (url, idToken, payload) => {
       const headers = {};
       if (idToken) {
         headers.Authorization = `Bearer ${idToken}`;
+      }
+      let body;
+      if (payload && typeof payload === 'object') {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(payload);
       }
       let response = await fetch(url, {
         method: 'POST',
         credentials: 'include',
         headers,
-        mode: 'cors'
+        mode: 'cors',
+        body
       });
       if (response.status === 405) {
         response = await fetch(url, {
@@ -867,11 +890,17 @@
       }
 
       try {
-        let response = await performManualSyncRequest(manualSyncEndpoint, idToken);
+        const manualSyncPayload = {
+          forceRefresh: true,
+          calendarId: `${cur.getFullYear()}-${cur.getMonth() + 1}`,
+          triggeredAt: new Date().toISOString(),
+          source: 'manual-refresh'
+        };
+        let response = await performManualSyncRequest(manualSyncEndpoint, idToken, manualSyncPayload);
         if (response.status === 401 || response.status === 403) {
           try {
             idToken = await ensureAuthIdToken(true);
-            response = await performManualSyncRequest(manualSyncEndpoint, idToken);
+            response = await performManualSyncRequest(manualSyncEndpoint, idToken, manualSyncPayload);
           } catch (refreshError) {
             console.error('Błąd ponownego uwierzytelniania dla synchronizacji OneDrive:', refreshError);
             throw new Error('Błąd uwierzytelniania podczas odświeżania OneDrive');
@@ -879,12 +908,14 @@
         }
         const bodyText = await safeReadResponseText(response);
 
-        if (!response.ok) {
-          const errorMessage = parseStatusMessage(bodyText) || `Request failed with status ${response.status}`;
+        const { message: parsedMessage, success: parsedSuccess } = parseManualSyncBody(bodyText);
+
+        if (!response.ok || parsedSuccess === false) {
+          const errorMessage = (parsedMessage && parsedMessage.trim()) || `Request failed with status ${response.status}`;
           throw new Error(errorMessage);
         }
 
-        const finalMessage = parseStatusMessage(bodyText);
+        const finalMessage = parsedMessage && parsedMessage.trim();
         setSyncStatusMessage(finalMessage ? `✅ ${finalMessage}` : '✅ Odświeżono dane z OneDrive', 'success');
       } catch (error) {
         console.error('Błąd ręcznej synchronizacji z OneDrive:', error);
