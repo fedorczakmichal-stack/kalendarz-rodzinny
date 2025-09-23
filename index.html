@@ -68,7 +68,7 @@
       .mobile-header { display: flex; flex-direction: column; gap: .75rem; }
       .mobile-nav { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: 0 .25rem; }
       .mobile-brand { display: flex; align-items: center; gap: .5rem; }
-      .mobile-brand .logo { width: 32px; height: 32px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .mobile-brand .logo { width: 32px; height: 32px; background: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
       .mobile-brand .title { font-weight: 800; font-size: 1rem; color: #1f2937; }
       .mobile-controls { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; border-radius: 12px; padding: .5rem; margin: 0 .25rem; }
       .month-selector { display: flex; align-items: center; gap: .25rem; flex: 1; }
@@ -214,7 +214,11 @@
     <header class="hdr">
       <div class="desktop-controls flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-4 flex-1">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 grid place-items-center shadow-lg"><span class="text-white font-black text-xl">📅</span></div>
+          <div class="w-12 h-12 rounded-lg bg-purple-600 flex items-center justify-center shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-white">
+              <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
+            </svg>
+          </div>
           <div>
             <div class="font-extrabold text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Kalendarz Rodzinny</div>
             <div class="text-slate-500 text-xs uppercase tracking-wider">System zarządzania czasem</div>
@@ -247,7 +251,11 @@
       <div class="mobile-header md:hidden">
         <div class="mobile-nav">
           <div class="mobile-brand">
-            <div class="logo">📅</div>
+            <div class="logo">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-white">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
+              </svg>
+            </div>
             <div class="title">Kalendarz Rodzinny</div>
           </div>
           <div class="view-toggle">
@@ -259,7 +267,7 @@
           </button>
         </div>
         <div class="mobile-controls">
-          <div class="month-selector">
+          <div class="month-selector mr-2">
             <button id="prev-mobile" class="nav-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg></button>
             <h2 id="title-mobile" class="month-title">—</h2>
             <button id="next-mobile" class="nav-btn"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg></button>
@@ -364,33 +372,7 @@
     const labels={ania:'Ania',aniaPraca:'Ania Praca',michal:'Michał',michalPraca:'Michał Praca',wspolne:'Niania',inne:'Inne'};
     let data={}; let clip=null;
     const el=id=>document.getElementById(id);
-    const E={
-      title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'),
-      next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'),
-      desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'),
-      sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'),
-      sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'),
-      sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'),
-      msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'),
-      msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'),
-      msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'),
-      sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),
-      ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),
-      ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),
-      editTitle:el('edit-title'),editSave:el('edit-save'),
-      xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'),
-      exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'),
-      menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'),
-      clearMonthBtnMobile:el('clearMonthBtnMobile'),
-      exportIcsBtnMobile:el('exportIcsBtnMobile'),
-      importBtnText:el('importBtnText'),
-      importStatus:el('importStatus'),
-      mobileGridView:el('mobile-grid-view'),
-      mobileGridContent:el('mobile-grid-content'),
-      gridViewBtn:el('grid-view-btn'),
-      cardViewBtn:el('card-view-btn'),
-      currentTime:el('current-time')
-    };
+    const E={ title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'), next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'), desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'), sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'), sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'), sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'), msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'), msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'), msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'), sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'), ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'), ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'), editTitle:el('edit-title'),editSave:el('edit-save'), xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'), exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'), clearMonthBtnMobile:el('clearMonthBtnMobile'), exportIcsBtnMobile:el('exportIcsBtnMobile'), importBtnText:el('importBtnText'), importStatus:el('importStatus'), mobileGridView:el('mobile-grid-view'), mobileGridContent:el('mobile-grid-content'), gridViewBtn:el('grid-view-btn'), cardViewBtn:el('card-view-btn'), currentTime:el('current-time') };
     
     window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
     
