@@ -3,287 +3,344 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Kalendarz rodzinny</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Kalendarz Rodziny Fedorczak</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    :root{--c-ania:#f0fff4;--c-aniaP:#fff1f2;--c-michal:#f0f9ff;--c-michalP:#f5f3ff;--c-wsp:#fffbeb;--c-inne:#f1f5f9;--k-lask:#a7f3d0;--k-brzeziny:#fde68a;--k-ortho:#f9a8d4;--k-jb:#c4b5fd;--k-jb24:#7c3aed;}
+    :root{--c-ania:#f0fff4;--c-aniaP:#fff1f2;--c-michal:#f0f9ff;--c-michalP:#f5f3ff;--c-wsp:#fffbeb;--c-inne:#f1f5f9;--k-lask:#a7f3d0;--k-brzeziny:#fde68a;--k-ortho:#f9a8d4;--k-jb:#c4b5fd;--k-jb24:#7c3aed;--safe-top: env(safe-area-inset-top);--safe-bottom: env(safe-area-inset-bottom);}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased;margin:0;padding:0;min-height:100vh;overflow-x:hidden;}
-    .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 3px rgba(0,0,0,.08);position:sticky;top:0;z-index:100;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fef3f8,#f3f4f6);-webkit-font-smoothing:antialiased;margin:0;padding:0;min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;}
+    html,body{position:fixed;overflow:hidden;width:100%;height:100%;}
+    #app-container{width:100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .hdr{background:#fff;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;box-shadow:0 1px 3px rgba(0,0,0,.08);position:sticky;top:0;z-index:100;padding-top:calc(.75rem + var(--safe-top));}
+    @media (max-width:768px){.hdr{padding:.5rem;padding-top:calc(.5rem + var(--safe-top));}.hdr .desktop-controls{display:none;}.mobile-header{display:flex;flex-direction:column;gap:.75rem;}.mobile-nav{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:0 .25rem;}.mobile-brand{display:flex;align-items:center;gap:.5rem;}.mobile-brand .logo{width:32px;height:32px;background:linear-gradient(135deg,#ec4899,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;}.mobile-brand .title{font-weight:800;font-size:1rem;color:#1f2937;}.mobile-controls{display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border-radius:12px;padding:.5rem;margin:0 .25rem;}.month-selector{display:flex;align-items:center;gap:.25rem;flex:1;}.month-title{flex:1;text-align:center;font-weight:600;font-size:.95rem;color:#374151;}.nav-btn{width:36px;height:36px;border-radius:8px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:14px;color:#6b7280;transition:all .2s;}.nav-btn:active{background:#f3f4f6;transform:scale(.95);}.today-btn{padding:.5rem 1rem;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;border:none;border-radius:8px;font-weight:600;font-size:.85rem;transition:all .2s;}.today-btn:active{transform:scale(.95);}.mobile-menu-btn{width:36px;height:36px;border-radius:8px;background:white;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;}}
+    .sumbar{display:flex;gap:.5rem;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;padding:.5rem 1rem}
+    .chip{display:inline-flex;gap:.35rem;align-items:center;border:1px solid #e5e7eb;background:#f9fafb;border-radius:9999px;padding:.3rem .55rem;font-size:.82rem}
+    .dot{width:.55rem;height:.55rem;border-radius:9999px}
+    @media (max-width:768px){.sumbar{display:none}}
     .grid{display:grid;grid-template-columns:64px repeat(6,1fr);border-top:1px solid #e5e7eb}
     .cell{border-bottom:1px solid #e5e7eb;border-left:1px solid #e5e7eb;min-height:60px;position:relative;padding:4px}
     .cell:nth-child(7n+1){border-left:none}
     .cell.header{background:#f9fafb;font-weight:600}
-    .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;}
+    .day-cell{cursor:pointer}
+    .day-num{font-weight:800;color:#374151}
+    .day-name{font-size:.7rem;color:#6b7280}
+    .today .day-num,.today .day-name{color:#6d28d9}
+    .off{position:relative}
+    .off::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(219,39,119,.08));pointer-events:none;z-index:1}
+    .fld{height:100%;padding:6px;border-radius:10px;font-size:.9rem;line-height:1.35;cursor:pointer;word-break:break-word;transition:transform .12s;position:relative;z-index:2}
+    .fld:hover{transform:translateY(-1px)}
     .c-ania{background:var(--c-ania)} .c-aniaP{background:var(--c-aniaP)} .c-michal{background:var(--c-michal)} .c-michalP{background:var(--c-michalP)} .c-wsp{background:var(--c-wsp)} .c-inne{background:var(--c-inne)}
     .tile-ortho{background:var(--k-ortho)!important;font-weight:600} .tile-brzeziny{background:var(--k-brzeziny)!important;font-weight:600} .tile-lask{background:var(--k-lask)!important;font-weight:600} .tile-jb{background:var(--k-jb)!important;font-weight:600} .tile-jb24{background:var(--k-jb24)!important;color:#fff;font-weight:700}
-    
-    #edit{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2500;display:none;align-items:center;justify-content:center;padding:1rem;}
-    .edit-body{background:white;border-radius:16px;width:100%;max-width:500px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;}
-    .edit-head{display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid #e5e7eb;background:#f9fafb;}
-    .edit-title{font-weight:700;color:#1f2937;margin:0;}
-    .edit-close{width:32px;height:32px;border:none;background:none;font-size:18px;color:#6b7280;cursor:pointer;border-radius:6px;}
-    .edit-content{padding:1rem;overflow-y:auto;flex:1;}
-    .edit-foot{padding:1rem;border-top:1px solid #e5e7eb;background:#f9fafb;}
+    .mcal{display:none;padding:.5rem;padding-bottom:calc(.5rem + var(--safe-bottom) + 70px);}
+    @media (max-width:768px){.grid{display:none} .mcal{display:block}.m-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:.75rem;margin-bottom:.65rem;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:all .2s;}.m-card:active{transform:scale(.98);}.m-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;padding-bottom:.4rem;border-bottom:1.5px solid #f3f4f6;}.m-num{font-size:1.35rem;font-weight:800;color:#1f2937;}.m-name{font-size:.75rem;color:#6b7280;margin-left:.25rem;}.tag{font-size:.65rem;border-radius:999px;padding:.15rem .4rem;font-weight:600;}.m-row{display:flex;gap:.4rem;align-items:stretch;margin:.25rem 0;}.m-label{flex:0 0 75px;border-radius:8px;padding:.4rem .45rem;font-weight:600;color:#334155;font-size:.75rem;display:flex;align-items:center;}.m-content{flex:1;border-radius:8px;padding:.5rem .6rem;cursor:pointer;position:relative;z-index:2;min-height:34px;display:flex;align-items:center;transition:all .15s;}.m-content:active{background-color:rgba(0,0,0,.05);}.m-content .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.85rem;line-height:1.3;}.m-content .placeholder{color:#9ca3af;font-size:.8rem;}}
+    #ctx{position:fixed;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.15);padding:6px;display:none;z-index:1000}
+    .ctx-it{padding:10px 14px;font-size:.9rem;color:#374151;cursor:pointer;border-radius:8px} .ctx-it:hover{background:#f3f4f6}
+    #edit{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1200;padding:16px;}
+    .edit-body{background:#fff;border-radius:20px;width:min(720px,100%);max-height:86vh;overflow:hidden;padding:0;display:flex;flex-direction:column;box-shadow:0 20px 40px rgba(0,0,0,.2);}
+    .edit-head{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1.5px solid #e5e7eb;display:flex;align-items:center;gap:.75rem;padding:1rem;}
+    .edit-title{font-weight:800;color:#0f172a;font-size:1.1rem}
+    .edit-close{margin-left:auto;flex-shrink:0;width:36px;height:36px;border-radius:10px;border:1px solid #e5e7eb;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:20px;color:#6b7280;}
+    .edit-close:active{background:#eef2ff;border-color:#c7d2fe}
+    .edit-content{padding:1rem;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .edit-foot{padding:1rem;border-top:1.5px solid #e5e7eb;background:#f8fafc;display:flex;justify-content:flex-end;gap:.5rem;}
+    @media (max-width:768px){#edit{align-items:flex-end;padding:0}.edit-body{width:100%;max-height:92vh;border-radius:20px 20px 0 0;animation:slideUp .3s ease-out;}@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}.edit-head{padding-top:1.25rem;padding-bottom:1rem;}.edit-content{padding:1rem;padding-bottom:1.5rem;}.edit-foot{padding-bottom:calc(1rem + var(--safe-bottom));}.edit-content input[type="text"],.edit-content input[type="number"]{font-size:16px;}}
+    #fab{position:fixed;right:16px;bottom:calc(16px + var(--safe-bottom));z-index:1100;display:none;align-items:center;gap:.4rem;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;border:none;border-radius:999px;padding:.65rem .9rem;font-weight:700;font-size:.85rem;box-shadow:0 4px 12px rgba(139,92,246,.4);transition:all .2s;}
+    #fab:active{transform:scale(.95);}
+    #fab svg{width:16px;height:16px}
+    @media (max-width:768px){#fab{display:inline-flex}}
+    #sheet{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -8px 24px rgba(0,0,0,.15);transform:translateY(110%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:1200;padding-bottom:var(--safe-bottom);max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    #sheet.open{transform:translateY(0)}
+    .sheet-handle{width:36px;height:4px;background:#d1d5db;border-radius:999px;margin:.75rem auto .5rem;}
+    .sheet-content{padding:1rem;padding-top:0;}
+    .sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.75rem;}
+    .sheet-item{padding:.75rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;}
+    .sheet-item.highlight{background:linear-gradient(135deg,#ede9fe,#fce7f3);border-color:#c7d2fe;}
+    .sheet-item.full{grid-column:span 2;}
+    .sheet-label{font-size:.7rem;color:#6b7280;font-weight:500;margin-bottom:.15rem;}
+    .sheet-value{font-size:1.1rem;font-weight:700;color:#1f2937;}
+    .sheet-close-btn{width:100%;padding:.75rem;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:12px;font-weight:600;color:#374151;margin-top:1rem;transition:all .2s;}
+    .sheet-close-btn:active{background:#e5e7eb;transform:scale(.98);}
+    #mobile-menu{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.5);z-index:1300;display:none;animation:fadeIn .2s;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    #mobile-menu.open{display:block;}
+    .menu-panel{position:absolute;right:0;top:0;bottom:0;width:min(85%,320px);background:white;padding:1rem;padding-top:calc(1rem + var(--safe-top));box-shadow:-4px 0 12px rgba(0,0,0,.1);animation:slideIn .3s;overflow-y:auto;}
+    @keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid #e5e7eb;}
+    .menu-title{font-weight:700;font-size:1.1rem;color:#1f2937;}
+    .menu-close{width:32px;height:32px;border-radius:8px;background:#f3f4f6;border:none;display:flex;align-items:center;justify-content:center;}
+    .menu-item{display:block;width:100%;padding:.75rem 1rem;margin-bottom:.5rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-weight:600;font-size:.9rem;text-align:left;transition:all .2s;}
+    .menu-item:active{background:#f3f4f6;transform:scale(.98);}
     .form-group{margin-bottom:1rem;}
-    .form-label{display:block;font-size:.85rem;font-weight:600;color:#374151;margin-bottom:.5rem;}
-    .form-input{width:100%;padding:.75rem;border:2px solid #e5e7eb;border-radius:10px;font-size:.9rem;font-weight:500;}
-    .hours-control{margin:1rem 0;padding:1rem;background:#f8fafc;border-radius:16px;border:2px solid #e2e8f0;}
+    .form-label{display:block;font-weight:600;color:#374151;margin-bottom:.35rem;font-size:.85rem;}
+    .form-input{width:100%;padding:.75rem;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;transition:all .2s;}
+    .form-input:focus{outline:none;border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.1);}
+    .hours-control{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:.75rem;margin-bottom:.75rem;}
+    .hours-control-label{font-weight:600;color:#1f2937;font-size:.85rem;margin-bottom:.5rem;}
+    .hours-slider{width:100%;margin:.5rem 0;}
+    .hours-number{width:100%;padding:.5rem;border:1.5px solid #e5e7eb;border-radius:8px;text-align:center;font-weight:600;font-size:16px;}
+    button,.m-content,.m-card,.nav-btn,.menu-item{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px;}
   </style>
 </head>
 <body>
   <div id="app-container">
     <header class="hdr">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow">
-                    <span class="text-white font-black">🌸</span>
-                </div>
-                <div>
-                    <div class="font-extrabold text-slate-900">Kalendarz rodzinny</div>
-                    <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
-                </div>
-            </div>
-            <div class="flex items-center gap-4 flex-wrap">
-                <button id="prev" class="p-3 rounded-xl hover:bg-gray-100">Poprzedni</button>
-                <h2 id="title" class="font-bold text-slate-800 min-w-[180px] text-center text-lg">—</h2>
-                <button id="next" class="p-3 rounded-xl hover:bg-gray-100">Następny</button>
-                <button id="today" class="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl">Dziś</button>
-                <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-8">
-                    <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md">Połącz z OneDrive</button>
-                    <button id="forceSyncBtn" class="px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md" disabled>🔄 Odśwież</button>
-                    <div id="syncStatus" class="text-sm text-gray-500"></div>
-                </div>
-            </div>
+      <div class="desktop-controls flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow"><span class="text-white font-black">🌸</span></div>
+          <div>
+            <div class="font-extrabold text-slate-900">Rodzina Fedorczak</div>
+            <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
+          </div>
         </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="prev" class="p-2 rounded-lg hover:bg-gray-100" title="Poprzedni miesiąc">◀</button>
+          <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
+          <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
+          <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
+          
+          <div id="sync-controls" class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
+             <button id="connectOnedriveBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Połącz z OneDrive</button>
+             <div id="syncStatus" class="text-sm text-gray-500"></div>
+          </div>
+
+        </div>
+      </div>
+      
+      <div class="mobile-header md:hidden">
+        <div class="mobile-nav">
+          <div class="mobile-brand">
+            <div class="logo">🌸</div>
+            <div class="title">Kalendarz</div>
+          </div>
+          <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>
+          </button>
+        </div>
+        <div class="mobile-controls">
+          <div class="month-selector">
+            <button id="prev-mobile" class="nav-btn">◀</button>
+            <h2 id="title-mobile" class="month-title">—</h2>
+            <button id="next-mobile" class="nav-btn">▶</button>
+          </div>
+          <button id="today-mobile" class="today-btn">Dziś</button>
+        </div>
+      </div>
     </header>
+    
+    <div class="sumbar">
+      <span class="chip"><span class="dot" style="background:var(--k-ortho)"></span> Ortho: <b id="sum-ortho">0h</b></span>
+      <span class="chip"><span class="dot" style="background:var(--k-brzeziny)"></span> Brzeziny: <b id="sum-brzeziny">0h</b></span>
+      <span class="chip"><span class="dot" style="background:var(--k-lask)"></span> Łask: <b id="sum-lask">0h</b></span>
+      <span class="chip"><span class="dot" style="background:var(--k-jb)"></span> JB: <b id="sum-jb">0h</b></span>
+      <span class="chip"><span class="dot" style="background:#8b5cf6"></span> Łącznie godzin: <b id="sum-total-hours">0h</b></span>
+      <span class="chip"><span class="dot" style="background:#fca5a5"></span> Porty: <b id="sum-ports">0</b></span>
+      <span class="chip"><span class="dot" style="background:#fcd34d"></span> Jednodniówki: <b id="sum-jednodniowki">0</b></span>
+      <span class="chip"><span class="dot" style="background:#818cf8"></span> Kwalifikacje: <b id="sum-kwalifikacje">0</b></span>
+      <span class="chip"><span class="dot" style="background:#f87171"></span> Komercja: <b id="sum-komercja">0</b></span>
+      <span class="chip"><span class="dot" style="background:#6ee7b7"></span> 💰 Zarobki: <b id="sum-earnings">0 zł</b></span>
+    </div>
+    
     <main class="w-full bg-white flex flex-col flex-grow">
-      <div id="desk" class="grid"></div>
+      <div id="standard" class="flex-1 flex flex-col">
+        <div id="desk-wrap" class="overflow-auto hidden md:block flex-1">
+          <div class="bg-white border-t min-w-[900px]">
+            <div class="grid font-semibold text-sm text-center text-gray-700 sticky top-0 bg-white z-10">
+              <div class="cell header p-3">Dzień</div><div class="cell header p-3 c-ania">Ania</div><div class="cell header p-3 c-aniaP">Ania Praca</div><div class="cell header p-3 c-michal">Michał</div><div class="cell header p-3 c-michalP">Michał Praca</div><div class="cell header p-3 c-wsp">Niania</div><div class="cell header p-3 c-inne">Inne</div>
+            </div>
+            <div id="desk" class="grid"></div>
+          </div>
+        </div>
+        <div id="mob" class="mcal md:hidden"></div>
+      </div>
     </main>
+    
+    <button id="fab" aria-label="Pokaż podsumowanie"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Podsumowanie</button>
+    
+    <div id="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-content">
+        <h3 id="sheet-title" class="text-lg font-bold text-gray-900 mb-1">Podsumowanie</h3>
+        <div class="sheet-grid">
+          <div class="sheet-item"><div class="sheet-label">Ortho</div><div id="ms-ortho" class="sheet-value">0h</div></div>
+          <div class="sheet-item"><div class="sheet-label">Brzeziny</div><div id="ms-brzeziny" class="sheet-value">0h</div></div>
+          <div class="sheet-item"><div class="sheet-label">Łask</div><div id="ms-lask" class="sheet-value">0h</div></div>
+          <div class="sheet-item"><div class="sheet-label">JB</div><div id="ms-jb" class="sheet-value">0h</div></div>
+          <div class="sheet-item highlight full"><div class="sheet-label">📊 Łącznie godzin</div><div id="ms-total-hours" class="sheet-value">0h</div></div>
+          <div class="sheet-item"><div class="sheet-label">Porty</div><div id="ms-ports" class="sheet-value">0</div></div>
+          <div class="sheet-item"><div class="sheet-label">Jednodniówki</div><div id="ms-jednodniowki" class="sheet-value">0</div></div>
+          <div class="sheet-item"><div class="sheet-label">Kwalifikacje</div><div id="ms-kwalifikacje" class="sheet-value">0</div></div>
+          <div class="sheet-item"><div class="sheet-label">Komercja</div><div id="ms-komercja" class="sheet-value">0</div></div>
+          <div class="sheet-item highlight full"><div class="sheet-label">💰 Zarobki</div><div id="ms-earnings" class="sheet-value">0 zł</div></div>
+        </div>
+        <button id="sheet-close" class="sheet-close-btn">Zamknij</button>
+      </div>
+    </div>
+    
+    <div id="mobile-menu">
+      <div class="menu-panel">
+        <div class="menu-header"><div class="menu-title">Menu</div><button id="menu-close" class="menu-close">✕</button></div>
+        <button id="connectOnedriveBtnMobile" class="menu-item">
+          🔗 Połącz z OneDrive
+        </button>
+         <div id="syncStatusMobile" class="text-sm text-center text-gray-500 p-2"></div>
+      </div>
+    </div>
+    
+    <div id="ctx">
+      <div id="ctx-copy" class="ctx-it">Kopiuj</div><div id="ctx-cut" class="ctx-it">Wytnij</div><div id="ctx-paste" class="ctx-it">Wklej</div>
+      <div class="h-px bg-gray-200 my-1"></div><div id="ctx-del" class="ctx-it text-red-600">Usuń</div>
+    </div>
+    
     <div id="edit">
       <div class="edit-body">
-        <div class="edit-head">
-          <h3 id="edit-title" class="edit-title">Edycja</h3>
-          <button id="edit-close" class="edit-close">✕</button>
-        </div>
+        <div class="edit-head"><h3 id="edit-title" class="edit-title">Edycja</h3><button id="edit-close" class="edit-close">✕</button></div>
         <div id="edit-content" class="edit-content"></div>
-        <div class="edit-foot">
-          <button id="edit-save" class="px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">Zapisz</button>
-        </div>
+        <div class="edit-foot"><button id="edit-save" class="px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">Zapisz</button></div>
       </div>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ",
-      authDomain: "kalendarz-rodzinny-68d04.firebaseapp.com",
-      projectId: "kalendarz-rodzinny-68d04",
-      storageBucket: "kalendarz-rodzinny-68d04.appspot.com",
-      messagingSenderId: "1050937545151",
-      appId: "1:1050937545151:web:a85fd1a5f066f4a499910a"
-    };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, collection, updateDoc, deleteField, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+    const cfg = { apiKey:"AIzaSyAgHtQFaHXlPweFU90GKGW2Jx0fl23VRkQ", authDomain:"kalendarz-rodzinny-68d04.firebaseapp.com", projectId:"kalendarz-rodzinny-68d04", storageBucket:"kalendarz-rodzinny-68d04.appspot.com", messagingSenderId:"1050937545151", appId:"1:1050937545151:web:a85fd1a5f066f4a499910a", measurementId:"G-57YKE2XKQ1"};
+    
+    let db; 
+    try { 
+      const app = initializeApp(cfg); 
+      const auth = getAuth(app); 
+      db = getFirestore(app); 
+      signInAnonymously(auth); 
+      onAuthStateChanged(auth, u => u && init()); 
+    } catch(e) { 
+      console.error("Błąd inicjalizacji Firebase:", e); 
+      alert("Nie udało się połączyć z bazą danych. Odśwież stronę.");
+    }
 
-    let cur = new Date();
-    let data = {};
+    let cur = new Date(); let unsub = () => {}; let isMobile = matchMedia("(max-width: 768px)").matches;
     const fields = ['ania', 'aniaPraca', 'michal', 'michalPraca', 'wspolne', 'inne'];
     const labels = { ania: 'Ania', aniaPraca: 'Ania Praca', michal: 'Michał', michalPraca: 'Michał Praca', wspolne: 'Niania', inne: 'Inne' };
-    const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
-    const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
-    
+    let data = {}; let clip = null;
+    const el = id => document.getElementById(id);
+
     const E = {
-      title: document.getElementById('title'),
-      prev: document.getElementById('prev'),
-      next: document.getElementById('next'),
-      today: document.getElementById('today'),
-      desk: document.getElementById('desk'),
-      edit: document.getElementById('edit'),
-      editTitle: document.getElementById('edit-title'),
-      editContent: document.getElementById('edit-content'),
-      editClose: document.getElementById('edit-close'),
-      editSave: document.getElementById('edit-save'),
-      connectOnedriveBtn: document.getElementById('connectOnedriveBtn'),
-      forceSyncBtn: document.getElementById('forceSyncBtn'),
-      syncStatus: document.getElementById('syncStatus')
+      title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'),next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'),desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'),sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'),sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'),sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'),msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'),msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'),msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'),sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'),ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),editTitle:el('edit-title'),editSave:el('edit-save'),
+      connectOnedriveBtn: el('connectOnedriveBtn'), syncStatus: el('syncStatus'),
+      mobileMenu:el('mobile-menu'), mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'),
+      connectOnedriveBtnMobile: el('connectOnedriveBtnMobile'), syncStatusMobile: el('syncStatusMobile')
     };
     
+    const mNames = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+    const dNamesFull = ['Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota','Niedziela']; 
+    const dShort = ['PN','WT','ŚR','CZ','PT','SB','ND'];
+    const getDayIdx = d => (d + 6) % 7;
+    const hourlyRates = { brzeziny: 400, ortho: 400, jb: 220, lask: 190 };
+    const portRates = { install: 731, remove: 386 };
+    const endoRates = { one_day: 200, qual: 80 };
+    const komercjaRate = 500;
+    const ZASTEPCA_ORDYNATORA_BONUS = 4000;
+
+    const jb24 = ['jb oit', 'jb zniecz', 'jb znieczulenia', 'jb znieczuleń'];
+    const isOrtho = t => /ortho/i.test(t || ''); 
+    const isBrzeziny = t => /brzeziny/i.test(t || ''); 
+    const isLask = t => /łask/i.test(t || ''); 
+    const isJB = t => !!(t && (t.toLowerCase().startsWith('jb') || t.toLowerCase().includes('jb ')));
+
     const getFieldClass = (field) => ({ aniaPraca: 'c-aniaP', michalPraca: 'c-michalP', wspolne: 'c-wsp' }[field] || `c-${field}`);
-    const getTileClass = t => {
-      if (!t) return '';
-      const s = t.toLowerCase();
-      if (s.includes('ortho')) return 'tile-ortho';
-      if (s.includes('brzeziny')) return 'tile-brzeziny';
-      if (s.includes('łask')) return 'tile-lask';
-      if (s.startsWith('jb')) return 'tile-jb';
-      return '';
-    };
-
-    async function makeAuthenticatedRequest(url, body) {
-        const user = auth.currentUser;
-        if (!user) throw new Error("Użytkownik nie jest zalogowany.");
-        const token = await user.getIdToken();
-        const response = await fetch(url, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Błąd serwera (${response.status}): ${errorText}`);
-        }
-        return response.json();
-    }
-
-    const save = async (day, field, valueObject) => {
-        try {
-            await makeAuthenticatedRequest('https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/updateCell', {
-                day, field, value: valueObject,
-                month: cur.getMonth() + 1, year: cur.getFullYear()
-            });
-        } catch (error) {
-            console.warn('Błąd zapisu do Excela, zapisuję w Firestore:', error);
-            E.syncStatus.textContent = '⚠️ Błąd zapisu do Excela';
-            try {
-                await db.collection(`${cur.getFullYear()}-${cur.getMonth() + 1}`).doc(String(day)).set({ [field]: valueObject }, { merge: true });
-            } catch (fbError) {
-                alert('Krytyczny błąd zapisu: ' + fbError.message);
-                return;
-            }
-        }
-        if (!data[day]) data[day] = {};
-        data[day][field] = valueObject;
-        render();
+    const getTileClass = t => { 
+      if (!t) return ''; 
+      const s = t.toLowerCase(); 
+      if (jb24.some(k => s.includes(k))) return 'tile-jb24'; 
+      if (isLask(s)) return 'tile-lask'; 
+      if (isOrtho(s)) return 'tile-ortho'; 
+      if (isBrzeziny(s)) return 'tile-brzeziny'; 
+      if (s.startsWith('jb')) return 'tile-jb'; 
+      return ''; 
     };
     
-    const render = () => {
-        E.desk.innerHTML = '';
-        const days = new Date(cur.getFullYear(), cur.getMonth() + 1, 0).getDate();
-        for (let d = 1; d <= days; d++) {
-            const dayCell = document.createElement('div');
-            dayCell.className = 'cell';
-            dayCell.innerHTML = `<div class="day-num">${d}</div><div class="day-name">${dShort[(new Date(cur.getFullYear(), cur.getMonth(), d).getDay() + 6) % 7]}</div>`;
-            E.desk.appendChild(dayCell);
-            for (const f of fields) {
-                const entry = data[d]?.[f] || {};
-                const text = typeof entry === 'object' ? entry.text || '' : entry;
-                const cell = document.createElement('div');
-                cell.className = `cell ${getFieldClass(f)}`;
-                const fld = document.createElement('div');
-                fld.className = `fld ${getTileClass(text)}`;
-                fld.textContent = text;
-                fld.onclick = () => openEdit(d, f);
-                cell.appendChild(fld);
-                E.desk.appendChild(cell);
-            }
-        }
+    const getDefaultHours = (txt) => {
+        if (!txt) return 0; const s = txt.toLowerCase();
+        if (isOrtho(s) || isBrzeziny(s)) return 10; 
+        if (isLask(s)) return 24; 
+        if (jb24.some(k => s.includes(k))) return 24; 
+        if (/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6; 
+        if (isJB(s)) return 6; 
+        return 0;
+    };
+    const getEntryProp = (day, field, prop, fallback) => (data[day]?.[field]?.[prop]) ?? fallback;
+    const getEntryText = (day, field) => { 
+      const entry = data[day]?.[field]; 
+      return typeof entry === 'object' ? entry.text || '' : entry || ''; 
+    };
+    
+    const connectToOnedrive = () => {
+      // Link do funkcji został już uzupełniony na podstawie Twojego wdrożenia
+      const authUrl = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth"; 
+      window.location.href = authUrl;
     };
 
-    function openEdit(day, field) {
-        const entry = data[day]?.[field] || {};
-        const text = typeof entry === 'object' ? entry.text || '' : entry;
-        E.editTitle.textContent = `${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;
-        
-        let formHTML = `<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${text}"></div>`;
-        if (field === 'michalPraca') {
-            formHTML += `
-                <div class="hours-control">
-                    <label class="form-label">Porty</label>
-                    <input type="number" id="editPortsI" class="form-input" placeholder="Założenie" value="${entry.ports_i || ''}">
-                    <input type="number" id="editPortsR" class="form-input mt-2" placeholder="Usunięcie" value="${entry.ports_r || ''}">
-                </div>
-                <div class="hours-control">
-                    <label class="form-label">Inne procedury</label>
-                    <input type="number" id="editEndoOD" class="form-input" placeholder="Jednodniówki" value="${entry.endo_od || ''}">
-                    <input type="number" id="editEndoQ" class="form-input mt-2" placeholder="Kwalifikacje" value="${entry.endo_q || ''}">
-                    <input type="number" id="editKomercja" class="form-input mt-2" placeholder="Komercja" value="${entry.komercja || ''}">
-                </div>`;
-        }
-        E.editContent.innerHTML = formHTML;
-        
-        E.editSave.onclick = async () => {
-            const newText = document.getElementById('editText').value.trim();
-            const finalData = { text: newText };
-            if (field === 'michalPraca') {
-                const getVal = id => parseInt(document.getElementById(id).value) || 0;
-                finalData.ports_i = getVal('editPortsI');
-                finalData.ports_r = getVal('editPortsR');
-                finalData.endo_od = getVal('editEndoOD');
-                finalData.endo_q = getVal('editEndoQ');
-                finalData.komercja = getVal('editKomercja');
+    E.connectOnedriveBtn.onclick = connectToOnedrive;
+    E.connectOnedriveBtnMobile.onclick = connectToOnedrive;
+
+    const checkSyncStatus = async () => {
+        try {
+            if (!db) return;
+            const tokenDocRef = doc(db, "onedrive_config", "user_token");
+            const tokenDoc = await getDoc(tokenDocRef);
+            
+            if (tokenDoc.exists()) {
+                E.syncStatus.textContent = "✅ Połączono";
+                E.syncStatus.className = "text-sm text-green-600 font-semibold";
+                E.syncStatusMobile.textContent = "✅ Połączono z OneDrive";
+                E.connectOnedriveBtn.textContent = "Połącz ponownie";
+                E.connectOnedriveBtnMobile.textContent = "🔗 Połącz ponownie z OneDrive";
+            } else {
+                E.syncStatus.textContent = "❌ Brak połączenia";
+                E.syncStatus.className = "text-sm text-red-600 font-semibold";
+                E.syncStatusMobile.textContent = "❌ Brak połączenia z OneDrive";
             }
-            await save(day, field, finalData.text && Object.keys(finalData).length === 1 ? finalData.text : finalData);
-            E.edit.style.display = 'none';
-        };
-        E.edit.style.display = 'flex';
+        } catch (error) {
+            console.error("Błąd podczas sprawdzania statusu synchronizacji:", error);
+            E.syncStatus.textContent = "⚠️ Błąd";
+            E.syncStatus.className = "text-sm text-yellow-600 font-semibold";
+            E.syncStatusMobile.textContent = "⚠️ Błąd sprawdzania statusu";
+        }
+    };
+    
+    const renderDesktop=(y,m,ev)=>{E.desk.innerHTML='';const days=new Date(y,m+1,0).getDate();const today=new Date();for(let d=1;d<=days;d++){const date=new Date(y,m,d);const dow=date.getDay();const isToday=today.toDateString()===date.toDateString();const de=ev[d]||{};const off=(dow===0||dow===6)||de.isHoliday;const dayCell=document.createElement('div');dayCell.className=`cell day-cell ${off?'off':''} ${isToday?'today':''} flex items-center justify-center`;dayCell.dataset.day=d;dayCell.innerHTML=`<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;E.desk.appendChild(dayCell);for(const f of fields){const t=getEntryText(d,f);const c=document.createElement('div');c.className=`cell ${off?'off':''} ${getFieldClass(f)}`;const div=document.createElement('div');div.className=`fld ${getTileClass(t)}`;div.dataset.day=d;div.dataset.field=f;const span=document.createElement('span');span.className='txt';span.textContent=t;div.appendChild(span);c.appendChild(div);E.desk.appendChild(c);}}};
+    const renderMobile=(y,m,ev)=>{E.mob.innerHTML='';const days=new Date(y,m+1,0).getDate();const today=new Date();const frag=document.createDocumentFragment();for(let d=1;d<=days;d++){const date=new Date(y,m,d);const dow=date.getDay();const de=ev[d]||{};const off=(dow===0||dow===6)||de.isHoliday;const isToday=today.toDateString()===date.toDateString();const card=document.createElement('div');card.className=`m-card ${off?'ring-1 ring-red-200':''} ${isToday?'ring-2 ring-purple-400':''}`;let html=`<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div><div class="flex gap-1">${de.isHoliday?'<span class="tag bg-red-100 text-red-600">Święto</span>':''}${isToday?'<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>':''}</div></div>`;for(const f of fields){const t=getEntryText(d,f);html+=`<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div><div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}"><span class="txt">${t||'<span class="placeholder">+ Dodaj</span>'}</span></div></div>`;}card.innerHTML=html;frag.appendChild(card);}E.mob.appendChild(frag);};
+    const computeSumsAndEarnings=()=>{let sums={ortho:0,brz:0,lask:0,jb:0,portsInstall:0,portsRemove:0,earnings:0,jednodniowki:0,kwalifikacje:0,komercja:0};const days=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();const calculateEarningsForText=(text,hours)=>{if(!text||!hours)return 0;if(isOrtho(text))return hours*hourlyRates.ortho;if(isBrzeziny(text))return hours*hourlyRates.brzeziny;if(isLask(text))return hours*hourlyRates.lask;if(isJB(text))return hours*hourlyRates.jb;return 0;};const sumHoursForText=(text,hours,target)=>{if(!text||!hours)return;if(isOrtho(text))target.ortho+=hours;else if(isBrzeziny(text))target.brz+=hours;else if(isLask(text))target.lask+=hours;else if(isJB(text))target.jb+=hours;};let hasZastepcaBonus=false;for(let d=1;d<=days;d++){const dayData=data[d];if(!dayData)continue;const michalPracaText=getEntryText(d,'michalPraca');if(/zastępca|zastepca|ordynator/i.test(michalPracaText)){hasZastepcaBonus=true;}for(const f of fields){const entry=dayData[f];if(!entry)continue;if(typeof entry==='object'){const textParts=(entry.text||'').split('/').map(t=>t.trim());const h1=entry.h1||0,h2=entry.h2||0;sumHoursForText(textParts[0],h1,sums);sums.earnings+=calculateEarningsForText(textParts[0],h1);if(textParts.length>1){sumHoursForText(textParts[1],h2,sums);sums.earnings+=calculateEarningsForText(textParts[1],h2);}}else{const hours=getDefaultHours(entry);sumHoursForText(entry,hours,sums);sums.earnings+=calculateEarningsForText(entry,hours);}if(f==='michalPraca'){sums.portsInstall+=getEntryProp(d,f,'ports_i',0);sums.portsRemove+=getEntryProp(d,f,'ports_r',0);sums.jednodniowki+=getEntryProp(d,f,'endo_od',0);sums.kwalifikacje+=getEntryProp(d,f,'endo_q',0);sums.komercja+=getEntryProp(d,f,'komercja',0);}}}sums.earnings+=(sums.portsInstall*portRates.install)+(sums.portsRemove*portRates.remove);sums.earnings+=sums.jednodniowki*endoRates.one_day;sums.earnings+=sums.kwalifikacje*endoRates.qual;sums.earnings+=sums.komercja*komercjaRate;if(hasZastepcaBonus){sums.earnings+=ZASTEPCA_ORDYNATORA_BONUS;}const totalPorts=sums.portsInstall+sums.portsRemove;const totalHours=sums.ortho+sums.brz+sums.lask+sums.jb;E.sumOrtho.textContent=`${sums.ortho}h`;E.sumBrz.textContent=`${sums.brz}h`;E.sumLask.textContent=`${sums.lask}h`;E.sumJB.textContent=`${sums.jb}h`;E.sumTotalHours.textContent=`${totalHours}h`;E.sumPorts.textContent=String(totalPorts);E.sumJednodniowki.textContent=String(sums.jednodniowki);E.sumKwalifikacje.textContent=String(sums.kwalifikacje);E.sumKomercja.textContent=String(sums.komercja);E.sumEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;E.msOrtho.textContent=`${sums.ortho}h`;E.msBrz.textContent=`${sums.brz}h`;E.msLask.textContent=`${sums.lask}h`;E.msJB.textContent=`${sums.jb}h`;E.msTotalHours.textContent=`${totalHours}h`;E.msPorts.textContent=String(totalPorts);E.msJednodniowki.textContent=String(sums.jednodniowki);E.msKwalifikacje.textContent=String(sums.kwalifikacje);E.msKomercja.textContent=String(sums.komercja);E.msEarnings.textContent=`${sums.earnings.toLocaleString('pl-PL')} zł`;E.sheetTitle.textContent=`${mNames[cur.getMonth()]} ${cur.getFullYear()}`;};
+    const calId=()=>`${cur.getFullYear()}-${cur.getMonth()+1}`;
+    const save=async(day,field,val)=>setDoc(doc(db,calId(),String(day)),{[field]:val},{merge:true});
+    const del=async(day,field)=>updateDoc(doc(db,calId(),String(day)),{[field]:deleteField()});
+    function openEdit(day,field,overrideText=null){const entry=data[day]?.[field]||{};const initialText=typeof entry==='object'?entry.text||'':entry||'';const entryText=overrideText??initialText;const textParts=entryText.split('/').map(t=>t.trim());const date=new Date(cur.getFullYear(),cur.getMonth(),day);E.editTitle.textContent=`${labels[field]} — ${day} ${mNames[cur.getMonth()]}`;let formHTML=`<div class="form-group"><label class="form-label">Treść wpisu</label><input type="text" id="editText" class="form-input" value="${entryText.replace(/"/g,'&quot;')}" placeholder="np. JB wybudzeń / ortho od 15:00"></div>`;const createHoursHTML=(partNum,text,hours)=>{const defaultH=getDefaultHours(text);const currentH=hours??defaultH;return`<div class="hours-control"><div class="hours-control-label">${text||`Część ${partNum}`}</div><div class="mt-2"><input type="range" min="0" max="48" step="0.5" value="${currentH}" data-part="${partNum}" data-role="slider" class="hours-slider"><input type="number" min="0" max="48" step="0.5" value="${currentH}" placeholder="${defaultH}" data-part="${partNum}" data-role="num" class="hours-number"></div></div>`;};formHTML+=createHoursHTML(1,textParts[0],getEntryProp(day,field,'h1',null));if(textParts.length>1){formHTML+=createHoursHTML(2,textParts[1],getEntryProp(day,field,'h2',null));}if(field==='michalPraca'){formHTML+=`<div class="hours-control" style="background:#ede9fe;"><div class="hours-control-label">Porty</div><div class="grid grid-cols-2 gap-3 mt-2"><div><label class="text-xs text-gray-500">Założenie</label><input type="number" min="0" value="${getEntryProp(day,field,'ports_i','')}" id="editPortsI" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Usunięcie</label><input type="number" min="0" value="${getEntryProp(day,field,'ports_r','')}" id="editPortsR" placeholder="0" class="form-input text-center"></div></div></div>`;formHTML+=`<div class="hours-control" style="background:#f0fdfa;"><div class="hours-control-label">Inne procedury</div><div class="grid grid-cols-3 gap-2 mt-2"><div><label class="text-xs text-gray-500">Jednodniówki</label><input type="number" min="0" value="${getEntryProp(day,field,'endo_od','')}" id="editEndoOD" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Kwalifikacje</label><input type="number" min="0" value="${getEntryProp(day,field,'endo_q','')}" id="editEndoQ" placeholder="0" class="form-input text-center"></div><div><label class="text-xs text-gray-500">Komercja</label><input type="number" min="0" value="${getEntryProp(day,field,'komercja','')}" id="editKomercja" placeholder="0" class="form-input text-center"></div></div></div>`;}E.editContent.innerHTML=formHTML;const editTextEl=el('editText');editTextEl.focus();editTextEl.selectionStart=editTextEl.selectionEnd=editTextEl.value.length;const handleSliderSync=e=>{if(e.target.dataset.role==='slider'){const numInput=E.editContent.querySelector(`input[data-role="num"][data-part="${e.target.dataset.part}"]`);if(numInput)numInput.value=e.target.value;}else if(e.target.dataset.role==='num'){const slider=E.editContent.querySelector(`input[data-role="slider"][data-part="${e.target.dataset.part}"]`);const currentTextPart=textParts[parseInt(e.target.dataset.part,10)-1]||'';if(slider)slider.value=e.target.value||getDefaultHours(currentTextPart);}};E.editContent.addEventListener('input',handleSliderSync);editTextEl.addEventListener('input',e=>{const newText=e.target.value;const needsRerender=(initialText.includes('/')!==newText.includes('/'));if(needsRerender){openEdit(day,field,newText);}});E.editSave.onclick=async()=>{const newText=el('editText').value.trim();if(!newText&&!el('editPortsI')?.value&&!el('editPortsR')?.value&&!el('editEndoOD')?.value&&!el('editEndoQ')?.value&&!el('editKomercja')?.value){await del(day,field);}else{const finalData={text:newText};const getNumVal=(selector,isFloat=false)=>{const i=el(selector)||E.editContent.querySelector(selector);if(!i||i.value==='')return deleteField();return isFloat?parseFloat(i.value.replace(',','.')):parseInt(i.value,10);};const initialParts=initialText.split('/').map(t=>t.trim());const newParts=newText.split('/').map(t=>t.trim());const processHours=(partNum,initialPartText,newPartText)=>{const formVal=getNumVal(`input[data-part="${partNum}"][data-role="num"]`,true);if(typeof formVal==='object'){return getDefaultHours(newPartText)||deleteField();}const oldDefault=getDefaultHours(initialPartText);if(formVal===oldDefault&&initialPartText!==newPartText){return getDefaultHours(newPartText)||deleteField();}return formVal;};finalData.h1=processHours(1,initialParts[0],newParts[0]);if(newText.includes('/')){finalData.h2=processHours(2,initialParts[1]||'',newParts[1]||'');}if(field==='michalPraca'){finalData.ports_i=getNumVal('#editPortsI');finalData.ports_r=getNumVal('#editPortsR');finalData.endo_od=getNumVal('#editEndoOD');finalData.endo_q=getNumVal('#editEndoQ');finalData.komercja=getNumVal('#editKomercja');}await save(day,field,finalData);}E.edit.style.display='none';};E.edit.style.display='flex';}
+    E.editClose.onclick=()=>E.edit.style.display='none';E.edit.addEventListener('click',e=>{if(e.target===E.edit)E.edit.style.display='none';});document.addEventListener('keydown',e=>{if(e.key==='Escape')E.edit.style.display='none';});
+    E.mobileMenuBtn.onclick=()=>E.mobileMenu.classList.add('open');E.menuClose.onclick=()=>E.mobileMenu.classList.remove('open');E.mobileMenu.addEventListener('click',e=>{if(e.target===E.mobileMenu)E.mobileMenu.classList.remove('open');});
+    document.addEventListener('contextmenu',e=>{const fld=e.target.closest('.fld,.m-content');if(!fld)return;e.preventDefault();E.ctx.style.display='block';E.ctx.style.left=e.clientX+'px';E.ctx.style.top=e.clientY+'px';E.ctx.dataset.day=fld.dataset.day;E.ctx.dataset.field=fld.dataset.field;});document.addEventListener('click',e=>{if(!e.target.closest('#ctx'))E.ctx.style.display='none';});
+    E.ctxCopy.onclick=()=>{const d=E.ctx.dataset;clip=data[d.day]?.[d.field];E.ctx.style.display='none';};E.ctxCut.onclick=async()=>{const d=E.ctx.dataset;clip=data[d.day]?.[d.field];await del(d.day,d.field);E.ctx.style.display='none';};E.ctxPaste.onclick=async()=>{const d=E.ctx.dataset;if(clip)await save(d.day,d.field,clip);E.ctx.style.display='none';};E.ctxDel.onclick=async()=>{const d=E.ctx.dataset;await del(d.day,d.field);E.ctx.style.display='none';};
+    const launchEdit=(e)=>{const target=e.target.closest('[data-day][data-field]');if(target)openEdit(target.dataset.day,target.dataset.field);};
+    E.desk.addEventListener('click',launchEdit);E.mob.addEventListener('click',launchEdit);E.desk.addEventListener('click',e=>{const dayCell=e.target.closest('.day-cell');if(dayCell)toggleHoliday(dayCell.dataset.day);});
+    async function toggleHoliday(day){const ref=doc(db,calId(),String(day));const snap=await getDoc(ref);const cur=(snap.exists()&&snap.data().isHoliday)||false;await setDoc(ref,{isHoliday:!cur},{merge:true});}
+    function setTitle(){const title=`${mNames[cur.getMonth()]} ${cur.getFullYear()}`;E.title.textContent=title;E.titleMobile.textContent=title;}
+    async function update(){if(!db)return;setTitle();unsub();unsub=onSnapshot(collection(db,calId()),s=>{data={};s.forEach(doc=>data[doc.id]=doc.data());isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data);computeSumsAndEarnings();});}
+    const changeMonth=(delta)=>{cur.setDate(1);cur.setMonth(cur.getMonth()+delta);update();};
+    const goToToday=()=>{const t=new Date();cur=new Date(t.getFullYear(),t.getMonth(),1);update();};
+    E.prev.onclick=()=>changeMonth(-1);E.next.onclick=()=>changeMonth(1);E.prevMobile.onclick=()=>changeMonth(-1);E.nextMobile.onclick=()=>changeMonth(1);E.today.onclick=goToToday;E.todayMobile.onclick=goToToday;
+    E.fab.onclick=()=>E.sheet.classList.add('open');E.sheetClose.onclick=()=>E.sheet.classList.remove('open');
+    let startY=0,currentY=0;const sheet=E.sheet;sheet.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;});sheet.addEventListener('touchmove',e=>{currentY=e.touches[0].clientY;const diff=currentY-startY;if(diff>0){sheet.style.transform=`translateY(${diff}px)`;}});sheet.addEventListener('touchend',()=>{const diff=currentY-startY;if(diff>50){sheet.classList.remove('open');}sheet.style.transform='';});
+    
+    function init(){
+      update(); 
+      checkSyncStatus();
     }
-
-    const loadData = async () => {
-        E.syncStatus.textContent = 'Pobieram dane...';
-        try {
-            const excelData = await makeAuthenticatedRequest('https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/getData', { month: cur.getMonth() + 1, year: cur.getFullYear() });
-            data = excelData || {};
-            E.syncStatus.textContent = '✅ Dane aktualne';
-            render();
-        } catch (error) {
-            console.warn('Błąd pobierania z Excela, używam Firestore:', error);
-            E.syncStatus.textContent = '⚠️ Używam danych offline';
-            db.collection(`${cur.getFullYear()}-${cur.getMonth() + 1}`).onSnapshot(snapshot => {
-                data = {};
-                snapshot.forEach(doc => data[doc.id] = doc.data());
-                render();
-            });
-        }
-    };
-
-    const update = () => {
-        E.title.textContent = `${mNames[cur.getMonth()]} ${cur.getFullYear()}`;
-        loadData();
-    };
-
-    E.prev.onclick = () => { cur.setMonth(cur.getMonth() - 1); update(); };
-    E.next.onclick = () => { cur.setMonth(cur.getMonth() + 1); update(); };
-    E.today.onclick = () => { cur = new Date(); update(); };
-    E.editClose.onclick = () => E.edit.style.display = 'none';
-    E.connectOnedriveBtn.onclick = () => window.location.href = "https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/auth";
-
-    E.forceSyncBtn.onclick = async () => {
-        E.syncStatus.textContent = 'Synchronizuję...';
-        E.forceSyncBtn.disabled = true;
-        try {
-            const response = await makeAuthenticatedRequest('https://europe-central2-kalendarz-rodzinny-68d04.cloudfunctions.net/sync', {});
-            E.syncStatus.textContent = `✅ ${response.message || 'Zsynchronizowano!'}`;
-            setTimeout(loadData, 1000);
-        } catch (error) {
-            E.syncStatus.textContent = '❌ Błąd synchronizacji';
-            alert(`Błąd: ${error.message}`);
-        } finally {
-            E.forceSyncBtn.disabled = false;
-        }
-    };
-
-    auth.onAuthStateChanged(async (user) => {
-        if (!user) await auth.signInAnonymously();
-        console.log('Zalogowano jako:', auth.currentUser.uid);
-        const doc = await db.collection('onedrive_config').doc('user_token').get();
-        if (doc.exists) {
-            E.syncStatus.textContent = '✅ Połączono';
-            E.connectOnedriveBtn.textContent = 'Połącz ponownie';
-            E.forceSyncBtn.disabled = false;
-        } else {
-            E.syncStatus.textContent = '❌ Brak połączenia';
-        }
-        update();
-    });
   </script>
 </body>
 </html>
