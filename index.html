@@ -572,6 +572,32 @@
       border-color: #fca5a5;
     }
     
+    /* Import status */
+    .import-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      color: #0369a1;
+      margin-left: 0.5rem;
+    }
+    
+    .import-status.success {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #14532d;
+    }
+    
+    .import-status.error {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #7f1d1d;
+    }
+    
     /* Improved form styles for mobile */
     .form-group {
       margin-bottom: 1rem;
@@ -669,15 +695,17 @@
           <h2 id="title" class="font-semibold text-slate-700 min-w-[160px] text-center">—</h2>
           <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
           <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
-          <div class="flex items-center gap-2 border border-gray-200 rounded-xl p-2 ml-4">
+          
+          <!-- Uproszczony import Excel -->
+          <div class="flex items-center gap-2 ml-4">
             <input type="file" id="xlsxFileInput" accept=".xlsx,.xls" class="hidden">
-            <label for="xlsxFileInput" class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-green-600 rounded-md hover:bg-green-700">
+            <label for="xlsxFileInput" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
-                Importuj z Excel
+                <span id="importBtnText">Importuj Excel</span>
             </label>
-            <span id="fileName" class="text-sm text-gray-500 max-w-[150px] truncate" title=""></span>
+            <div id="importStatus" style="display:none"></div>
             <button id="clearMonthBtn" class="px-3 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Wyczyść miesiąc</button>
             <button id="exportIcsBtn" class="px-3 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">Eksportuj .ics</button>
           </div>
@@ -801,7 +829,7 @@
         </div>
         <input type="file" id="xlsxFileInputMobile" accept=".xlsx,.xls" class="hidden">
         <label for="xlsxFileInputMobile" class="menu-item">
-          📄 Importuj z Excel
+          📄 Importuj Excel
         </label>
         <button id="exportIcsBtnMobile" class="menu-item">
           📅 Eksportuj .ics
@@ -861,11 +889,13 @@
       ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'),
       ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'),
       editTitle:el('edit-title'),editSave:el('edit-save'),
-      xlsxFileInput:el('xlsxFileInput'), fileName:el('fileName'), clearMonthBtn:el('clearMonthBtn'),
+      xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'),
       exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'),
       menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'),
       clearMonthBtnMobile:el('clearMonthBtnMobile'),
-      exportIcsBtnMobile:el('exportIcsBtnMobile')
+      exportIcsBtnMobile:el('exportIcsBtnMobile'),
+      importBtnText:el('importBtnText'),
+      importStatus:el('importStatus')
     };
     
     window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
@@ -1248,7 +1278,7 @@
     E.today.onclick=goToToday;
     E.todayMobile.onclick=goToToday;
     
-    // --- NEW EXCEL IMPORT FUNCTIONALITY ---
+    // === ULEPSZONA FUNKCJA IMPORTU EXCEL ===
     const mNamesToNum = {
         'styczeń': 0, 'stycznia': 0, 'sty': 0,
         'luty': 1, 'lutego': 1, 'lut': 1,
@@ -1264,142 +1294,204 @@
         'grudzień': 11, 'grudnia': 11, 'gru': 11
     };
     
-    function handleExcelImport(event) {
+    function showImportStatus(message, type = 'info') {
+        E.importStatus.style.display = 'inline-flex';
+        E.importStatus.className = `import-status ${type}`;
+        E.importStatus.innerHTML = message;
+        
+        if (type !== 'loading') {
+            setTimeout(() => {
+                E.importStatus.style.display = 'none';
+            }, 5000);
+        }
+    }
+    
+    async function handleExcelImport(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        if (E.fileName) {
-            E.fileName.textContent = file.name;
-            E.fileName.title = file.name;
-        }
+        E.importBtnText.textContent = 'Importowanie...';
+        showImportStatus('Przetwarzanie pliku...', 'loading');
 
-        const monthNamesPattern = Object.keys(mNamesToNum).join('|');
-        const dateRegex = new RegExp(`(${monthNamesPattern})\\s*(\\d{4})`, 'i');
-        const match = file.name.match(dateRegex);
-        
-        let importConfirmed = false;
-
-        if (match) {
-            const monthName = match[1].toLowerCase();
-            const year = parseInt(match[2], 10);
-            const month = mNamesToNum[monthName];
-
-            if (month !== undefined && year) {
-                if (cur.getFullYear() !== year || cur.getMonth() !== month) {
-                    if (confirm(`Plik "${file.name}" dotyczy miesiąca ${mNames[month]} ${year}. Czy chcesz przełączyć widok i zaimportować dane do tego miesiąca?`)) {
-                        cur = new Date(year, month, 1);
-                        importConfirmed = true;
-                    } else {
-                        event.target.value = '';
-                        if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
-                        return;
-                    }
-                }
-            }
-        }
-        
-        const processFile = (confirmed) => {
-            if (!confirmed) {
-                if (!confirm(`Czy na pewno chcesz zaimportować dane z pliku "${file.name}" do kalendarza dla ${mNames[cur.getMonth()]} ${cur.getFullYear()}?`)) {
-                    event.target.value = '';
-                    if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
-                    return;
-                }
-            }
+        try {
+            // Próba rozpoznania miesiąca z nazwy pliku
+            const monthNamesPattern = Object.keys(mNamesToNum).join('|');
+            const dateRegex = new RegExp(`(${monthNamesPattern})\\s*(\\d{4})`, 'i');
+            const match = file.name.match(dateRegex);
             
+            let targetMonth = null;
+            let targetYear = null;
+            
+            if (match) {
+                const monthName = match[1].toLowerCase();
+                targetYear = parseInt(match[2], 10);
+                targetMonth = mNamesToNum[monthName];
+            }
+
             const reader = new FileReader();
+            
             reader.onload = async function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const workbook = XLSX.read(data, { 
+                        type: 'array',
+                        cellDates: true,
+                        dateNF: 'yyyy-mm-dd'
+                    });
+                    
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "", raw: false, dateNF: 'yyyy-mm-dd' });
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+                        defval: "", 
+                        raw: false,
+                        dateNF: 'dd-mm-yyyy'
+                    });
                     
-                    const batch = writeBatch(db);
-                    let operationsCount = 0;
-                    
+                    // Funkcja pomocnicza do znajdowania wartości w wierszu
                     const findValue = (row, possibleKeys) => {
                         const lowerKeys = possibleKeys.map(k => k.toLowerCase());
                         for (const key in row) {
-                            if (Object.prototype.hasOwnProperty.call(row, key) && lowerKeys.includes(key.toLowerCase())) {
+                            if (lowerKeys.includes(key.toLowerCase())) {
                                 return row[key];
                             }
                         }
                         return undefined;
                     };
                     
+                    // Próba automatycznego wykrycia miesiąca z danych
+                    if (!targetMonth && jsonData.length > 0) {
+                        const firstRow = jsonData[0];
+                        const dateField = findValue(firstRow, ['Data', 'Date']);
+                        
+                        if (dateField) {
+                            const parsedDate = new Date(dateField);
+                            if (!isNaN(parsedDate.getTime())) {
+                                targetMonth = parsedDate.getMonth();
+                                targetYear = parsedDate.getFullYear();
+                            }
+                        }
+                    }
+                    
+                    // Jeśli udało się wykryć miesiąc i jest inny niż obecny
+                    if (targetMonth !== null && targetYear !== null) {
+                        if (cur.getFullYear() !== targetYear || cur.getMonth() !== targetMonth) {
+                            const switchMonth = confirm(
+                                `Plik zawiera dane dla ${mNames[targetMonth]} ${targetYear}.\n` +
+                                `Czy chcesz przełączyć widok i zaimportować dane?`
+                            );
+                            
+                            if (switchMonth) {
+                                cur = new Date(targetYear, targetMonth, 1);
+                                await update();
+                            } else {
+                                const importAnyway = confirm(
+                                    `Czy mimo to chcesz zaimportować dane do obecnego miesiąca (${mNames[cur.getMonth()]} ${cur.getFullYear()})?`
+                                );
+                                if (!importAnyway) {
+                                    event.target.value = '';
+                                    E.importBtnText.textContent = 'Importuj Excel';
+                                    showImportStatus('Import anulowany', 'error');
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    showImportStatus('Importowanie danych do bazy...', 'loading');
+                    
+                    const batch = writeBatch(db);
+                    let importedDays = 0;
+                    const processedDays = new Set();
+                    
+                    // Mapowanie kolumn
+                    const fieldMappings = {
+                        aniaPraca: ['Ania praca'],
+                        ania: ['Ania inne', 'Ania'],
+                        michalPraca: ['Michal praca', 'Michał praca'],
+                        michal: ['Michał inne', 'Michal inne', 'Michał'],
+                        wspolne: ['Niania', 'Wspólne'],
+                        inne: ['Inne']
+                    };
+                    
                     for (const row of jsonData) {
                         let day = 0;
-                        const dateValue = findValue(row, ['Data']);
-                        if (dateValue !== undefined && dateValue !== '') {
-                            let parsedDate = new Date(dateValue);
-                            if (typeof dateValue === 'number') {
-                                parsedDate = new Date((dateValue - 25569) * 86400 * 1000);
-                            }
-                            
-                            if (parsedDate && !isNaN(parsedDate.getTime())) {
-                                if (parsedDate.getMonth() === cur.getMonth() && parsedDate.getFullYear() === cur.getFullYear()) {
+                        
+                        // Próba odczytu daty
+                        const dateValue = findValue(row, ['Data', 'Date', 'Dzień']);
+                        
+                        if (dateValue) {
+                            // Jeśli to data
+                            if (dateValue.includes('-') || dateValue.includes('/')) {
+                                const parsedDate = new Date(dateValue);
+                                if (!isNaN(parsedDate.getTime())) {
                                     day = parsedDate.getDate();
-                                } else {
-                                    continue;
+                                }
+                            }
+                            // Jeśli to format "1 Dec", "2 Dec" itd.
+                            else if (/^\d+\s+(Dec|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov)/i.test(dateValue)) {
+                                day = parseInt(dateValue.match(/^\d+/)[0], 10);
+                            }
+                            // Jeśli to tylko numer dnia
+                            else {
+                                const parsed = parseInt(String(dateValue).trim(), 10);
+                                if (!isNaN(parsed) && parsed >= 1 && parsed <= 31) {
+                                    day = parsed;
                                 }
                             }
                         }
-                        if (!day) {
-                            const dayValue = findValue(row, ['Dzień', 'Data']);
-                            if (dayValue !== undefined) {
-                                const parsedDay = parseInt(String(dayValue).trim(), 10);
-                                if (!isNaN(parsedDay) && parsedDay >= 1 && parsedDay <= 31) {
-                                    day = parsedDay;
-                                }
-                            }
-                        }
-                        if (!day) continue;
                         
-                        let dayUpdate = {};
-                        let hasAnyData = false;
+                        if (!day || day < 1 || day > 31) continue;
+                        if (processedDays.has(day)) continue;
                         
-                        const mappings = {
-                            aniaPraca: ['Ania praca'], ania: ['Ania inne'],
-                            michalPraca: ['Michal praca', 'Michał praca'], michal: ['Michał inne', 'Michal inne'],
-                            wspolne: ['Niania'], inne: ['Inne']
-                        };
-
-                        for (const field in mappings) {
-                            const value = findValue(row, mappings[field]);
+                        let dayData = {};
+                        let hasData = false;
+                        
+                        // Przetwarzanie pól
+                        for (const field in fieldMappings) {
+                            const value = findValue(row, fieldMappings[field]);
                             if (value && String(value).trim()) {
                                 const text = String(value).trim();
                                 const hours = getDefaultHours(text);
-                                dayUpdate[field] = hours > 0 ? { text, h1: hours } : { text };
-                                hasAnyData = true;
+                                dayData[field] = hours > 0 ? { text, h1: hours } : text;
+                                hasData = true;
                             }
                         }
                         
-                        if (hasAnyData) {
+                        if (hasData) {
                             const docRef = doc(db, calId(), String(day));
-                            batch.set(docRef, dayUpdate, { merge: true });
-                            operationsCount++;
+                            batch.set(docRef, dayData, { merge: true });
+                            processedDays.add(day);
+                            importedDays++;
                         }
                     }
                     
                     await batch.commit();
-                    alert(`Pomyślnie zaimportowano dane dla ${operationsCount} dni.`);
-                    update();
-
+                    
+                    E.importBtnText.textContent = 'Importuj Excel';
+                    showImportStatus(`✓ Zaimportowano dane dla ${importedDays} dni`, 'success');
+                    
+                    await update();
+                    
                 } catch (error) {
-                    console.error("Błąd importu Excel:", error);
-                    alert("Wystąpił błąd podczas importu pliku Excel.");
+                    console.error("Błąd importu:", error);
+                    E.importBtnText.textContent = 'Importuj Excel';
+                    showImportStatus('✕ Błąd podczas importu pliku', 'error');
+                    alert("Wystąpił błąd podczas importu pliku. Sprawdź format pliku Excel.");
                 } finally {
                     event.target.value = '';
-                    if (E.fileName) { E.fileName.textContent = ''; E.fileName.title = ''; }
                 }
             };
+            
             reader.readAsArrayBuffer(file);
-        };
-        
-        processFile(importConfirmed);
+            
+        } catch (error) {
+            console.error("Błąd czytania pliku:", error);
+            E.importBtnText.textContent = 'Importuj Excel';
+            showImportStatus('✕ Nie można odczytać pliku', 'error');
+            event.target.value = '';
+        }
     }
     
+    // Podpięcie funkcji importu
     E.xlsxFileInput.onchange = handleExcelImport;
     E.xlsxFileInputMobile.onchange = (e) => {
         handleExcelImport(e);
