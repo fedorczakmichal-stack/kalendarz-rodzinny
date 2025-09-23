@@ -236,7 +236,6 @@
     
     .mobile-grid-wrapper {
       min-width: 550px;
-      width: 100%;
     }
     
     .mobile-grid-table {
@@ -1257,17 +1256,9 @@
             else if (isJB(text)) target.jb += hours;
         };
 
-        // Sprawdzanie bonusu za zastępcę ordynatora (4000 zł)
-        let hasZastepcaBonus = false;
         for (let d = 1; d <= days; d++) {
             const dayData = data[d]; 
             if (!dayData) continue;
-
-            const michalPracaText = getEntryText(d, 'michalPraca');
-            // Szukamy wzmianki o zastępcy lub ordynatorze
-            if (/zastępca|zastepca|ordynator|z-ca\s+ordynatora|zca\s+ordynatora/i.test(michalPracaText)) {
-                hasZastepcaBonus = true;
-            }
 
             for (const f of fields) {
                 const entry = dayData[f]; 
@@ -1300,16 +1291,14 @@
         sums.earnings += sums.kwalifikacje * endoRates.qual;
         sums.earnings += sums.komercja * komercjaRate;
         
-        // BONUS: 4000 zł za zastępcę ordynatora
-        if(hasZastepcaBonus) {
-            sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
-            // Dodajemy wskaźnik w podsumowaniu, że bonus został naliczony
-            if(E.sumEarnings) {
-                E.sumEarnings.title = 'Zawiera bonus 4000 zł za zastępcę ordynatora';
-            }
-            if(E.msEarnings) {
-                E.msEarnings.title = 'Zawiera bonus 4000 zł za zastępcę ordynatora';
-            }
+        // BONUS: 4000 zł - zawsze dodawany
+        sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
+        
+        if(E.sumEarnings) {
+            E.sumEarnings.title = 'Zawiera stały bonus 4000 zł';
+        }
+        if(E.msEarnings) {
+            E.msEarnings.title = 'Zawiera stały bonus 4000 zł';
         }
 
         const totalPorts = sums.portsInstall + sums.portsRemove;
