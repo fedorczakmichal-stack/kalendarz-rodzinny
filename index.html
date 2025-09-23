@@ -1,4 +1,12 @@
-<!DOCTYPE html>
+/* Adjusted background colors for mobile grid */
+    @media (max-width: 768px) {
+      .mobile-grid-cell.c-ania { background: rgba(240, 255, 244, 0.5); }
+      .mobile-grid-cell.c-aniaP { background: rgba(255, 241, 242, 0.5); }
+      .mobile-grid-cell.c-michal { background: rgba(240, 249, 255, 0.5); }
+      .mobile-grid-cell.c-michalP { background: rgba(245, 243, 255, 0.5); }
+      .mobile-grid-cell.c-wsp { background: rgba(255, 251, 235, 0.5); }
+      .mobile-grid-cell.c-inne { background: rgba(241, 245, 249, 0.5); }
+    }<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
@@ -187,9 +195,160 @@
       padding:.5rem;
       padding-bottom: calc(.5rem + var(--safe-bottom) + 70px);
     }
+    
+    /* Mobile grid view */
+    .mobile-grid-view {
+      display: none;
+      overflow-x: auto;
+      padding: 0.5rem;
+      padding-bottom: calc(.5rem + var(--safe-bottom) + 110px);
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    
+    .mobile-grid-view::after {
+      content: '→ Przesuń w bok';
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      pointer-events: none;
+      animation: fadeInOut 3s ease-in-out;
+      opacity: 0;
+    }
+    
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      20%, 80% { opacity: 1; }
+    }
+    
+    .mobile-grid {
+      min-width: 100%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    
+    .mobile-grid-wrapper {
+      min-width: 550px;
+      width: 100%;
+    }
+    
+    .mobile-grid-table {
+      display: grid;
+      grid-template-columns: 45px repeat(6, minmax(70px, 1fr));
+      font-size: 0.7rem;
+    }
+    
+    .mobile-grid-cell {
+      border: 0.5px solid #e5e7eb;
+      min-height: 35px;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      word-break: break-word;
+    }
+    
+    .mobile-grid-header {
+      background: #f9fafb;
+      font-weight: 600;
+      font-size: 0.6rem;
+      color: #4b5563;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      min-height: 30px;
+    }
+    
+    .mobile-grid-day {
+      font-weight: 700;
+      background: #fafafa;
+      flex-direction: column;
+      font-size: 0.65rem;
+      padding: 2px;
+      position: sticky;
+      left: 0;
+      z-index: 5;
+    }
+    
+    .mobile-grid-day .day-num {
+      font-size: 0.85rem;
+      color: #1f2937;
+    }
+    
+    .mobile-grid-day.weekend {
+      background: #fef2f2;
+    }
+    
+    .mobile-grid-day.today {
+      background: linear-gradient(135deg, #ede9fe, #fce7f3);
+      color: #7c3aed;
+      box-shadow: inset 0 0 0 2px rgba(124, 58, 237, 0.3);
+    }
+    
+    .mobile-grid-content {
+      font-size: 0.65rem;
+      line-height: 1.15;
+      padding: 2px;
+      border-radius: 3px;
+      width: 100%;
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .mobile-grid-content:active {
+      transform: scale(0.95);
+    }
+    
+    /* View toggle */
+    .view-toggle {
+      display: none;
+      position: fixed;
+      bottom: calc(80px + var(--safe-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      padding: 4px;
+      z-index: 1000;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .view-toggle button {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      background: transparent;
+      color: #6b7280;
+    }
+    
+    .view-toggle button.active {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white;
+    }
+    
     @media (max-width:768px){
       .grid{display:none} 
-      .mcal{display:block}
+      .mcal{display:none}
+      .mobile-grid-view{display:block}
+      .view-toggle{display:flex;gap:4px;}
+      body.card-view .mcal{display:block}
+      body.card-view .mobile-grid-view{display:none}
       .m-card{
         background:#fff;
         border:1px solid #e5e7eb;
@@ -683,11 +842,19 @@
   <div id="app-container">
     <header class="hdr">
       <div class="desktop-controls flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-300 to-purple-400 grid place-items-center shadow"><span class="text-white font-black">🌸</span></div>
+        <div class="flex items-center gap-4 flex-1">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 grid place-items-center shadow-lg"><span class="text-white font-black text-xl">📅</span></div>
           <div>
-            <div class="font-extrabold text-slate-900">Rodzina Fedorczak</div>
-            <div class="text-slate-500 text-sm -mt-1">Kalendarz</div>
+            <div class="font-extrabold text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">Kalendarz Rodzinny</div>
+            <div class="text-slate-500 text-xs uppercase tracking-wider">System zarządzania czasem</div>
+          </div>
+          <div class="ml-auto flex items-center gap-2 text-sm text-gray-500">
+            <span class="hidden lg:inline-flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span id="current-time"></span>
+            </span>
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -716,8 +883,8 @@
       <div class="mobile-header md:hidden">
         <div class="mobile-nav">
           <div class="mobile-brand">
-            <div class="logo">🌸</div>
-            <div class="title">Kalendarz</div>
+            <div class="logo">📅</div>
+            <div class="title">Kalendarz Rodzinny</div>
           </div>
           <button id="mobile-menu-btn" class="mobile-menu-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -759,9 +926,24 @@
             <div id="desk" class="grid"></div>
           </div>
         </div>
+        <!-- Mobile grid view -->
+        <div id="mobile-grid-view" class="mobile-grid-view md:hidden">
+          <div class="mobile-grid">
+            <div class="mobile-grid-wrapper">
+              <div id="mobile-grid-content" class="mobile-grid-table"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile cards view -->
         <div id="mob" class="mcal md:hidden"></div>
       </div>
     </main>
+    
+    <!-- View toggle for mobile -->
+    <div class="view-toggle">
+      <button id="grid-view-btn" class="active">Siatka</button>
+      <button id="card-view-btn">Karty</button>
+    </div>
     
     <button id="fab" aria-label="Pokaż podsumowanie">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -895,7 +1077,12 @@
       clearMonthBtnMobile:el('clearMonthBtnMobile'),
       exportIcsBtnMobile:el('exportIcsBtnMobile'),
       importBtnText:el('importBtnText'),
-      importStatus:el('importStatus')
+      importStatus:el('importStatus'),
+      mobileGridView:el('mobile-grid-view'),
+      mobileGridContent:el('mobile-grid-content'),
+      gridViewBtn:el('grid-view-btn'),
+      cardViewBtn:el('card-view-btn'),
+      currentTime:el('current-time')
     };
     
     window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
@@ -976,6 +1163,64 @@
       }
     };
     
+    const renderMobileGrid=(y,m,ev)=>{
+      E.mobileGridContent.innerHTML='';
+      const days=new Date(y,m+1,0).getDate();
+      const today=new Date();
+      
+      // Headers - skrócone dla mobile
+      const headers = ['', 'Ania', 'A.Praca', 'Michał', 'M.Praca', 'Niania', 'Inne'];
+      headers.forEach(h => {
+        const header = document.createElement('div');
+        header.className = 'mobile-grid-cell mobile-grid-header';
+        header.textContent = h;
+        E.mobileGridContent.appendChild(header);
+      });
+      
+      // Days
+      let todayElement = null;
+      for(let d=1; d<=days; d++){
+        const date=new Date(y,m,d);
+        const dow=date.getDay();
+        const isToday=today.toDateString()===date.toDateString();
+        const de=ev[d]||{};
+        const off=(dow===0||dow===6)||de.isHoliday;
+        
+        // Day cell
+        const dayCell = document.createElement('div');
+        dayCell.className = `mobile-grid-cell mobile-grid-day ${off?'weekend':''} ${isToday?'today':''}`;
+        dayCell.innerHTML = `<div class="day-num">${d}</div><div style="font-size:0.5rem">${dShort[getDayIdx(dow)]}</div>`;
+        dayCell.dataset.day=d;
+        dayCell.addEventListener('click', ()=>toggleHoliday(d));
+        E.mobileGridContent.appendChild(dayCell);
+        if(isToday) todayElement = dayCell;
+        
+        // Field cells
+        for(const f of fields){
+          const t=getEntryText(d,f);
+          const cell=document.createElement('div');
+          cell.className=`mobile-grid-cell ${getFieldClass(f)}`;
+          const content=document.createElement('div');
+          content.className=`mobile-grid-content ${getTileClass(t)}`;
+          content.dataset.day=d;
+          content.dataset.field=f;
+          // Skracamy tekst dla mobile
+          const shortText = t.length > 12 ? t.substring(0,10) + '...' : t;
+          content.textContent=shortText;
+          content.title=t; // Pełny tekst w tooltip
+          cell.appendChild(content);
+          E.mobileGridContent.appendChild(cell);
+        }
+      }
+      
+      // Automatyczne przewinięcie do dzisiejszego dnia
+      if(todayElement && isMobile) {
+        setTimeout(() => {
+          todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    };
+    
     const renderMobile=(y,m,ev)=>{
       E.mob.innerHTML=''; 
       const days=new Date(y,m+1,0).getDate(); 
@@ -1019,13 +1264,15 @@
             else if (isJB(text)) target.jb += hours;
         };
 
+        // Sprawdzanie bonusu za zastępcę ordynatora (4000 zł)
         let hasZastepcaBonus = false;
         for (let d = 1; d <= days; d++) {
             const dayData = data[d]; 
             if (!dayData) continue;
 
             const michalPracaText = getEntryText(d, 'michalPraca');
-            if (/zastępca|zastepca|ordynator/i.test(michalPracaText)) {
+            // Szukamy wzmianki o zastępcy lub ordynatorze
+            if (/zastępca|zastepca|ordynator|z-ca\s+ordynatora|zca\s+ordynatora/i.test(michalPracaText)) {
                 hasZastepcaBonus = true;
             }
 
@@ -1059,8 +1306,17 @@
         sums.earnings += sums.jednodniowki * endoRates.one_day;
         sums.earnings += sums.kwalifikacje * endoRates.qual;
         sums.earnings += sums.komercja * komercjaRate;
+        
+        // BONUS: 4000 zł za zastępcę ordynatora
         if(hasZastepcaBonus) {
             sums.earnings += ZASTEPCA_ORDYNATORA_BONUS;
+            // Dodajemy wskaźnik w podsumowaniu, że bonus został naliczony
+            if(E.sumEarnings) {
+                E.sumEarnings.title = 'Zawiera bonus 4000 zł za zastępcę ordynatora';
+            }
+            if(E.msEarnings) {
+                E.msEarnings.title = 'Zawiera bonus 4000 zł za zastępcę ordynatora';
+            }
         }
 
         const totalPorts = sums.portsInstall + sums.portsRemove;
@@ -1209,14 +1465,41 @@
     E.menuClose.onclick=()=>E.mobileMenu.classList.remove('open');
     E.mobileMenu.addEventListener('click',e=>{if(e.target===E.mobileMenu) E.mobileMenu.classList.remove('open');});
 
-    // Context menu
+    // Context menu with smart positioning
     document.addEventListener('contextmenu', e=>{ 
-      const fld=e.target.closest('.fld,.m-content'); 
+      const fld=e.target.closest('.fld,.m-content,.mobile-grid-content'); 
       if(!fld)return; 
       e.preventDefault(); 
-      E.ctx.style.display='block'; 
-      E.ctx.style.left=e.clientX+'px'; 
-      E.ctx.style.top=e.clientY+'px'; 
+      E.ctx.style.display='block';
+      
+      // Smart positioning - show above cursor for days 25+
+      const day = parseInt(fld.dataset.day);
+      const menuHeight = 180; // approximate height of context menu
+      
+      if(day >= 25 && e.clientY > window.innerHeight - menuHeight - 50) {
+        // Show above cursor
+        E.ctx.style.left = e.clientX + 'px';
+        E.ctx.style.top = (e.clientY - menuHeight) + 'px';
+      } else {
+        // Normal positioning
+        E.ctx.style.left = e.clientX + 'px';
+        E.ctx.style.top = e.clientY + 'px';
+      }
+      
+      // Keep menu within viewport
+      setTimeout(() => {
+        const rect = E.ctx.getBoundingClientRect();
+        if(rect.right > window.innerWidth) {
+          E.ctx.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        }
+        if(rect.bottom > window.innerHeight) {
+          E.ctx.style.top = (e.clientY - rect.height) + 'px';
+        }
+        if(rect.top < 0) {
+          E.ctx.style.top = '10px';
+        }
+      }, 0);
+      
       E.ctx.dataset.day=fld.dataset.day; 
       E.ctx.dataset.field=fld.dataset.field; 
     });
@@ -1232,7 +1515,33 @@
     };
     E.desk.addEventListener('click', launchEdit);
     E.mob.addEventListener('click', launchEdit);
+    E.mobileGridView.addEventListener('click', launchEdit);
     E.desk.addEventListener('click', e => { const dayCell = e.target.closest('.day-cell'); if (dayCell) toggleHoliday(dayCell.dataset.day); });
+    
+    // View toggle buttons
+    if(E.gridViewBtn && E.cardViewBtn) {
+      E.gridViewBtn.onclick = () => {
+        document.body.classList.remove('card-view');
+        E.gridViewBtn.classList.add('active');
+        E.cardViewBtn.classList.remove('active');
+      };
+      
+      E.cardViewBtn.onclick = () => {
+        document.body.classList.add('card-view');
+        E.cardViewBtn.classList.add('active');
+        E.gridViewBtn.classList.remove('active');
+      };
+    }
+    
+    // Clock in header
+    function updateClock() {
+      if(E.currentTime) {
+        const now = new Date();
+        E.currentTime.textContent = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
     
     async function toggleHoliday(day){ 
       const ref=doc(db,calId(),String(day)); 
@@ -1254,7 +1563,12 @@
         unsub=onSnapshot(collection(db,calId()),s=>{ 
           data={};
           s.forEach(doc => data[doc.id] = doc.data());
-          isMobile?renderMobile(cur.getFullYear(),cur.getMonth(),data):renderDesktop(cur.getFullYear(),cur.getMonth(),data); 
+          if(isMobile) {
+            renderMobileGrid(cur.getFullYear(),cur.getMonth(),data);
+            renderMobile(cur.getFullYear(),cur.getMonth(),data);
+          } else {
+            renderDesktop(cur.getFullYear(),cur.getMonth(),data);
+          }
           computeSumsAndEarnings(); 
         });
     }
