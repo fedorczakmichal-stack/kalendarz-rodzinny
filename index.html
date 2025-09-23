@@ -891,7 +891,11 @@
         const fallbackError = 'Błąd podczas odświeżania danych z OneDrive';
         const message = typeof error?.message === 'string' && error.message.trim() ? error.message.trim() : fallbackError;
         let normalizedMessage = message.replace(/^✅|^❌|^⚠️|^⏳/, '').trim();
-        if (/failed to fetch/i.test(normalizedMessage) || /networkerror/i.test(normalizedMessage)) {
+        if (
+          /failed to fetch/i.test(normalizedMessage) ||
+          /networkerror/i.test(normalizedMessage) ||
+          /load failed/i.test(normalizedMessage)
+        ) {
           normalizedMessage = 'Nie udało się połączyć z serwerem synchronizacji OneDrive';
         }
         setSyncStatusMessage(`❌ ${normalizedMessage || fallbackError}`, 'error');
