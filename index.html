@@ -1,12 +1,4 @@
-/* Adjusted background colors for mobile grid */
-    @media (max-width: 768px) {
-      .mobile-grid-cell.c-ania { background: rgba(240, 255, 244, 0.5); }
-      .mobile-grid-cell.c-aniaP { background: rgba(255, 241, 242, 0.5); }
-      .mobile-grid-cell.c-michal { background: rgba(240, 249, 255, 0.5); }
-      .mobile-grid-cell.c-michalP { background: rgba(245, 243, 255, 0.5); }
-      .mobile-grid-cell.c-wsp { background: rgba(255, 251, 235, 0.5); }
-      .mobile-grid-cell.c-inne { background: rgba(241, 245, 249, 0.5); }
-    }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
@@ -67,6 +59,13 @@
     }
     
     @media (max-width: 768px) {
+      /* Adjusted background colors for mobile grid */
+      .mobile-grid-cell.c-ania { background: rgba(240, 255, 244, 0.5); }
+      .mobile-grid-cell.c-aniaP { background: rgba(255, 241, 242, 0.5); }
+      .mobile-grid-cell.c-michal { background: rgba(240, 249, 255, 0.5); }
+      .mobile-grid-cell.c-michalP { background: rgba(245, 243, 255, 0.5); }
+      .mobile-grid-cell.c-wsp { background: rgba(255, 251, 235, 0.5); }
+      .mobile-grid-cell.c-inne { background: rgba(241, 245, 249, 0.5); }
       .hdr {
         padding: .5rem;
         padding-top: calc(.5rem + var(--safe-top));
@@ -863,7 +862,6 @@
           <button id="next" class="p-2 rounded-lg hover:bg-gray-100" title="Następny miesiąc">▶</button>
           <button id="today" class="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Dziś</button>
           
-          <!-- Uproszczony import Excel -->
           <div class="flex items-center gap-2 ml-4">
             <input type="file" id="xlsxFileInput" accept=".xlsx,.xls" class="hidden">
             <label for="xlsxFileInput" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm transition-all">
@@ -879,7 +877,6 @@
         </div>
       </div>
       
-      <!-- Mobile header -->
       <div class="mobile-header md:hidden">
         <div class="mobile-nav">
           <div class="mobile-brand">
@@ -926,7 +923,6 @@
             <div id="desk" class="grid"></div>
           </div>
         </div>
-        <!-- Mobile grid view -->
         <div id="mobile-grid-view" class="mobile-grid-view md:hidden">
           <div class="mobile-grid">
             <div class="mobile-grid-wrapper">
@@ -934,12 +930,10 @@
             </div>
           </div>
         </div>
-        <!-- Mobile cards view -->
         <div id="mob" class="mcal md:hidden"></div>
       </div>
     </main>
     
-    <!-- View toggle for mobile -->
     <div class="view-toggle">
       <button id="grid-view-btn" class="active">Siatka</button>
       <button id="card-view-btn">Karty</button>
@@ -1002,7 +996,6 @@
       </div>
     </div>
     
-    <!-- Mobile menu -->
     <div id="mobile-menu">
       <div class="menu-panel">
         <div class="menu-header">
