@@ -429,10 +429,11 @@
     const isBrzeziny=t=>/brzeziny/i.test(t||''); 
     const isLask=t=>/łask/i.test(t||''); 
     const isJB=t=>!!(t&&(t.toLowerCase().startsWith('jb')||t.toLowerCase().includes('jb ')));
+    const isJBk=t=>!!(t&&/jbk/i.test(t));
 
     const getFieldClass=(field)=>({aniaPraca:'c-aniaP',michalPraca:'c-michalP',wspolne:'c-wsp'}[field]||`c-${field}`);
     const getTileClass=t=>{ if(!t)return''; const s=t.toLowerCase(); if(jb24.some(k=>s.includes(k)))return'tile-jb24'; if(isLask(s))return'tile-lask'; if(isOrtho(s))return'tile-ortho'; if(isBrzeziny(s))return'tile-brzeziny'; if(s.startsWith('jb'))return'tile-jb'; return''; };
-    const getDefaultHours = (txt) => { if (!txt) return 0; const s = txt.toLowerCase(); if (isOrtho(s) || isBrzeziny(s)) return 10; if (isLask(s)) return 24; if (jb24.some(k => s.includes(k))) return 24; if (/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6; if (isJB(s)) return 6; return 0; };
+    const getDefaultHours = (txt) => { if (!txt) return 0; const s = txt.toLowerCase(); if (isOrtho(s) || isBrzeziny(s)) return 10; if (isLask(s)) return 24; if (jb24.some(k => s.includes(k))) return 24; if (/rano|poranna|7[:\.]30|wybudze/i.test(s)) return 6; if (isJBk(s)) return 6; if (isJB(s)) return 6; return 0; };
     const getEntryProp = (day, field, prop, fallback) => (data[day]?.[field]?.[prop]) ?? fallback;
     const getEntryText = (day, field) => { const entry = data[day]?.[field]; return typeof entry === 'object' ? entry.text || '' : entry || ''; };
 
