@@ -228,10 +228,6 @@
             <div class="text-slate-500 text-xs uppercase tracking-wider">Auto-Sync z OneDrive</div>
           </div>
           <div class="ml-auto flex items-center gap-2 text-sm text-gray-500">
-            <span id="sync-indicator" class="hidden items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span id="sync-text">—</span>
-            </span>
             <span class="hidden lg:inline-flex items-center gap-1">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               <span id="current-time"></span>
@@ -405,7 +401,7 @@
     let autoSyncInterval = null;
     
     const el=id=>document.getElementById(id);
-    const E={ title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'), next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'), desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'), sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'), sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'), sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'), msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'), msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'), msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'), sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'), ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'), ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'), editTitle:el('edit-title'),editSave:el('edit-save'), xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'), exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'), clearMonthBtnMobile:el('clearMonthBtnMobile'), exportIcsBtnMobile:el('exportIcsBtnMobile'), syncStatus:el('syncStatus'), mobileGridView:el('mobile-grid-view'), mobileGridContent:el('mobile-grid-content'), gridViewBtn:el('grid-view-btn'), cardViewBtn:el('card-view-btn'), currentTime:el('current-time'), onedriveBtn:el('onedriveBtn'), onedriveBtnText:el('onedriveBtnText'), onedriveBtnMobile:el('onedriveBtnMobile'), syncIndicator:el('sync-indicator'), syncText:el('sync-text') };
+    const E={ title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'), next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'), desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'), sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'), sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'), sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'), msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'), msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'), msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'), sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'), ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'), ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'), editTitle:el('edit-title'),editSave:el('edit-save'), xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'), exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'), clearMonthBtnMobile:el('clearMonthBtnMobile'), exportIcsBtnMobile:el('exportIcsBtnMobile'), syncStatus:el('syncStatus'), mobileGridView:el('mobile-grid-view'), mobileGridContent:el('mobile-grid-content'), gridViewBtn:el('grid-view-btn'), cardViewBtn:el('card-view-btn'), currentTime:el('current-time'), onedriveBtn:el('onedriveBtn'), onedriveBtnText:el('onedriveBtnText'), onedriveBtnMobile:el('onedriveBtnMobile') };
     
     window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
     
@@ -435,13 +431,6 @@
       E.syncStatus.className = `sync-status ${type}`; 
       E.syncStatus.innerHTML = message; 
       if (type !== 'syncing') setTimeout(() => { E.syncStatus.style.display = 'none'; }, 5000); 
-    }
-
-    function updateSyncIndicator(status, text) {
-      E.syncIndicator.classList.remove('hidden');
-      E.syncIndicator.classList.add('inline-flex');
-      E.syncIndicator.style.color = status === 'success' ? '#14532d' : status === 'error' ? '#7f1d1d' : '#0369a1';
-      E.syncText.textContent = text;
     }
 
     async function connectOneDrive() {
@@ -532,7 +521,6 @@
 
       try {
         showSyncStatus('<span class="spinner"></span> Synchronizacja...', 'syncing');
-        updateSyncIndicator('syncing', 'Synchronizacja...');
         
         const files = await getOnedriveFiles();
         const mNamesToNum = { 
@@ -551,10 +539,11 @@
         };
         
         let syncedFiles = 0;
+        let syncedMonths = [];
         
+        // Synchronizuj WSZYSTKIE pliki znalezione w folderze
         for (const file of files) {
           const monthNamesPattern = Object.keys(mNamesToNum).join('|');
-          // Rozpoznaje: "plan pracy styczeń 2025" lub po prostu "styczeń 2025"
           const dateRegex = new RegExp(`(?:plan\\s+pracy\\s+)?(${monthNamesPattern})\\s+(\\d{4})`, 'i');
           const match = file.name.match(dateRegex);
           
@@ -567,25 +556,23 @@
             const fileData = await downloadFile(file.id);
             await processExcelData(fileData, file.name, targetYear, targetMonth);
             syncedFiles++;
+            syncedMonths.push(`${mNames[targetMonth]} ${targetYear}`);
           }
         }
         
         if (syncedFiles === 0) {
-          showSyncStatus('⚠️ Nie znaleziono plików "plan pracy miesiąc rok"', 'error');
-          updateSyncIndicator('error', 'Brak plików');
+          showSyncStatus('⚠️ Nie znaleziono plików w folderze "plany pracy"', 'error');
           return;
         }
         
         const lastSync = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-        showSyncStatus(`✓ Zsynchronizowano ${syncedFiles} plików`, 'success');
-        updateSyncIndicator('success', `Ostatnia sync: ${lastSync}`);
+        showSyncStatus(`✓ Zsynchronizowano ${syncedFiles} ${syncedFiles === 1 ? 'plik' : syncedFiles < 5 ? 'pliki' : 'plików'}: ${syncedMonths.join(', ')}`, 'success');
         
         await update();
         
       } catch (error) {
         console.error('Błąd synchronizacji:', error);
         showSyncStatus(`✕ Błąd: ${error.message}`, 'error');
-        updateSyncIndicator('error', 'Błąd synchronizacji');
       }
     }
 
