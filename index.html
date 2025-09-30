@@ -600,7 +600,6 @@
         }
       };
       
-      const batch = writeBatch(db);
       const processedDays = new Set();
       const fieldMappings = {
         aniaPraca: ['Ania praca'],
@@ -612,6 +611,16 @@
       };
       
       const calendarId = `${targetYear}-${targetMonth + 1}`;
+      
+      // Najpierw wyczyść cały miesiąc
+      console.log(`Czyszczenie ${mNames[targetMonth]} ${targetYear}...`);
+      const existingDocs = await getDocs(collection(db, calendarId));
+      const deleteBatch = writeBatch(db);
+      existingDocs.docs.forEach(d => deleteBatch.delete(d.ref));
+      await deleteBatch.commit();
+      
+      // Teraz dodaj nowe dane
+      const batch = writeBatch(db);
       
       for (const row of jsonData) {
         let day = 0;
@@ -640,7 +649,7 @@
         }
         
         if (hasData) {
-          batch.set(doc(db, calendarId, String(day)), dayData, { merge: true });
+          batch.set(doc(db, calendarId, String(day)), dayData);
           processedDays.add(day);
         }
       }
