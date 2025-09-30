@@ -524,22 +524,21 @@
         
         const files = await getOnedriveFiles();
         const mNamesToNum = { 
-          'styczeń': 0, 'stycznia': 0, 'sty': 0, 
+          'styczeń': 0, 'styczen': 0, 'stycznia': 0, 'sty': 0, 
           'luty': 1, 'lutego': 1, 'lut': 1, 
           'marzec': 2, 'marca': 2, 'mar': 2, 
-          'kwiecień': 3, 'kwietnia': 3, 'kwi': 3, 
+          'kwiecień': 3, 'kwiecien': 3, 'kwietnia': 3, 'kwi': 3, 
           'maj': 4, 'maja': 4, 
           'czerwiec': 5, 'czerwca': 5, 'cze': 5, 
           'lipiec': 6, 'lipca': 6, 'lip': 6, 
-          'sierpień': 7, 'sierpnia': 7, 'sie': 7, 
-          'wrzesień': 8, 'września': 8, 'wrz': 8, 
-          'październik': 9, 'października': 9, 'paź': 9, 
+          'sierpień': 7, 'sierpien': 7, 'sierpnia': 7, 'sie': 7, 
+          'wrzesień': 8, 'wrzesien': 8, 'września': 8, 'wrz': 8, 
+          'październik': 9, 'pazdziernik': 9, 'października': 9, 'paź': 9, 'paz': 9,
           'listopad': 10, 'listopada': 10, 'lis': 10, 
-          'grudzień': 11, 'grudnia': 11, 'gru': 11 
+          'grudzień': 11, 'grudzien': 11, 'grudnia': 11, 'gru': 11 
         };
         
         let syncedFiles = 0;
-        let syncedMonths = [];
         
         // Synchronizuj WSZYSTKIE pliki znalezione w folderze
         for (const file of files) {
@@ -551,28 +550,26 @@
             const targetMonth = mNamesToNum[match[1].toLowerCase()];
             const targetYear = parseInt(match[2], 10);
             
-            console.log(`📥 Synchronizacja: ${file.name} → ${mNames[targetMonth]} ${targetYear}`);
+            console.log(`Synchronizacja: ${file.name} -> ${mNames[targetMonth]} ${targetYear}`);
             
             const fileData = await downloadFile(file.id);
             await processExcelData(fileData, file.name, targetYear, targetMonth);
             syncedFiles++;
-            syncedMonths.push(`${mNames[targetMonth]} ${targetYear}`);
           }
         }
         
         if (syncedFiles === 0) {
-          showSyncStatus('⚠️ Nie znaleziono plików w folderze "plany pracy"', 'error');
+          showSyncStatus('⚠️ Brak plików do synchronizacji', 'error');
           return;
         }
         
-        const lastSync = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-        showSyncStatus(`✓ Zsynchronizowano ${syncedFiles} ${syncedFiles === 1 ? 'plik' : syncedFiles < 5 ? 'pliki' : 'plików'}: ${syncedMonths.join(', ')}`, 'success');
+        showSyncStatus(`✓ Zsynchronizowano ${syncedFiles} ${syncedFiles === 1 ? 'miesiąc' : syncedFiles < 5 ? 'miesiące' : 'miesięcy'}`, 'success');
         
         await update();
         
       } catch (error) {
         console.error('Błąd synchronizacji:', error);
-        showSyncStatus(`✕ Błąd: ${error.message}`, 'error');
+        showSyncStatus(`✕ ${error.message}`, 'error');
       }
     }
 
