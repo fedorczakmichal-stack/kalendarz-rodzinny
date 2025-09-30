@@ -195,6 +195,15 @@
     .sync-status.error { background: #fef2f2; border-color: #fca5a5; color: #7f1d1d; }
     .sync-status.syncing { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
     
+    #toast { position: fixed; top: 5rem; right: 1rem; z-index: 2000; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-weight: 600; font-size: 0.95rem; display: none; transition: opacity 0.5s ease-out; }
+    #toast.show { display: block; animation: slideInRight 0.3s ease-out; }
+    #toast.fade { opacity: 0; }
+    #toast.success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+    #toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+    #toast.syncing { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+    @keyframes slideInRight { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @media (max-width: 768px) { #toast { top: auto; bottom: calc(80px + var(--safe-bottom)); left: 1rem; right: 1rem; text-align: center; } }
+    
     .form-group { margin-bottom: 1rem; }
     .form-label { display: block; font-weight: 600; color: #374151; margin-bottom: .35rem; font-size: .85rem; }
     .form-input { width: 100%; padding: .75rem; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 16px; transition: all .2s; }
@@ -244,7 +253,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M16.95 8.89c-.21-3.85-3.44-6.89-7.35-6.89-2.54 0-4.79 1.31-6.12 3.3C1.53 5.6 0 7.56 0 9.89c0 2.75 2.25 5 5 5h11.5c2.49 0 4.5-2.01 4.5-4.5 0-2.32-1.75-4.23-4.05-4.5z"/></svg>
                 <span id="onedriveBtnText">Połącz OneDrive</span>
             </button>
-            <div id="syncStatus" style="display:none"></div>
             <input type="file" id="xlsxFileInput" accept=".xlsx,.xls" class="hidden">
             <label for="xlsxFileInput" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
@@ -367,6 +375,8 @@
       </div>
     </div>
   </div>
+  
+  <div id="toast"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -401,7 +411,7 @@
     let autoSyncInterval = null;
     
     const el=id=>document.getElementById(id);
-    const E={ title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'), next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'), desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'), sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'), sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'), sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'), msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'), msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'), msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'), sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'), ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'), ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'), editTitle:el('edit-title'),editSave:el('edit-save'), xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'), exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'), clearMonthBtnMobile:el('clearMonthBtnMobile'), exportIcsBtnMobile:el('exportIcsBtnMobile'), syncStatus:el('syncStatus'), mobileGridView:el('mobile-grid-view'), mobileGridContent:el('mobile-grid-content'), gridViewBtn:el('grid-view-btn'), cardViewBtn:el('card-view-btn'), currentTime:el('current-time'), onedriveBtn:el('onedriveBtn'), onedriveBtnText:el('onedriveBtnText'), onedriveBtnMobile:el('onedriveBtnMobile') };
+    const E={ title:el('title'),titleMobile:el('title-mobile'),prev:el('prev'),prevMobile:el('prev-mobile'), next:el('next'),nextMobile:el('next-mobile'),today:el('today'),todayMobile:el('today-mobile'), desk:el('desk'),mob:el('mob'),sumOrtho:el('sum-ortho'),sumBrz:el('sum-brzeziny'), sumLask:el('sum-lask'),sumJB:el('sum-jb'),sumPorts:el('sum-ports'), sumJednodniowki:el('sum-jednodniowki'),sumKwalifikacje:el('sum-kwalifikacje'), sumKomercja:el('sum-komercja'),sumEarnings:el('sum-earnings'),sumTotalHours:el('sum-total-hours'), msOrtho:el('ms-ortho'),msBrz:el('ms-brzeziny'),msLask:el('ms-lask'),msJB:el('ms-jb'), msPorts:el('ms-ports'),msJednodniowki:el('ms-jednodniowki'),msKwalifikacje:el('ms-kwalifikacje'), msKomercja:el('ms-komercja'),msEarnings:el('ms-earnings'),msTotalHours:el('ms-total-hours'), sheet:el('sheet'),sheetClose:el('sheet-close'),fab:el('fab'),sheetTitle:el('sheet-title'), ctx:el('ctx'),ctxCopy:el('ctx-copy'),ctxCut:el('ctx-cut'),ctxPaste:el('ctx-paste'), ctxDel:el('ctx-del'),edit:el('edit'),editClose:el('edit-close'),editContent:el('edit-content'), editTitle:el('edit-title'),editSave:el('edit-save'), xlsxFileInput:el('xlsxFileInput'), clearMonthBtn:el('clearMonthBtn'), exportIcsBtn:el('exportIcsBtn'),mobileMenu:el('mobile-menu'),mobileMenuBtn:el('mobile-menu-btn'), menuClose:el('menu-close'), xlsxFileInputMobile:el('xlsxFileInputMobile'), clearMonthBtnMobile:el('clearMonthBtnMobile'), exportIcsBtnMobile:el('exportIcsBtnMobile'), mobileGridView:el('mobile-grid-view'), mobileGridContent:el('mobile-grid-content'), gridViewBtn:el('grid-view-btn'), cardViewBtn:el('card-view-btn'), currentTime:el('current-time'), onedriveBtn:el('onedriveBtn'), onedriveBtnText:el('onedriveBtnText'), onedriveBtnMobile:el('onedriveBtnMobile'), toast:el('toast') };
     
     window.addEventListener('resize',()=>{const was=isMobile;isMobile=matchMedia("(max-width: 768px)").matches;if(was!==isMobile)update();});
     
@@ -427,10 +437,17 @@
     const getEntryText = (day, field) => { const entry = data[day]?.[field]; return typeof entry === 'object' ? entry.text || '' : entry || ''; };
 
     function showSyncStatus(message, type = 'info') { 
-      E.syncStatus.style.display = 'inline-flex'; 
-      E.syncStatus.className = `sync-status ${type}`; 
-      E.syncStatus.innerHTML = message; 
-      if (type !== 'syncing') setTimeout(() => { E.syncStatus.style.display = 'none'; }, 5000); 
+      E.toast.innerHTML = message;
+      E.toast.className = `show ${type}`;
+      
+      if (type !== 'syncing') {
+        setTimeout(() => {
+          E.toast.classList.add('fade');
+          setTimeout(() => {
+            E.toast.classList.remove('show', 'fade', type);
+          }, 500);
+        }, 3000);
+      }
     }
 
     async function connectOneDrive() {
@@ -520,7 +537,7 @@
       }
 
       try {
-        showSyncStatus('<span class="spinner"></span> Synchronizacja...', 'syncing');
+        showSyncStatus('⏳ Synchronizacja w toku...', 'syncing');
         
         const files = await getOnedriveFiles();
         const mNamesToNum = { 
