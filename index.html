@@ -392,7 +392,7 @@
     // Twój Client ID z Azure Portal
     const ONEDRIVE_CLIENT_ID = 'b128c542-2b84-466f-a1e1-8c10862821e5';
     const ONEDRIVE_REDIRECT_URI = 'https://rodzinnykalendarz.netlify.app/';
-    const SYNC_INTERVAL = 1800000; // 30 minut
+    const SYNC_INTERVAL = 300000; // 5 minut (300000 ms) - zmień na 60000 dla 1 minuty
     
     let cur = new Date(); 
     let unsub=()=>{}; 
@@ -493,7 +493,8 @@
     async function getOnedriveFiles() {
       if (!onedriveToken) throw new Error('Brak tokenu OneDrive');
       
-      const response = await fetch('https://graph.microsoft.com/v1.0/me/drive/root/children', {
+      // Szukaj w folderze "plany pracy"
+      const response = await fetch('https://graph.microsoft.com/v1.0/me/drive/root:/plany pracy:/children', {
         headers: { 'Authorization': `Bearer ${onedriveToken}` }
       });
       
@@ -503,6 +504,9 @@
           localStorage.removeItem('onedrive_token');
           updateOneDriveUI(false);
           throw new Error('Token wygasł - zaloguj się ponownie');
+        }
+        if (response.status === 404) {
+          throw new Error('Nie znaleziono folderu "plany pracy" w OneDrive');
         }
         throw new Error('Błąd pobierania plików z OneDrive');
       }
