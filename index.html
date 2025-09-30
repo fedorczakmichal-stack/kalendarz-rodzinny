@@ -791,50 +791,107 @@
     
     function exportToICS() { 
       const year = cur.getFullYear(), month = cur.getMonth(); 
-      const formatICSDate = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}${String(d.getSeconds()).padStart(2,'0')}`; 
-      const parseStartTime = text => { 
-        const match = text?.match(/\bod\s+(\d{1,2})[:.]?(\d{2})?/i); 
-        return match ? { hour: parseInt(match[1],10), minute: match[2] ? parseInt(match[2],10) : 0 } : { hour: 8, minute: 0 }; 
-      }; 
+      const formatICSDate = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}00`; 
       
-      let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Kalendarz Rodzinny//PL\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n'; 
+      let icsContent = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Kalendarz Rodzinny//PL\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n'; 
       const days = new Date(year, month+1, 0).getDate(); 
       
       for(let d=1; d<=days; d++){ 
         const dayData = data[d]; 
         if(!dayData) continue; 
         
-        for(const field of fields){ 
-          const entry = dayData[field]; 
-          if(!entry) continue; 
-          const text = typeof entry === 'object' ? entry.text : entry; 
-          if(!text) continue; 
+        // Tylko Michał i Michał Praca
+        const michalEntry = dayData['michal'];
+        const michalPracaEntry = dayData['michalPraca'];
+        
+        // Zbierz wszystkie wpisy Michała z tego dnia
+        const allEntries = [];
+        
+        if(michalEntry) {
+          const text = typeof michalEntry === 'object' ? michalEntry.text : michalEntry;
+          if(text) allEntries.push({text, entry: michalEntry, field: 'michal'});
+        }
+        
+        if(michalPracaEntry) {
+          const text = typeof michalPracaEntry === 'object' ? michalPracaEntry.text : michalPracaEntry;
+          if(text) allEntries.push({text, entry: michalPracaEntry, field: 'michalPraca'});
+        }
+        
+        if(allEntries.length === 0) continue;
+        
+        let currentStartHour = 8;
+        
+        for(const {text, entry, field} of allEntries) {
+          // Sprawdź czy jest dzień dzielony (/)
+          const parts = text.split('/').map(t => t.trim());
           
-          const startTime = parseStartTime(text); 
-          const start = new Date(year, month, d, startTime.hour, startTime.minute); 
-          const end = new Date(start.getTime() + 3600000); 
-          const uid = `${year}${month}${d}${field}@kalendarz-rodzinny`; 
-          
-          icsContent += `BEGIN:VEVENT\n`; 
-          icsContent += `UID:${uid}\n`; 
-          icsContent += `DTSTAMP:${formatICSDate(new Date())}\n`; 
-          icsContent += `DTSTART:${formatICSDate(start)}\n`; 
-          icsContent += `DTEND:${formatICSDate(end)}\n`; 
-          icsContent += `SUMMARY:${labels[field]}: ${text.replace(/\n/g, ' ')}\n`; 
-          icsContent += `DESCRIPTION:${text.replace(/\n/g, '\\n')}\n`; 
-          icsContent += `STATUS:CONFIRMED\n`; 
-          icsContent += `END:VEVENT\n`; 
+          if(parts.length > 1 && typeof entry === 'object') {
+            // Dzień dzielony
+            for(let i = 0; i < parts.length; i++) {
+              const partText = parts[i];
+              if(!partText) continue;
+              
+              const hours = i === 0 ? (entry.h1 || getDefaultHours(partText)) : (entry.h2 || getDefaultHours(partText));
+              if(!hours) continue;
+              
+              const start = new Date(year, month, d, currentStartHour, 0);
+              const end = new Date(start.getTime() + hours * 3600000);
+              
+              icsContent += `BEGIN:VEVENT\r\n`; 
+              icsContent += `UID:${year}${month}${d}${field}${i}@kalendarz\r\n`; 
+              icsContent += `DTSTAMP:${formatICSDate(new Date())}\r\n`; 
+              icsContent += `DTSTART:${formatICSDate(start)}\r\n`; 
+              icsContent += `DTEND:${formatICSDate(end)}\r\n`; 
+              icsContent += `SUMMARY:${partText} (${hours}h)\r\n`; 
+              icsContent += `DESCRIPTION:${partText} - ${hours} godzin\r\n`; 
+              icsContent += `STATUS:CONFIRMED\r\n`; 
+              icsContent += `END:VEVENT\r\n`;
+              
+              currentStartHour = end.getHours();
+              if(end.getMinutes() > 0) currentStartHour++;
+            }
+          } else {
+            // Pojedynczy wpis
+            const hours = typeof entry === 'object' ? (entry.h1 || getDefaultHours(text)) : getDefaultHours(text);
+            if(!hours) continue;
+            
+            const start = new Date(year, month, d, currentStartHour, 0);
+            let end;
+            
+            if(hours >= 24) {
+              end = new Date(year, month, d + 1, currentStartHour, 0);
+            } else {
+              end = new Date(start.getTime() + hours * 3600000);
+            }
+            
+            icsContent += `BEGIN:VEVENT\r\n`; 
+            icsContent += `UID:${year}${month}${d}${field}@kalendarz\r\n`; 
+            icsContent += `DTSTAMP:${formatICSDate(new Date())}\r\n`; 
+            icsContent += `DTSTART:${formatICSDate(start)}\r\n`; 
+            icsContent += `DTEND:${formatICSDate(end)}\r\n`; 
+            icsContent += `SUMMARY:${text} (${hours}h)\r\n`; 
+            icsContent += `DESCRIPTION:${text} - ${hours} godzin\r\n`; 
+            icsContent += `STATUS:CONFIRMED\r\n`; 
+            icsContent += `END:VEVENT\r\n`;
+            
+            currentStartHour = end.getHours();
+            if(end.getMinutes() > 0) currentStartHour++;
+          }
         }
       } 
       
       icsContent += 'END:VCALENDAR'; 
-      const blob = new Blob([icsContent], { type: 'text/calendar' }); 
+      const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' }); 
       const url = URL.createObjectURL(blob); 
       const a = document.createElement('a'); 
       a.href = url; 
-      a.download = `kalendarz-${mNames[month]}-${year}.ics`; 
+      a.download = `michal-${mNames[month]}-${year}.ics`; 
+      document.body.appendChild(a);
       a.click(); 
+      document.body.removeChild(a);
       URL.revokeObjectURL(url); 
+      
+      showSyncStatus(`Wyeksportowano kalendarz Michała`, 'success');
     }
     
     E.exportIcsBtn.onclick = exportToICS; 
