@@ -1852,35 +1852,42 @@
       }
       styleEl.textContent = css;
 
+      console.log('Starting renderDesktop', y, m, days);
       for (let d = 1; d <= days; d++) {
-        const date = new Date(y, m, d);
-        const dow = date.getDay();
-        const isToday = today.toDateString() === date.toDateString();
-        const de = ev[d] || {};
-        const off = (dow === 0 || dow === 6) || de.isHoliday;
-        const dayCell = document.createElement('div');
-        dayCell.className = `cell day-cell ${off ? 'off' : ''} ${isToday ? 'today' : ''} flex items-center justify-center`;
-        dayCell.dataset.day = d;
-        dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;
-        E.desk.appendChild(dayCell);
-        for (const f of fields) {
-          const t = getEntryText(d, f);
-          const c = document.createElement('div');
-          c.className = `cell ${off ? 'off' : ''} ${getFieldClass(f)}`;
-          const div = document.createElement('div');
-          try {
-            div.className = `fld ${getTileClass(t)}`;
-          } catch (e) { console.error('Error getting tile class', e); div.className = 'fld'; }
-          div.dataset.day = d;
-          div.dataset.field = f;
-          const span = document.createElement('span');
-          span.className = 'txt';
-          span.textContent = t;
-          div.appendChild(span);
-          c.appendChild(div);
-          E.desk.appendChild(c);
+        try {
+          // console.log('Rendering day', d);
+          const date = new Date(y, m, d);
+          const dow = date.getDay();
+          const isToday = today.toDateString() === date.toDateString();
+          const de = ev[d] || {};
+          const off = (dow === 0 || dow === 6) || de.isHoliday;
+          const dayCell = document.createElement('div');
+          dayCell.className = `cell day-cell ${off ? 'off' : ''} ${isToday ? 'today' : ''} flex items-center justify-center`;
+          dayCell.dataset.day = d;
+          dayCell.innerHTML = `<div class="text-center"><div class="day-num">${d}</div><div class="day-name">${dShort[getDayIdx(dow)]}</div></div>`;
+          E.desk.appendChild(dayCell);
+          for (const f of fields) {
+            const t = getEntryText(d, f);
+            const c = document.createElement('div');
+            c.className = `cell ${off ? 'off' : ''} ${getFieldClass(f)}`;
+            const div = document.createElement('div');
+            try {
+              div.className = `fld ${getTileClass(t)}`;
+            } catch (e) { console.error('Error getting tile class', e); div.className = 'fld'; }
+            div.dataset.day = d;
+            div.dataset.field = f;
+            const span = document.createElement('span');
+            span.className = 'txt';
+            span.textContent = t;
+            div.appendChild(span);
+            c.appendChild(div);
+            E.desk.appendChild(c);
+          }
+        } catch (err) {
+          console.error('Error rendering day', d, err);
         }
       }
+      console.log('Finished renderDesktop');
     };
     const renderMobileGrid = (y, m, ev) => { E.mobileGridContent.innerHTML = ''; const days = new Date(y, m + 1, 0).getDate(); const today = new Date(); const headers = ['', 'Ania', 'A.Praca', 'Michał', 'M.Praca', 'Niania', 'Inne']; headers.forEach(h => { const header = document.createElement('div'); header.className = 'mobile-grid-cell mobile-grid-header'; header.textContent = h; E.mobileGridContent.appendChild(header); }); let todayElement = null; for (let d = 1; d <= days; d++) { const date = new Date(y, m, d); const dow = date.getDay(); const isToday = today.toDateString() === date.toDateString(); const de = ev[d] || {}; const off = (dow === 0 || dow === 6) || de.isHoliday; const dayCell = document.createElement('div'); dayCell.className = `mobile-grid-cell mobile-grid-day ${off ? 'weekend' : ''} ${isToday ? 'today' : ''}`; dayCell.innerHTML = `<div class="day-num">${d}</div><div style="font-size:0.5rem">${dShort[getDayIdx(dow)]}</div>`; dayCell.dataset.day = d; dayCell.addEventListener('click', () => toggleHoliday(d)); E.mobileGridContent.appendChild(dayCell); if (isToday) todayElement = dayCell; for (const f of fields) { const t = getEntryText(d, f); const cell = document.createElement('div'); cell.className = `mobile-grid-cell ${getFieldClass(f)}`; const content = document.createElement('div'); content.className = `mobile-grid-content ${getTileClass(t)}`; content.dataset.day = d; content.dataset.field = f; const shortText = t.length > 12 ? t.substring(0, 10) + '...' : t; content.textContent = shortText; content.title = t; cell.appendChild(content); E.mobileGridContent.appendChild(cell); } } if (todayElement && isMobile) { setTimeout(() => { todayElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); }, 100); } };
     const renderMobile = (y, m, ev) => { E.mob.innerHTML = ''; const days = new Date(y, m + 1, 0).getDate(); const today = new Date(); const frag = document.createDocumentFragment(); for (let d = 1; d <= days; d++) { const date = new Date(y, m, d); const dow = date.getDay(); const de = ev[d] || {}; const off = (dow === 0 || dow === 6) || de.isHoliday; const isToday = today.toDateString() === date.toDateString(); const card = document.createElement('div'); card.className = `m-card ${off ? 'ring-1 ring-red-200' : ''} ${isToday ? 'ring-2 ring-purple-400' : ''}`; let html = `<div class="m-head"><div><span class="m-num">${d}</span> <span class="m-name">${dNamesFull[getDayIdx(dow)]}</span></div><div class="flex gap-1">${de.isHoliday ? '<span class="tag bg-red-100 text-red-600">Święto</span>' : ''}${isToday ? '<span class="tag bg-gradient-to-r from-purple-500 to-pink-500 text-white">Dziś</span>' : ''}</div></div>`; for (const f of fields) { const t = getEntryText(d, f); html += `<div class="m-row"><div class="m-label ${getFieldClass(f)}">${labels[f]}</div><div class="m-content ${getFieldClass(f)} ${getTileClass(t)}" data-day="${d}" data-field="${f}"><span class="txt">${t || '<span class="placeholder">+ Dodaj</span>'}</span></div></div>`; } card.innerHTML = html; frag.appendChild(card); } E.mob.appendChild(frag); };
