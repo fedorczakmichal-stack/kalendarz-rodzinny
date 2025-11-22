@@ -1698,7 +1698,7 @@
         // Synchronizuj WSZYSTKIE pliki znalezione w folderze
         for (const file of files) {
           const monthNamesPattern = Object.keys(mNamesToNum).join('|');
-          const dateRegex = new RegExp(`(?:plan\\s+pracy\\s+)?(${monthNamesPattern})\\s+(\\d{4})`, 'i');
+          const dateRegex = new RegExp('(' + monthNamesPattern + ')\\s+(\\d{4})', 'i');
           const match = file.name.match(dateRegex);
 
           if (match) {
@@ -1988,7 +1988,7 @@
 
       try {
         const monthNamesPattern = Object.keys(mNamesToNum).join('|');
-        const dateRegex = new RegExp(`(?:plan\\s+pracy\\s+)?(${monthNamesPattern})\\s+(\\d{4})`, 'i');
+        const dateRegex = new RegExp('(' + monthNamesPattern + ')\\s+(\\d{4})', 'i');
         const match = file.name.match(dateRegex);
         let targetMonth = null, targetYear = null;
 
@@ -2153,7 +2153,7 @@
         if (docSnap.exists()) {
           const savedConfig = docSnap.data();
           if (savedConfig.rates) Config.rates = { ...Config.rates, ...savedConfig.rates };
-          if (savedConfig.workplaces) Config.workplaces = savedConfig.workplaces;
+          if (savedConfig.workplaces && Array.isArray(savedConfig.workplaces)) Config.workplaces = savedConfig.workplaces;
           console.log('Settings loaded');
         } else {
           console.log('No settings found, saving defaults');
@@ -2371,6 +2371,7 @@
     };
 
     SettingsModal.init();
+    window.SettingsModal = SettingsModal;
 
     // --- STATISTICS MODAL LOGIC ---
     const StatsModal = {
@@ -2500,6 +2501,7 @@
     };
 
     StatsModal.init();
+    window.StatsModal = StatsModal;
   </script>
 </body>
 
